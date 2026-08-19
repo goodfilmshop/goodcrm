@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">GOOD CRM</title>
+  <defs>
+    <linearGradient id="bg" x1="8" y1="5" x2="57" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#103D94"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="url(#bg)"/>
+  <rect x="17" y="13" width="30" height="38" rx="7" fill="#fff"/>
+  <circle cx="27" cy="25" r="5" fill="#2563EB"/>
+  <path d="M19.5 35c2-5.2 13-5.2 15 0" fill="#2563EB"/>
+  <path d="M37 23h6M37 29h6M22 42h21" stroke="#8CB5F5" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

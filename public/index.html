@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GOOD CRM - ระบบจัดการฐานข้อมูลลูกค้า</title>
+  <meta name="application-name" content="GOOD CRM">
+  <meta name="theme-color" content="#1d4ed8">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="GOOD CRM">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/assets/good-crm-favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/good-crm-icon-180.png" sizes="180x180">
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons CDN -->
@@ -25,6 +34,26 @@
     }
   </script>
   <style>
+    html {
+      background: #f8fbff;
+      overscroll-behavior: none;
+    }
+    body {
+      min-height: 100dvh;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .app-mark {
+      background: linear-gradient(145deg, #2563eb, #123f98);
+      box-shadow: 0 8px 18px rgba(30, 64, 175, 0.24);
+    }
+    .app-mark img {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #installAppButton:not(.hidden) {
+      display: flex;
+    }
     /* Smooth transition for sidebar width and opacity */
     .sidebar-transition {
       transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -751,6 +780,49 @@
 </head>
 <body class="h-full font-sans antialiased text-slate-800 flex overflow-hidden bg-slate-50">
 
+  <section id="authGate" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 px-4 py-8 backdrop-blur-sm" aria-labelledby="authGateTitle">
+    <div class="w-full max-w-md rounded-3xl border border-white/20 bg-white p-7 shadow-2xl shadow-slate-950/40 sm:p-9">
+      <div class="mb-6 flex items-center gap-3">
+        <span class="app-mark flex h-11 w-11 items-center justify-center rounded-2xl overflow-hidden"><img src="/assets/good-crm-icon.svg" width="44" height="44" alt=""></span>
+        <div>
+          <h1 id="authGateTitle" class="text-xl font-bold text-slate-900">เข้าสู่ระบบ GOOD CRM</h1>
+          <p class="text-xs font-medium text-slate-500">สำหรับผู้ใช้ที่ได้รับอนุมัติเท่านั้น</p>
+        </div>
+      </div>
+
+      <p id="authGateMessage" role="status" class="mb-5 rounded-xl border border-blue-100 bg-blue-50 px-3.5 py-3 text-sm leading-5 text-blue-800">กำลังตรวจสอบการเข้าสู่ระบบ…</p>
+
+      <form id="authForm" onsubmit="signIn(event)" class="space-y-4">
+        <label class="block text-sm font-semibold text-slate-700" for="authEmail">อีเมล
+          <input id="authEmail" type="email" autocomplete="email" required class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="name@company.com">
+        </label>
+        <label class="block text-sm font-semibold text-slate-700" for="authPassword">รหัสผ่าน
+          <input id="authPassword" type="password" autocomplete="current-password" required minlength="6" class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="••••••••">
+        </label>
+        <button id="authSubmitButton" type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60">
+          <i class="fa-solid fa-right-to-bracket"></i><span>เข้าสู่ระบบ</span>
+        </button>
+      </form>
+
+      <form id="passwordRecoveryForm" onsubmit="updateRecoveredPassword(event)" class="hidden space-y-4">
+        <label class="block text-sm font-semibold text-slate-700" for="recoveryPassword">รหัสผ่านใหม่
+          <input id="recoveryPassword" type="password" autocomplete="new-password" required minlength="12" class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="อย่างน้อย 12 ตัวอักษร">
+        </label>
+        <label class="block text-sm font-semibold text-slate-700" for="recoveryPasswordConfirmation">ยืนยันรหัสผ่านใหม่
+          <input id="recoveryPasswordConfirmation" type="password" autocomplete="new-password" required minlength="12" class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="กรอกรหัสผ่านอีกครั้ง">
+        </label>
+        <button id="passwordRecoverySubmitButton" type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60">
+          <i class="fa-solid fa-key"></i><span>บันทึกรหัสผ่านใหม่</span>
+        </button>
+      </form>
+
+      <button id="requestPasswordResetButton" type="button" onclick="requestPasswordReset()" class="mt-4 w-full text-center text-sm font-semibold text-blue-600 transition hover:text-blue-700">ลืมรหัสผ่าน?</button>
+
+      <button id="authGateSignOutButton" type="button" onclick="signOut()" class="mt-4 hidden w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">ออกจากระบบ</button>
+      <p class="mt-5 text-center text-xs leading-5 text-slate-400">หากยังไม่มีสิทธิ์ใช้งาน โปรดติดต่อผู้ดูแล GOOD CRM</p>
+    </div>
+  </section>
+
   <!-- Sidebar Backdrop for Mobile Overlay -->
   <div id="sidebarBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 z-30 md:hidden hidden transition-opacity duration-300"></div>
 
@@ -764,9 +836,9 @@
 
     <!-- Brand / Logo -->
     <div class="h-14 flex items-center px-5 border-b border-blue-100 bg-white/70 gap-3 overflow-hidden shrink-0">
-      <!-- Blue Dot/Circle representing Logo -->
-      <div class="w-7 h-7 rounded-full bg-blue-600 shrink-0 flex items-center justify-center shadow-sm">
-        <i class="fa-solid fa-building-office text-white text-[10px]"></i>
+      <!-- Brand app icon -->
+      <div class="app-mark w-8 h-8 rounded-[10px] shrink-0 overflow-hidden">
+        <img src="/assets/good-crm-icon-192.png" width="32" height="32" alt="">
       </div>
       <!-- Brand Text: Hidden when sidebar collapsed -->
       <div id="brandText" class="fade-transition whitespace-nowrap flex-1">
@@ -839,6 +911,16 @@
       </button>
     </nav>
 
+    <button id="installAppButton" type="button" onclick="installApplication()" class="hidden mx-3 mb-3 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-white/80 px-3 py-2.5 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-50 hover:text-blue-800" title="ติดตั้ง GOOD CRM เป็นแอป">
+      <i class="fa-solid fa-download text-sm"></i>
+      <span class="sidebar-label whitespace-nowrap">ติดตั้งแอป</span>
+    </button>
+
+    <button id="authSignOutButton" type="button" onclick="signOut()" class="hidden mx-3 mb-3 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-3 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900" title="ออกจากระบบ">
+      <i class="fa-solid fa-right-from-bracket text-sm"></i>
+      <span class="sidebar-label whitespace-nowrap">ออกจากระบบ</span>
+    </button>
+
     <!-- Footer of Sidebar -->
     <div class="sidebar-footer p-3 border-t overflow-hidden text-center shrink-0">
       <span id="sidebarFooterText" class="text-[10px] text-slate-400 font-light block transition-all">GOOD CRM Database v1.0.0</span>
@@ -854,6 +936,7 @@
         <button onclick="toggleMobileSidebar()" class="text-slate-600 p-2 rounded-lg hover:bg-slate-100 focus:outline-none">
           <i class="fa-solid fa-bars text-lg"></i>
         </button>
+        <span class="app-mark h-8 w-8 overflow-hidden rounded-[10px] shadow-sm"><img src="/assets/good-crm-icon-192.png" width="32" height="32" alt=""></span>
         <span class="font-bold text-blue-900 text-md">GOOD CRM</span>
       </div>
       <!-- Quick user initials badge -->
@@ -1626,10 +1709,10 @@
             <input type="text" id="adminNameConfigSetting" placeholder="คุณเก็ต" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
           </div>
           <div>
-            <label class="block text-slate-600 text-xs font-semibold mb-1.5">Google Apps Script Web App URL <span class="text-red-500">*</span></label>
-            <textarea id="appsScriptUrlSetting" rows="3" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xs font-mono"></textarea>
+            <label class="block text-slate-600 text-xs font-semibold mb-1.5">การเชื่อมต่อข้อมูล</label>
+            <input id="crmApiUrlSetting" type="text" value="Supabase Database ผ่าน GOOD CRM API ที่มีการป้องกัน" readonly class="w-full cursor-not-allowed px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs font-mono text-slate-500">
             <p class="text-[10px] text-slate-400 mt-1.5 leading-relaxed">
-              ใส่ URL เว็บแอปพลิเคชันที่สร้างจาก Google Apps Script เพื่อใช้ดึงและส่งข้อมูลจากสเปรดชีต
+              ข้อมูล CRM ถูกเก็บใน Supabase และเรียกผ่าน API ที่ตรวจสอบสิทธิ์สมาชิกทุกครั้ง
             </p>
           </div>
           
@@ -1647,7 +1730,7 @@
   <!-- Lead Detail Drawer -->
   <div id="leadDetailDrawer" class="fixed inset-0 z-50 hidden">
     <button id="leadDetailDrawerBackdrop" onclick="closeLeadDetailModal()" class="absolute inset-0 w-full h-full bg-slate-900/60 opacity-0 transition-opacity duration-300"></button>
-    <aside id="leadDetailDrawerPanel" class="fixed inset-y-0 right-0 w-full max-w-[640px] bg-white border-l border-slate-200/80 shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+    <aside id="leadDetailDrawerPanel" class="fixed inset-y-0 right-0 w-full max-w-[700px] bg-white border-l border-slate-200/80 shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
       <div id="leadDetailDrawerContent" class="h-full flex flex-col">
         <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
           <h3 id="leadDetailDrawerTitle" class="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -1675,7 +1758,7 @@
   <!-- Case Detail Drawer (slides above the customer detail drawer) -->
   <div id="caseDetailDrawer" class="fixed inset-0 z-[60] hidden" aria-hidden="true">
     <button id="caseDetailDrawerBackdrop" type="button" onclick="closeCaseDetailDrawer()" class="absolute inset-0 h-full w-full bg-slate-900/40 opacity-0 transition-opacity duration-300" aria-label="ปิดรายละเอียดเคส"></button>
-    <aside id="caseDetailDrawerPanel" class="fixed inset-y-0 right-0 flex w-full max-w-[540px] translate-x-full flex-col border-l border-slate-200/80 bg-white shadow-2xl transition-transform duration-300 ease-in-out" role="dialog" aria-modal="true" aria-labelledby="caseDetailDrawerTitle">
+    <aside id="caseDetailDrawerPanel" class="fixed inset-y-0 right-0 flex w-full max-w-[600px] translate-x-full flex-col border-l border-slate-200/80 bg-white shadow-2xl transition-transform duration-300 ease-in-out" role="dialog" aria-modal="true" aria-labelledby="caseDetailDrawerTitle">
       <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
         <div class="min-w-0">
           <h3 id="caseDetailDrawerTitle" class="flex items-center gap-2 text-lg font-bold text-slate-800"><i class="fa-solid fa-clipboard-list text-blue-600"></i><span>รายละเอียดเคส</span></h3>
@@ -1737,14 +1820,15 @@
     </div>
   </div>
 
+  <script src="/vendor/supabase/supabase.js"></script>
   <script>
     // State Variables
     let config = {
       adminName: "คุณเก็ต",
-      appsScriptUrl: "https://script.google.com/macros/s/AKfycbzJUk_Gtt_HygGSVz_qD_iKnFe8CzxaaZtQ6cwE22Pfp4B6VrdjfsFWqJcw9CkAzXTweg/exec"
+      crmApiUrl: `${window.location.origin}/api/crm`
     };
-    const requiredAppsScriptVersion = '2026-08-19-case-details-v19';
-    const requiredCaseDetailApiVersion = '2026-08-19-case-details-v19';
+    const requiredCrmApiVersion = '2026-08-19-supabase-v1';
+    const requiredCaseDetailApiVersion = '2026-08-19-supabase-v1';
     const LEADS_PAGE_SIZE = 50;
     const LEAD_CACHE_TTL_MS = 30 * 1000;
     let allLeads = []; // The currently displayed page of lead summaries.
@@ -1769,29 +1853,333 @@
     let customerEditRequestId = 0;
     let activeCaseDetail = null;
     let activeDetailSource = null;
+    let deferredInstallPrompt = null;
+    let supabaseClient = null;
+    let currentCrmMember = null;
+    let hasStartedCrm = false;
+    let isPasswordRecovery = false;
+
+    function setAuthGateMessage(message, type = 'info') {
+      const messageElement = document.getElementById('authGateMessage');
+      messageElement.textContent = message;
+      messageElement.className = 'mb-5 rounded-xl border px-3.5 py-3 text-sm leading-5';
+      if (type === 'error') {
+        messageElement.classList.add('border-rose-100', 'bg-rose-50', 'text-rose-800');
+      } else if (type === 'success') {
+        messageElement.classList.add('border-emerald-100', 'bg-emerald-50', 'text-emerald-800');
+      } else {
+        messageElement.classList.add('border-blue-100', 'bg-blue-50', 'text-blue-800');
+      }
+    }
+
+    function showAuthGate(message, type = 'info', allowSignOut = false) {
+      document.getElementById('authGate').classList.remove('hidden');
+      document.getElementById('authGateSignOutButton').classList.toggle('hidden', !allowSignOut);
+      document.getElementById('authSignOutButton').classList.add('hidden');
+      if (message) setAuthGateMessage(message, type);
+    }
+
+    function hideAuthGate() {
+      document.getElementById('authGate').classList.add('hidden');
+      document.getElementById('authSignOutButton').classList.remove('hidden');
+    }
+
+    function setAuthSubmitLoading(isLoading) {
+      const button = document.getElementById('authSubmitButton');
+      button.disabled = isLoading || !supabaseClient;
+      button.innerHTML = isLoading
+        ? '<i class="fa-solid fa-spinner fa-spin"></i><span>กำลังเข้าสู่ระบบ…</span>'
+        : '<i class="fa-solid fa-right-to-bracket"></i><span>เข้าสู่ระบบ</span>';
+    }
+
+    function setAuthMode(mode = 'sign-in') {
+      const isRecovery = mode === 'recovery';
+      document.getElementById('authForm').classList.toggle('hidden', isRecovery);
+      document.getElementById('passwordRecoveryForm').classList.toggle('hidden', !isRecovery);
+      document.getElementById('requestPasswordResetButton').classList.toggle('hidden', isRecovery);
+      document.getElementById('authGateTitle').textContent = isRecovery ? 'ตั้งรหัสผ่านใหม่' : 'เข้าสู่ระบบ GOOD CRM';
+      document.querySelector('#authGateTitle + p').textContent = isRecovery
+        ? 'กำหนดรหัสผ่านใหม่เพื่อกลับมาใช้งาน'
+        : 'สำหรับผู้ใช้ที่ได้รับอนุมัติเท่านั้น';
+    }
+
+    function setPasswordRecoveryLoading(isLoading) {
+      const button = document.getElementById('passwordRecoverySubmitButton');
+      button.disabled = isLoading || !supabaseClient;
+      button.innerHTML = isLoading
+        ? '<i class="fa-solid fa-spinner fa-spin"></i><span>กำลังบันทึก…</span>'
+        : '<i class="fa-solid fa-key"></i><span>บันทึกรหัสผ่านใหม่</span>';
+    }
+
+    function requireCrmAccess() {
+      if (currentCrmMember) return true;
+      showAuthGate('กรุณาเข้าสู่ระบบด้วยบัญชีที่ได้รับสิทธิ์ CRM ก่อนดำเนินการ', 'error', Boolean(supabaseClient));
+      return false;
+    }
+
+    function describeAuthConfigurationError(error) {
+      if (window.location.protocol === 'file:') {
+        return 'อย่าเปิดไฟล์ index.html โดยตรง ให้รัน npm start แล้วเปิด http://localhost:3000';
+      }
+      if (error instanceof TypeError && /failed to fetch/i.test(error.message)) {
+        return 'ไม่พบ GOOD CRM server ที่ URL นี้ ให้รัน npm start แล้วเปิด http://localhost:3000';
+      }
+      return `ตั้งค่า Supabase ไม่พร้อมใช้งาน: ${error.message}`;
+    }
+
+    function consumeAuthRedirectError() {
+      const url = new URL(window.location.href);
+      const hashParameters = new URLSearchParams(url.hash.replace(/^#/, ''));
+      const parameters = url.searchParams.has('error') ? url.searchParams : hashParameters;
+      const errorCode = parameters.get('error_code');
+      if (!parameters.get('error')) return null;
+
+      url.search = '';
+      url.hash = '';
+      window.history.replaceState({}, document.title, url.pathname);
+
+      if (errorCode === 'otp_expired') {
+        return 'ลิงก์รีเซ็ตรหัสผ่านหมดอายุหรือถูกใช้แล้ว กรุณาขอลิงก์ใหม่และเปิดอีเมลฉบับล่าสุด';
+      }
+      return 'ลิงก์ยืนยันไม่ถูกต้องหรือหมดอายุ กรุณาขอลิงก์ใหม่อีกครั้ง';
+    }
+
+    async function initializeAuth() {
+      showAuthGate('กำลังเชื่อมต่อ Supabase…');
+      try {
+        const response = await fetch('/api/runtime-config', { cache: 'no-store' });
+        const config = await response.json();
+        if (!response.ok) throw new Error(config.error || 'ไม่สามารถโหลดการตั้งค่า Supabase ได้');
+        if (!window.supabase?.createClient) throw new Error('ไม่สามารถโหลด Supabase client ได้');
+
+        supabaseClient = window.supabase.createClient(config.url, config.publishableKey, {
+          auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+        });
+        setAuthSubmitLoading(false);
+        supabaseClient.auth.onAuthStateChange((event) => {
+          if (event === 'PASSWORD_RECOVERY') {
+            isPasswordRecovery = true;
+            currentCrmMember = null;
+            hasStartedCrm = false;
+            setAuthMode('recovery');
+            showAuthGate('กรุณาตั้งรหัสผ่านใหม่เพื่อใช้งาน GOOD CRM ต่อ', 'info');
+            return;
+          }
+          if (event === 'SIGNED_OUT') {
+            isPasswordRecovery = false;
+            currentCrmMember = null;
+            hasStartedCrm = false;
+            setAuthMode('sign-in');
+            showAuthGate('ออกจากระบบแล้ว กรุณาเข้าสู่ระบบเพื่อใช้งาน CRM', 'info');
+          }
+        });
+        const redirectError = consumeAuthRedirectError();
+        if (redirectError) {
+          await clearInvalidSession(redirectError);
+          return;
+        }
+        await refreshCrmAccess();
+      } catch (error) {
+        console.error('Supabase initialization failed:', error);
+        setAuthSubmitLoading(false);
+        document.getElementById('authSubmitButton').disabled = true;
+        showAuthGate(describeAuthConfigurationError(error), 'error');
+      }
+    }
+
+    async function refreshCrmAccess() {
+      if (!supabaseClient) return false;
+
+      const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (sessionError || !accessToken) {
+        await clearInvalidSession('เซสชันหมดอายุแล้ว กรุณาเข้าสู่ระบบอีกครั้ง');
+        return false;
+      }
+
+      let access;
+      try {
+        const response = await fetch('/api/protected/health', {
+          cache: 'no-store',
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        access = await response.json();
+        if (!response.ok) {
+          if (response.status === 401) {
+            await clearInvalidSession('เซสชันหมดอายุหรือไม่ถูกต้อง กรุณาเข้าสู่ระบบอีกครั้ง');
+            return false;
+          }
+          throw new Error(access.error || 'ไม่สามารถยืนยันสิทธิ์ใช้งานได้');
+        }
+      } catch (error) {
+        console.error('CRM access check failed:', error);
+        currentCrmMember = null;
+        showAuthGate(error.message || 'ไม่สามารถยืนยันสิทธิ์ใช้งานได้', 'error', true);
+        return false;
+      }
+
+      currentCrmMember = access.membership;
+      hideAuthGate();
+      if (!hasStartedCrm) {
+        hasStartedCrm = true;
+        switchPage('leads-list');
+      }
+      return true;
+    }
+
+    async function clearInvalidSession(message, type = 'error') {
+      isPasswordRecovery = false;
+      currentCrmMember = null;
+      hasStartedCrm = false;
+      if (supabaseClient) {
+        await supabaseClient.auth.signOut({ scope: 'local' });
+      }
+      setAuthMode('sign-in');
+      showAuthGate(message, type);
+    }
+
+    async function signIn(event) {
+      event.preventDefault();
+      if (!supabaseClient) return;
+
+      setAuthSubmitLoading(true);
+      setAuthGateMessage('กำลังตรวจสอบอีเมลและรหัสผ่าน…');
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      setAuthSubmitLoading(false);
+
+      if (error) {
+        setAuthGateMessage(error.message, 'error');
+        return;
+      }
+      await refreshCrmAccess();
+    }
+
+    async function requestPasswordReset() {
+      if (!supabaseClient) return;
+      const emailInput = document.getElementById('authEmail');
+      const email = emailInput.value.trim();
+      if (!email || !emailInput.checkValidity()) {
+        emailInput.focus();
+        setAuthGateMessage('กรุณากรอกอีเมลก่อนขอลิงก์ตั้งรหัสผ่านใหม่', 'error');
+        return;
+      }
+
+      const button = document.getElementById('requestPasswordResetButton');
+      button.disabled = true;
+      button.textContent = 'กำลังส่งลิงก์…';
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}${window.location.pathname}`,
+      });
+      button.disabled = false;
+      button.textContent = 'ลืมรหัสผ่าน?';
+
+      if (error) {
+        setAuthGateMessage(error.message, 'error');
+        return;
+      }
+      setAuthGateMessage('หากอีเมลนี้มีบัญชีอยู่ ระบบจะส่งลิงก์ตั้งรหัสผ่านใหม่ โปรดเปิดอีเมลฉบับล่าสุด', 'success');
+    }
+
+    async function updateRecoveredPassword(event) {
+      event.preventDefault();
+      if (!supabaseClient || !isPasswordRecovery) return;
+
+      const password = document.getElementById('recoveryPassword').value;
+      const confirmation = document.getElementById('recoveryPasswordConfirmation').value;
+      if (password !== confirmation) {
+        setAuthGateMessage('ยืนยันรหัสผ่านใหม่ไม่ตรงกัน', 'error');
+        return;
+      }
+
+      setPasswordRecoveryLoading(true);
+      const { error } = await supabaseClient.auth.updateUser({ password });
+      setPasswordRecoveryLoading(false);
+      if (error) {
+        setAuthGateMessage(error.message, 'error');
+        return;
+      }
+
+      document.getElementById('passwordRecoveryForm').reset();
+      await clearInvalidSession('ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่', 'success');
+    }
+
+    async function signOut() {
+      currentCrmMember = null;
+      hasStartedCrm = false;
+      if (supabaseClient) await supabaseClient.auth.signOut();
+      showAuthGate('ออกจากระบบแล้ว กรุณาเข้าสู่ระบบเพื่อใช้งาน CRM');
+    }
+
+    async function crmFetch(resource, options = {}) {
+      if (!supabaseClient || !currentCrmMember) {
+        throw new Error('กรุณาเข้าสู่ระบบด้วยบัญชีที่ได้รับสิทธิ์ CRM');
+      }
+      const { data: sessionData, error } = await supabaseClient.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (error || !accessToken) {
+        await clearInvalidSession('เซสชันหมดอายุแล้ว กรุณาเข้าสู่ระบบอีกครั้ง');
+        throw new Error('เซสชันหมดอายุแล้ว');
+      }
+      const headers = new Headers(options.headers || {});
+      headers.set('Authorization', `Bearer ${accessToken}`);
+      const response = await fetch(resource, { ...options, headers });
+      if (response.status === 401) {
+        await clearInvalidSession('เซสชันหมดอายุหรือไม่ถูกต้อง กรุณาเข้าสู่ระบบอีกครั้ง');
+        throw new Error('เซสชันหมดอายุแล้ว');
+      }
+      return response;
+    }
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      document.getElementById('installAppButton')?.classList.remove('hidden');
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      document.getElementById('installAppButton')?.classList.add('hidden');
+      showSuccessToast('ติดตั้ง GOOD CRM บนอุปกรณ์แล้ว');
+    });
+
+    async function installApplication() {
+      if (!deferredInstallPrompt) {
+        showToast('เบราว์เซอร์นี้ยังไม่แสดงตัวเลือกติดตั้งแอป');
+        return;
+      }
+
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      document.getElementById('installAppButton')?.classList.add('hidden');
+    }
 
     // Initialize App
-    window.onload = function() {
+    window.onload = async function() {
       // Load configurations from LocalStorage
       const savedAdmin = localStorage.getItem("gfs_admin_name");
-      const savedUrl = localStorage.getItem("gfs_apps_script_url");
-      
       if (savedAdmin) config.adminName = savedAdmin;
-      if (savedUrl) config.appsScriptUrl = savedUrl;
+      localStorage.removeItem("gfs_apps_script_url");
       
       document.getElementById("adminNameConfigSetting").value = config.adminName;
-      document.getElementById("appsScriptUrlSetting").value = config.appsScriptUrl;
       
       updateAdminUI();
-      
-      // Open the customer list as the default page.
-      switchPage('leads-list');
       
       document.getElementById('leadForm').reset();
       applyNewLeadDefaults();
 
       // Check if draft exists
       checkDraft();
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js').catch((error) => {
+          console.warn('Service worker registration failed:', error);
+        });
+      }
+
+      await initializeAuth();
     };
 
     // Toggle Sidebar collapsed state (Desktop)
@@ -1834,6 +2222,7 @@
     }
 
     function openCustomerPopup() {
+      if (!requireCrmAccess()) return;
       const popup = document.getElementById('page-create-lead');
       if (!popup) return;
 
@@ -1881,6 +2270,7 @@
 
     // Switch Page
     function switchPage(pageId) {
+      if (!requireCrmAccess()) return;
       closeLeadDetailModal();
       closeCustomerPopup();
 
@@ -2037,7 +2427,7 @@
     // Fetch one server-filtered page.  The server also caches the compact
     // payload, while this cache makes repeated navigation instant in the same tab.
     async function fetchLeadsData(options = {}) {
-      if (!config.appsScriptUrl) {
+      if (!config.crmApiUrl) {
         renderMockDataWarning();
         return;
       }
@@ -2057,7 +2447,7 @@
 
       const requestId = ++leadsRequestId;
       try {
-        const leadsUrl = new URL(config.appsScriptUrl);
+        const leadsUrl = new URL(config.crmApiUrl);
         leadsUrl.searchParams.set('action', 'getLeads');
         leadsUrl.searchParams.set('page', String(requestedPage));
         leadsUrl.searchParams.set('pageSize', String(LEADS_PAGE_SIZE));
@@ -2065,7 +2455,7 @@
         if (filters.gender) leadsUrl.searchParams.set('gender', filters.gender);
         if (filters.channel) leadsUrl.searchParams.set('channel', filters.channel);
 
-        const response = await fetch(leadsUrl.toString(), { cache: 'default' });
+        const response = await crmFetch(leadsUrl.toString(), { cache: 'no-store' });
         const result = await response.json();
         if (!response.ok || !result.success || !Array.isArray(result.leads)) {
           throw new Error(result.error || 'ไม่สามารถดึงข้อมูลลูกค้าได้');
@@ -2110,15 +2500,15 @@
 
     // Fetch contact/case rows directly from the “ข้อมูลการติดต่อ” sheet.
     async function fetchCasesData() {
-      if (!config.appsScriptUrl) {
+      if (!config.crmApiUrl) {
         allCases = [];
-        setCasesListMessage('กรุณาตั้งค่า Google Apps Script URL ก่อนดูรายการเคส');
+        setCasesListMessage('Supabase CRM API ยังไม่พร้อมใช้งาน');
         return;
       }
 
-      setCasesListMessage('กำลังดาวน์โหลดรายการเคสจากชีต “ข้อมูลการติดต่อ”...', true);
+      setCasesListMessage('กำลังโหลดรายการเคสจาก Supabase…', true);
       try {
-        const casesUrl = new URL(config.appsScriptUrl);
+        const casesUrl = new URL(config.crmApiUrl);
         casesUrl.searchParams.set('action', 'getCases');
         casesUrl.searchParams.set('_', Date.now());
         const { response, result } = await fetchJsonWithTimeout(
@@ -2127,7 +2517,7 @@
         );
 
         if (!response.ok || !result.success || !Array.isArray(result.cases)) {
-          throw new Error(result.error || 'ไม่สามารถอ่านข้อมูลจากชีต “ข้อมูลการติดต่อ” ได้');
+          throw new Error(result.error || 'ไม่สามารถอ่านข้อมูลเคสจาก Supabase ได้');
         }
 
         allCases = result.cases;
@@ -2261,12 +2651,12 @@
       select.replaceChildren(new Option("กำลังโหลดรายชื่อ...", ""));
 
       try {
-        if (!config.appsScriptUrl) throw new Error("ยังไม่ได้ตั้งค่า Google Apps Script URL");
-        const employeeUrl = new URL(config.appsScriptUrl);
+        if (!config.crmApiUrl) throw new Error("Supabase CRM API ยังไม่พร้อมใช้งาน");
+        const employeeUrl = new URL(config.crmApiUrl);
         employeeUrl.searchParams.set("action", "getEmployees");
         employeeUrl.searchParams.set("position", "Admin Sale");
         employeeUrl.searchParams.set("_", Date.now());
-        const response = await fetch(employeeUrl.toString(), { method: "GET", mode: "cors", cache: "no-store" });
+        const response = await crmFetch(employeeUrl.toString(), { method: "GET", cache: "no-store" });
         const result = await response.json();
         if (!response.ok || !result.success || !Array.isArray(result.employees)) {
           throw new Error(result.error || "ไม่สามารถอ่านข้อมูลพนักงานได้");
@@ -2545,7 +2935,7 @@
       const clearButton = document.getElementById('leadsSearchClearButton');
       clearButton.classList.toggle('hidden', !input.value);
       window.clearTimeout(leadsSearchTimer);
-      // Debouncing prevents an Apps Script request for every keystroke while
+      // Debouncing prevents a Supabase query for every keystroke while
       // retaining the existing live-search experience.
       leadsSearchTimer = window.setTimeout(() => filterLeads(), 300);
     }
@@ -2861,16 +3251,16 @@
       const controller = new AbortController();
       const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
       try {
-        const response = await fetch(url, { ...options, signal: controller.signal });
+        const response = await crmFetch(url, { ...options, signal: controller.signal });
         const responseText = await response.text();
         let result;
         try {
           result = JSON.parse(responseText);
         } catch (parseError) {
           if (/^\s*<(?:!doctype|html)/i.test(responseText)) {
-            throw new Error('Google Apps Script ตอบกลับเป็นหน้าเว็บ โปรดตรวจสอบ Web App URL ว่าลงท้ายด้วย /exec และตั้งสิทธิ์การเข้าถึงเป็น Anyone');
+            throw new Error('Supabase CRM API ตอบกลับไม่ถูกต้อง โปรดตรวจสอบว่า GOOD CRM server ทำงานอยู่');
           }
-          throw new Error('Google Apps Script ตอบกลับข้อมูลในรูปแบบที่ไม่ถูกต้อง');
+          throw new Error('Supabase CRM API ตอบกลับข้อมูลในรูปแบบที่ไม่ถูกต้อง');
         }
         return { response, result };
       } catch (error) {
@@ -2885,7 +3275,7 @@
 
     async function saveCaseDetailEdit(event) {
       event.preventDefault();
-      if (!activeCaseDetail?.caseData || !config.appsScriptUrl) return;
+      if (!activeCaseDetail?.caseData || !config.crmApiUrl) return;
       const saveButton = document.getElementById("saveCaseDetailEditButton");
       const originalCase = activeCaseDetail.caseData;
       const caseId = String(originalCase.logId || "").trim();
@@ -2919,7 +3309,7 @@
         saveButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>กำลังบันทึก';
       }
       try {
-        const versionUrl = new URL(config.appsScriptUrl);
+        const versionUrl = new URL(config.crmApiUrl);
         versionUrl.searchParams.set("action", "getVersion");
         versionUrl.searchParams.set("_", Date.now());
         const { response: versionResponse, result: versionResult } = await fetchJsonWithTimeout(
@@ -2927,10 +3317,10 @@
           { cache: "no-store" }
         );
         if (!versionResponse.ok || versionResult.apiVersion !== requiredCaseDetailApiVersion) {
-          throw new Error("Google Apps Script ยังเป็นเวอร์ชันเดิม กรุณา Deploy เวอร์ชันล่าสุดก่อนแก้ไขเคส");
+          throw new Error("Supabase CRM API ยังไม่พร้อมใช้งาน");
         }
 
-        const { response, result } = await fetchJsonWithTimeout(config.appsScriptUrl, {
+        const { response, result } = await fetchJsonWithTimeout(config.crmApiUrl, {
           method: "POST",
           mode: "cors",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -3051,16 +3441,16 @@
       button.classList.add("opacity-60", "animate-pulse");
 
       try {
-        const versionUrl = new URL(config.appsScriptUrl);
+        const versionUrl = new URL(config.crmApiUrl);
         versionUrl.searchParams.set("action", "getVersion");
         versionUrl.searchParams.set("_", Date.now());
-        const versionResponse = await fetch(versionUrl.toString(), { method: "GET", mode: "cors", cache: "no-store" });
+        const versionResponse = await crmFetch(versionUrl.toString(), { method: "GET", cache: "no-store" });
         const versionResult = await versionResponse.json();
-        if (!versionResponse.ok || versionResult.apiVersion !== requiredAppsScriptVersion) {
-          throw new Error("Google Apps Script ยังเป็นเวอร์ชันเดิม กรุณา Deploy เวอร์ชันล่าสุด");
+        if (!versionResponse.ok || versionResult.apiVersion !== requiredCrmApiVersion) {
+          throw new Error("Supabase CRM API ยังไม่พร้อมใช้งาน");
         }
 
-        const response = await fetch(config.appsScriptUrl, {
+        const response = await crmFetch(config.crmApiUrl, {
           method: "POST",
           mode: "cors",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -3116,7 +3506,7 @@
         if (cachedLead) return cachedLead;
       }
 
-      const detailUrl = new URL(config.appsScriptUrl);
+      const detailUrl = new URL(config.crmApiUrl);
       detailUrl.searchParams.set('action', 'getLeadDetail');
       detailUrl.searchParams.set('customerId', cacheKey);
       const { response, result } = await fetchJsonWithTimeout(
@@ -3263,18 +3653,9 @@
     // Save Settings
     function saveGlobalSettings() {
       const adminVal = document.getElementById("adminNameConfigSetting").value.trim();
-      const urlVal = document.getElementById("appsScriptUrlSetting").value.trim();
-      
-      if (!urlVal) {
-        showToast("กรุณาระบุ Google Apps Script Web App URL");
-        return;
-      }
-      
       config.adminName = adminVal || "คุณเก็ต";
-      config.appsScriptUrl = urlVal;
       
       localStorage.setItem("gfs_admin_name", config.adminName);
-      localStorage.setItem("gfs_apps_script_url", config.appsScriptUrl);
       
       updateAdminUI();
       showSuccessToast("บันทึกการตั้งค่าเรียบร้อยแล้ว");
@@ -3764,10 +4145,10 @@
       showCustomerLookupStatus('customerNameLookup', 'info', `กำลังโหลดข้อมูลล่าสุดของลูกค้า ${customerId}…`);
 
       try {
-        const customerUrl = new URL(config.appsScriptUrl);
+        const customerUrl = new URL(config.crmApiUrl);
         customerUrl.searchParams.set('action', 'getCustomer');
         customerUrl.searchParams.set('customerId', customerId);
-        const response = await fetch(customerUrl.toString(), { method: 'GET', mode: 'cors' });
+        const response = await crmFetch(customerUrl.toString(), { method: 'GET', cache: 'no-store' });
         const result = await response.json();
         if (requestId !== customerEditRequestId) return;
         if (response.ok && result.success && result.customer) {
@@ -3851,8 +4232,8 @@
         return null;
       }
 
-      if (!config.appsScriptUrl) {
-        showCustomerLookupStatus(statusId, 'warning', 'ยังไม่ได้ตั้งค่า Google Apps Script URL');
+      if (!config.crmApiUrl) {
+        showCustomerLookupStatus(statusId, 'warning', 'Supabase CRM API ยังไม่พร้อมใช้งาน');
         return null;
       }
 
@@ -3860,14 +4241,13 @@
       showCustomerLookupStatus(statusId, 'info', kind === 'name' ? 'กำลังค้นหาชื่อลูกค้า…' : 'กำลังตรวจสอบเบอร์โทร…');
 
       try {
-        const lookupUrl = new URL(config.appsScriptUrl);
+        const lookupUrl = new URL(config.crmApiUrl);
         lookupUrl.searchParams.set('action', 'lookupCustomer');
         lookupUrl.searchParams.set(kind === 'name' ? 'customerName' : 'phone', value);
-        const response = await fetch(lookupUrl.toString(), { method: 'GET', mode: 'cors' });
+        const response = await crmFetch(lookupUrl.toString(), { method: 'GET', cache: 'no-store' });
         const result = await response.json();
         if (!response.ok || !result.success) {
-          const needsDeployment = result && result.status === 'success' && result.message === 'Good CRM Leads API is running!';
-          throw new Error(needsDeployment ? 'Google Apps Script ยังเป็นเวอร์ชันเดิม กรุณา Deploy เวอร์ชันล่าสุด' : (result.error || 'ไม่สามารถค้นหาข้อมูลลูกค้าได้'));
+          throw new Error(result.error || 'ไม่สามารถค้นหาข้อมูลลูกค้าได้');
         }
         if (requestId !== customerLookupRequests[kind]) return null;
 
@@ -3943,8 +4323,8 @@
         return;
       }
 
-      if (!config.appsScriptUrl) {
-        showToast('กรุณาตั้งค่า Google Apps Script Web App URL ก่อนบันทึกข้อมูลลูกค้า');
+      if (!config.crmApiUrl) {
+        showToast('Supabase CRM API ยังไม่พร้อมใช้งาน');
         switchPage('settings');
         return;
       }
@@ -3954,12 +4334,12 @@
       saveButton.disabled = true;
 
       try {
-        const versionUrl = new URL(config.appsScriptUrl);
+        const versionUrl = new URL(config.crmApiUrl);
         versionUrl.searchParams.set('action', 'getVersion');
-        const versionResponse = await fetch(versionUrl.toString(), { method: 'GET', mode: 'cors' });
+        const versionResponse = await crmFetch(versionUrl.toString(), { method: 'GET', cache: 'no-store' });
         const versionResult = await versionResponse.json();
-        if (!versionResponse.ok || versionResult.apiVersion !== requiredAppsScriptVersion) {
-          throw new Error('Google Apps Script ยังเป็นเวอร์ชันเดิม กรุณา Deploy โค้ดเวอร์ชันล่าสุดก่อนบันทึก');
+        if (!versionResponse.ok || versionResult.apiVersion !== requiredCrmApiVersion) {
+          throw new Error('Supabase CRM API ยังไม่พร้อมใช้งาน');
         }
 
         const customerValues = getFormValues();
@@ -3968,7 +4348,7 @@
           customerNote: customerValues.customerRemarks,
           action: 'saveCustomer'
         };
-        const response = await fetch(config.appsScriptUrl, {
+        const response = await crmFetch(config.crmApiUrl, {
           method: 'POST',
           mode: 'cors',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -3986,7 +4366,7 @@
           throw new Error(result.error || 'ไม่สามารถบันทึกข้อมูลลูกค้าได้');
         }
         if (!/^CUST-\d{6}-[0-9A-F]{3}$/.test(String(result.custId))) {
-          throw new Error('รูปแบบ Cust_ID ไม่ถูกต้อง กรุณาตรวจสอบ Google Apps Script เวอร์ชันที่ Deploy');
+          throw new Error('รูปแบบ Cust_ID ไม่ถูกต้อง กรุณาลองบันทึกใหม่อีกครั้ง');
         }
         if (Object.prototype.hasOwnProperty.call(result, 'customerRemarks')
           && String(result.customerRemarks) !== customerValues.customerRemarks) {
@@ -4194,9 +4574,10 @@
       updateAdminUI();
     }
 
-    // Handle Form Submit and call Google Apps Script
+    // Handle Form Submit through the authenticated Supabase CRM API.
     async function handleFormSubmit(e) {
       e.preventDefault();
+      if (!requireCrmAccess()) return;
 
       if (document.getElementById('page-create-lead').classList.contains('customer-popup-mode')) {
         await saveCustomerSection();
@@ -4223,8 +4604,8 @@
         return;
       }
       
-      if (!config.appsScriptUrl) {
-        showToast("กรุณาตั้งค่า Google Apps Script Web App URL ก่อนกดบันทึก (ไปที่เมนู 'ตั้งค่าระบบ')");
+      if (!config.crmApiUrl) {
+        showToast("Supabase CRM API ยังไม่พร้อมใช้งาน");
         switchPage('settings');
         return;
       }
@@ -4238,16 +4619,16 @@
       loading.classList.remove("hidden");
 
       try {
-        const versionUrl = new URL(config.appsScriptUrl);
+        const versionUrl = new URL(config.crmApiUrl);
         versionUrl.searchParams.set('action', 'getVersion');
         versionUrl.searchParams.set('_', Date.now());
-        const versionResponse = await fetch(versionUrl.toString(), { method: 'GET', mode: 'cors', cache: 'no-store' });
+        const versionResponse = await crmFetch(versionUrl.toString(), { method: 'GET', cache: 'no-store' });
         const versionResult = await versionResponse.json();
-        if (!versionResponse.ok || versionResult.apiVersion !== requiredAppsScriptVersion) {
-          throw new Error('Google Apps Script ยังเป็นเวอร์ชันเดิม กรุณา Deploy เวอร์ชันล่าสุดก่อนบันทึก');
+        if (!versionResponse.ok || versionResult.apiVersion !== requiredCrmApiVersion) {
+          throw new Error('Supabase CRM API ยังไม่พร้อมใช้งาน');
         }
 
-        const response = await fetch(config.appsScriptUrl, {
+        const response = await crmFetch(config.crmApiUrl, {
           method: "POST",
           mode: "cors",
           headers: {
@@ -4270,7 +4651,7 @@
           clearDraft();
           openSuccessModal(result.custId, result.caseId || result.logId);
         } else if (result.success) {
-          throw new Error('บันทึกไม่สำเร็จ: ระบบไม่ได้รับ Case_ID จาก Google Apps Script');
+          throw new Error('บันทึกไม่สำเร็จ: ระบบไม่ได้รับ Case_ID จาก Supabase');
         } else {
           showToast(`เกิดข้อผิดพลาดในการบันทึก: ${result.error || "ไม่ทราบสาเหตุ"}`);
         }

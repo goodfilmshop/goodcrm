@@ -4,7 +4,10 @@
  * Deploy as a Web App: Execute as "Me", Who has access: "Anyone".
  */
 
-var GOOD_CRM_API_VERSION = "2026-08-19-case-details-v19";
+var GOOD_CRM_API_VERSION = "2026-08-19-security-v21";
+// Store this value in Apps Script Properties, never in this source file or in
+// the browser. Every request is now sent by the authenticated Node.js proxy.
+var GOOD_CRM_SHARED_SECRET_PROPERTY = "GOOD_CRM_API_SHARED_SECRET";
 // List responses are intentionally short-lived.  Keeping the cache key behind
 // a version property lets every write invalidate all list/detail responses
 // without trying to enumerate ScriptCache keys (which Apps Script cannot do).
@@ -15,6 +18,12 @@ var GOOD_CRM_LEAD_CACHE_VERSION_KEY = "good_crm_lead_cache_version";
 // scanning the full contact sheet merely to render the count badge.
 var GOOD_CRM_CASE_COUNT_CACHE_SECONDS = 300;
 var GOOD_CRM_CASE_COUNT_CACHE_VERSION_KEY = "good_crm_case_count_cache_version";
+var GOOD_CRM_LEAD_INDEX_SHEET = "_GOOD_CRM_LEAD_INDEX";
+var GOOD_CRM_LEAD_INDEX_HEADERS = [
+  "Cust_ID", "วันที่บันทึก", "ชื่อลูกค้า", "เพศ", "เบอร์โทรศัพท์",
+  "ช่องทางติดต่อ", "ชื่อช่องทางติดต่อ", "รู้จักครั้งแรก", "หมายเหตุ",
+  "จำนวนเคส", "Source_Row"
+];
 var GOOD_CRM_CASE_STATUSES = [
   "ติดต่อสอบถาม",
   "ประเมินราคา",
@@ -58,6 +67,7 @@ var CONTACT_CASE_COLUMNS = {
 
 function doGet(e) {
   try {
+    if (!isAuthorizedGoodCrmRequest(e)) return unauthorizedGoodCrmResponse();
     var action = e && e.parameter && e.parameter.action;
 
     if (action === "getVersion") {
@@ -304,6 +314,7 @@ function doPost(e) {
     }
     
     var data = JSON.parse(e.postData.contents);
+    if (!isAuthorizedGoodCrmRequest(e, data)) return unauthorizedGoodCrmResponse();
     var ss = SpreadsheetApp.getActiveSpreadsheet();
 
     if (data.action === "updateCaseStatus") {
@@ -371,6 +382,12 @@ function doPost(e) {
       } else {
         customerSheet.getRange(customerRowNumber, 1, 1, customerHeaders.length).setValues([customerRow]);
       }
+      upsertLeadIndexCustomer(
+        ss,
+        customerHeaders,
+        customerRow,
+        customerRowNumber === -1 ? customerSheet.getLastRow() : customerRowNumber
+      );
       // List and detail caches must never outlive a customer write.
       invalidateLeadCaches();
 
@@ -471,6 +488,7 @@ function doPost(e) {
       var caseIdColumn = contactHeaders.indexOf("Case_ID") + 1;
       contactSheet.getRange(appendedRowNumber, caseIdColumn).setValue(caseId);
       SpreadsheetApp.flush();
+      incrementLeadIndexCaseCount(ss, custId);
       invalidateCaseCountCache();
       if (requestCacheKey) requestCache.put(requestCacheKey, caseId, 21600);
     
@@ -497,6 +515,24 @@ function doPost(e) {
     return ContentService.createTextOutput(JSON.stringify(errResponse))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+function isAuthorizedGoodCrmRequest(e, data) {
+  var expectedSecret = PropertiesService.getScriptProperties()
+    .getProperty(GOOD_CRM_SHARED_SECRET_PROPERTY);
+  if (!expectedSecret) return false;
+
+  var suppliedSecret = data && data.apiKey;
+  if (suppliedSecret === undefined && e && e.parameter) suppliedSecret = e.parameter.apiKey;
+  return typeof suppliedSecret === "string" && suppliedSecret === expectedSecret;
+}
+
+function unauthorizedGoodCrmResponse() {
+  return ContentService.createTextOutput(JSON.stringify({
+    success: false,
+    code: "UNAUTHORIZED",
+    error: "Unauthorized request."
+  })).setMimeType(ContentService.MimeType.JSON);
 }
 
 function getLeadListQuery(parameters) {
@@ -576,6 +612,155 @@ function isLeadListItemMatch(item, query) {
   return searchableText.indexOf(query.search) !== -1;
 }
 
+function isLeadIndexReady(indexSheet) {
+  if (!indexSheet || indexSheet.getLastColumn() < GOOD_CRM_LEAD_INDEX_HEADERS.length) return false;
+  var headers = indexSheet
+    .getRange(1, 1, 1, GOOD_CRM_LEAD_INDEX_HEADERS.length)
+    .getDisplayValues()[0];
+  return GOOD_CRM_LEAD_INDEX_HEADERS.every(function(header, index) {
+    return String(headers[index] || "").trim() === header;
+  });
+}
+
+function getLeadIndexSheetForRead(ss) {
+  var indexSheet = ss.getSheetByName(GOOD_CRM_LEAD_INDEX_SHEET);
+  return isLeadIndexReady(indexSheet) ? indexSheet : null;
+}
+
+function leadListItemFromIndexRow(row) {
+  return {
+    "Cust_ID": row[0] || "",
+    "วันที่บันทึก": row[1] || "",
+    "ชื่อลูกค้า": row[2] || "",
+    "เพศ": row[3] || "ไม่ระบุ",
+    "เบอร์โทรศัพท์": row[4] || "",
+    "ช่องทางติดต่อ": row[5] || "",
+    "ชื่อช่องทางติดต่อ": row[6] || "",
+    "รู้จักครั้งแรก": row[7] || "",
+    "หมายเหตุ": row[8] || "",
+    "จำนวนเคส": Number(row[9]) || 0
+  };
+}
+
+function leadIndexRowFromCustomerRow(customerRow, customerIndices, caseCount, sourceRow) {
+  var item = customerListItemFromRow(customerRow, customerIndices, caseCount);
+  return [
+    item["Cust_ID"], item["วันที่บันทึก"], item["ชื่อลูกค้า"], item["เพศ"],
+    item["เบอร์โทรศัพท์"], item["ช่องทางติดต่อ"], item["ชื่อช่องทางติดต่อ"],
+    item["รู้จักครั้งแรก"], item["หมายเหตุ"], item["จำนวนเคส"], sourceRow
+  ];
+}
+
+function getPagedLeadsFromIndex(indexSheet, query, cacheVersion, cacheKey) {
+  var lastRow = indexSheet.getLastRow();
+  var total = Math.max(0, lastRow - 1);
+  var totalPages = Math.max(1, Math.ceil(total / query.pageSize));
+  var page = Math.min(query.page, totalPages);
+  var hasFilters = Boolean(query.search || query.gender || query.channel);
+  var leads = [];
+
+  if (!hasFilters) {
+    var newestRow = lastRow - ((page - 1) * query.pageSize);
+    var pageRowCount = Math.max(0, Math.min(query.pageSize, newestRow - 1));
+    if (pageRowCount) {
+      var pageStartRow = newestRow - pageRowCount + 1;
+      leads = indexSheet
+        .getRange(pageStartRow, 1, pageRowCount, GOOD_CRM_LEAD_INDEX_HEADERS.length)
+        .getValues()
+        .reverse()
+        .map(leadListItemFromIndexRow);
+    }
+  } else {
+    var filteredLeads = lastRow > 1
+      ? indexSheet
+        .getRange(2, 1, lastRow - 1, GOOD_CRM_LEAD_INDEX_HEADERS.length)
+        .getValues()
+        .map(leadListItemFromIndexRow)
+        .filter(function(item) { return isLeadListItemMatch(item, query); })
+      : [];
+    filteredLeads.sort(function(a, b) {
+      return getDateTimestamp(b["วันที่บันทึก"]) - getDateTimestamp(a["วันที่บันทึก"]);
+    });
+    total = filteredLeads.length;
+    totalPages = Math.max(1, Math.ceil(total / query.pageSize));
+    page = Math.min(query.page, totalPages);
+    leads = filteredLeads.slice((page - 1) * query.pageSize, page * query.pageSize);
+  }
+
+  var response = {
+    success: true,
+    leads: leads,
+    pagination: { page: page, pageSize: query.pageSize, total: total, totalPages: totalPages },
+    cacheVersion: cacheVersion,
+    apiVersion: GOOD_CRM_API_VERSION
+  };
+  cacheLeadResponse(cacheKey, response);
+  return response;
+}
+
+// Run this manually once from the Apps Script editor after deployment. It
+// creates a compact, hidden read model that keeps list traffic away from the
+// two operational sheets. Future CRM writes maintain the affected index row.
+function rebuildGoodCrmLeadIndex() {
+  return rebuildLeadIndex(SpreadsheetApp.getActiveSpreadsheet());
+}
+
+function rebuildLeadIndex(ss) {
+  var customerSheet = ss.getSheetByName("ข้อมูลลูกค้า");
+  if (!customerSheet) throw new Error("Sheet 'ข้อมูลลูกค้า' not found.");
+  var customerHeaders = getHeaders(customerSheet);
+  var customerIndices = getCustomerListColumnIndices(customerHeaders);
+  if (customerIndices.custId === -1) throw new Error("Column 'Cust_ID' not found.");
+  var customerRows = customerSheet.getLastRow() > 1
+    ? customerSheet.getRange(2, 1, customerSheet.getLastRow() - 1, customerSheet.getLastColumn()).getValues()
+    : [];
+  var caseCounts = getCaseCountByCustomer(ss.getSheetByName("ข้อมูลการติดต่อ"));
+  var indexRows = customerRows.reduce(function(rows, customerRow, index) {
+    var customerId = String(getRowValue(customerRow, customerIndices.custId) || "").trim();
+    if (customerId) rows.push(leadIndexRowFromCustomerRow(customerRow, customerIndices, caseCounts[customerId] || 0, index + 2));
+    return rows;
+  }, []);
+
+  var indexSheet = ss.getSheetByName(GOOD_CRM_LEAD_INDEX_SHEET);
+  if (!indexSheet) indexSheet = ss.insertSheet(GOOD_CRM_LEAD_INDEX_SHEET);
+  indexSheet.clearContents();
+  indexSheet.getRange(1, 1, 1, GOOD_CRM_LEAD_INDEX_HEADERS.length).setValues([GOOD_CRM_LEAD_INDEX_HEADERS]);
+  if (indexRows.length) {
+    indexSheet.getRange(2, 1, indexRows.length, GOOD_CRM_LEAD_INDEX_HEADERS.length).setValues(indexRows);
+  }
+  if (typeof indexSheet.hideSheet === "function") indexSheet.hideSheet();
+  invalidateLeadCaches();
+  return { success: true, indexedCustomers: indexRows.length, sheet: GOOD_CRM_LEAD_INDEX_SHEET };
+}
+
+function upsertLeadIndexCustomer(ss, customerHeaders, customerRow, sourceRow) {
+  var indexSheet = getLeadIndexSheetForRead(ss);
+  if (!indexSheet) return;
+  var customerIndices = getCustomerListColumnIndices(customerHeaders);
+  var customerId = String(getRowValue(customerRow, customerIndices.custId) || "").trim();
+  if (!customerId) return;
+  var matchingRows = findSheetRowsByExactValue(indexSheet, 0, customerId);
+  var caseCount = 0;
+  if (matchingRows.length) {
+    caseCount = Number(indexSheet.getRange(matchingRows[0], 10, 1, 1).getValue()) || 0;
+  }
+  var indexRow = leadIndexRowFromCustomerRow(customerRow, customerIndices, caseCount, sourceRow);
+  if (matchingRows.length) {
+    indexSheet.getRange(matchingRows[0], 1, 1, indexRow.length).setValues([indexRow]);
+  } else {
+    indexSheet.appendRow(indexRow);
+  }
+}
+
+function incrementLeadIndexCaseCount(ss, customerId) {
+  var indexSheet = getLeadIndexSheetForRead(ss);
+  if (!indexSheet) return;
+  var matchingRows = findSheetRowsByExactValue(indexSheet, 0, customerId);
+  if (!matchingRows.length) return;
+  var countRange = indexSheet.getRange(matchingRows[0], 10, 1, 1);
+  countRange.setValue((Number(countRange.getValue()) || 0) + 1);
+}
+
 function getCaseCountByCustomer(contactSheet) {
   if (!contactSheet || contactSheet.getLastRow() <= 1) return {};
   var cacheKey = getLeadCacheKey("case_counts", [getCaseCountCacheVersion()]);
@@ -602,7 +787,10 @@ function getLeadCacheVersion() {
 }
 
 function invalidateLeadCaches() {
-  PropertiesService.getScriptProperties().setProperty(GOOD_CRM_LEAD_CACHE_VERSION_KEY, String(new Date().getTime()));
+  var properties = PropertiesService.getScriptProperties();
+  var nextVersion = new Date().getTime();
+  var previousVersion = Number(properties.getProperty(GOOD_CRM_LEAD_CACHE_VERSION_KEY)) || 0;
+  properties.setProperty(GOOD_CRM_LEAD_CACHE_VERSION_KEY, String(Math.max(nextVersion, previousVersion + 1)));
 }
 
 function getCaseCountCacheVersion() {
@@ -610,7 +798,10 @@ function getCaseCountCacheVersion() {
 }
 
 function invalidateCaseCountCache() {
-  PropertiesService.getScriptProperties().setProperty(GOOD_CRM_CASE_COUNT_CACHE_VERSION_KEY, String(new Date().getTime()));
+  var properties = PropertiesService.getScriptProperties();
+  var nextVersion = new Date().getTime();
+  var previousVersion = Number(properties.getProperty(GOOD_CRM_CASE_COUNT_CACHE_VERSION_KEY)) || 0;
+  properties.setProperty(GOOD_CRM_CASE_COUNT_CACHE_VERSION_KEY, String(Math.max(nextVersion, previousVersion + 1)));
 }
 
 function getLeadCacheKey(kind, parts) {
@@ -654,6 +845,11 @@ function getPagedLeads(ss, parameters) {
   var cacheKey = getLeadCacheKey("leads", [cacheVersion, query]);
   var cachedResponse = getCachedLeadResponse(cacheKey);
   if (cachedResponse) return cachedResponse;
+
+  // Once the compact read model has been built, list requests never need to
+  // touch the customer or contact source sheets.
+  var indexSheet = getLeadIndexSheetForRead(ss);
+  if (indexSheet) return getPagedLeadsFromIndex(indexSheet, query, cacheVersion, cacheKey);
 
   var customerSheet = ss.getSheetByName("ข้อมูลลูกค้า");
   if (!customerSheet) throw new Error("Sheet 'ข้อมูลลูกค้า' not found.");

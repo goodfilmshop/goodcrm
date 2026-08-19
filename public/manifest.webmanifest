@@ -1,0 +1,28 @@
+{
+  "id": "/",
+  "name": "GOOD CRM",
+  "short_name": "GOOD CRM",
+  "description": "ระบบจัดการฐานข้อมูลลูกค้าและติดตามงาน",
+  "lang": "th",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "background_color": "#f8fbff",
+  "theme_color": "#1d4ed8",
+  "icons": [
+    {
+      "src": "/assets/good-crm-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/good-crm-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

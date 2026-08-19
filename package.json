@@ -4,10 +4,11 @@
   "description": "Lead entry CRM system",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "migrate:import": "node scripts/import-google-apps-script.mjs"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "xlsx": "^0.18.5"
+    "@supabase/supabase-js": "2.112.3",
+    "express": "^4.19.2"
   }
 }
