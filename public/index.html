@@ -792,31 +792,14 @@
 
       <p id="authGateMessage" role="status" class="mb-5 rounded-xl border border-blue-100 bg-blue-50 px-3.5 py-3 text-sm leading-5 text-blue-800">กำลังตรวจสอบการเข้าสู่ระบบ…</p>
 
-      <form id="authForm" onsubmit="signIn(event)" class="space-y-4">
+      <form id="authForm" onsubmit="sendMagicLink(event)" class="space-y-4">
         <label class="block text-sm font-semibold text-slate-700" for="authEmail">อีเมล
           <input id="authEmail" type="email" autocomplete="email" required class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="name@company.com">
         </label>
-        <label class="block text-sm font-semibold text-slate-700" for="authPassword">รหัสผ่าน
-          <input id="authPassword" type="password" autocomplete="current-password" required minlength="6" class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="••••••••">
-        </label>
         <button id="authSubmitButton" type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60">
-          <i class="fa-solid fa-right-to-bracket"></i><span>เข้าสู่ระบบ</span>
+          <i class="fa-solid fa-envelope"></i><span>ส่งลิงก์เข้าสู่ระบบ</span>
         </button>
       </form>
-
-      <form id="passwordRecoveryForm" onsubmit="updateRecoveredPassword(event)" class="hidden space-y-4">
-        <label class="block text-sm font-semibold text-slate-700" for="recoveryPassword">รหัสผ่านใหม่
-          <input id="recoveryPassword" type="password" autocomplete="new-password" required minlength="12" class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="อย่างน้อย 12 ตัวอักษร">
-        </label>
-        <label class="block text-sm font-semibold text-slate-700" for="recoveryPasswordConfirmation">ยืนยันรหัสผ่านใหม่
-          <input id="recoveryPasswordConfirmation" type="password" autocomplete="new-password" required minlength="12" class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="กรอกรหัสผ่านอีกครั้ง">
-        </label>
-        <button id="passwordRecoverySubmitButton" type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60">
-          <i class="fa-solid fa-key"></i><span>บันทึกรหัสผ่านใหม่</span>
-        </button>
-      </form>
-
-      <button id="requestPasswordResetButton" type="button" onclick="requestPasswordReset()" class="mt-4 w-full text-center text-sm font-semibold text-blue-600 transition hover:text-blue-700">ลืมรหัสผ่าน?</button>
 
       <button id="authGateSignOutButton" type="button" onclick="signOut()" class="mt-4 hidden w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">ออกจากระบบ</button>
       <p class="mt-5 text-center text-xs leading-5 text-slate-400">หากยังไม่มีสิทธิ์ใช้งาน โปรดติดต่อผู้ดูแล GOOD CRM</p>
@@ -1856,8 +1839,8 @@
     let deferredInstallPrompt = null;
     let supabaseClient = null;
     let currentCrmMember = null;
+    let currentAccessToken = null;
     let hasStartedCrm = false;
-    let isPasswordRecovery = false;
 
     function setAuthGateMessage(message, type = 'info') {
       const messageElement = document.getElementById('authGateMessage');
@@ -1888,27 +1871,8 @@
       const button = document.getElementById('authSubmitButton');
       button.disabled = isLoading || !supabaseClient;
       button.innerHTML = isLoading
-        ? '<i class="fa-solid fa-spinner fa-spin"></i><span>กำลังเข้าสู่ระบบ…</span>'
-        : '<i class="fa-solid fa-right-to-bracket"></i><span>เข้าสู่ระบบ</span>';
-    }
-
-    function setAuthMode(mode = 'sign-in') {
-      const isRecovery = mode === 'recovery';
-      document.getElementById('authForm').classList.toggle('hidden', isRecovery);
-      document.getElementById('passwordRecoveryForm').classList.toggle('hidden', !isRecovery);
-      document.getElementById('requestPasswordResetButton').classList.toggle('hidden', isRecovery);
-      document.getElementById('authGateTitle').textContent = isRecovery ? 'ตั้งรหัสผ่านใหม่' : 'เข้าสู่ระบบ GOOD CRM';
-      document.querySelector('#authGateTitle + p').textContent = isRecovery
-        ? 'กำหนดรหัสผ่านใหม่เพื่อกลับมาใช้งาน'
-        : 'สำหรับผู้ใช้ที่ได้รับอนุมัติเท่านั้น';
-    }
-
-    function setPasswordRecoveryLoading(isLoading) {
-      const button = document.getElementById('passwordRecoverySubmitButton');
-      button.disabled = isLoading || !supabaseClient;
-      button.innerHTML = isLoading
-        ? '<i class="fa-solid fa-spinner fa-spin"></i><span>กำลังบันทึก…</span>'
-        : '<i class="fa-solid fa-key"></i><span>บันทึกรหัสผ่านใหม่</span>';
+        ? '<i class="fa-solid fa-spinner fa-spin"></i><span>กำลังส่งลิงก์…</span>'
+        : '<i class="fa-solid fa-envelope"></i><span>ส่งลิงก์เข้าสู่ระบบ</span>';
     }
 
     function requireCrmAccess() {
@@ -1927,21 +1891,33 @@
       return `ตั้งค่า Supabase ไม่พร้อมใช้งาน: ${error.message}`;
     }
 
-    function consumeAuthRedirectError() {
+    function consumeMagicLinkRedirectError() {
       const url = new URL(window.location.href);
       const hashParameters = new URLSearchParams(url.hash.replace(/^#/, ''));
       const parameters = url.searchParams.has('error') ? url.searchParams : hashParameters;
-      const errorCode = parameters.get('error_code');
       if (!parameters.get('error')) return null;
 
       url.search = '';
       url.hash = '';
       window.history.replaceState({}, document.title, url.pathname);
+      return 'ลิงก์เข้าสู่ระบบหมดอายุหรือไม่ถูกต้อง กรุณาขอลิงก์ใหม่';
+    }
 
-      if (errorCode === 'otp_expired') {
-        return 'ลิงก์รีเซ็ตรหัสผ่านหมดอายุหรือถูกใช้แล้ว กรุณาขอลิงก์ใหม่และเปิดอีเมลฉบับล่าสุด';
+    function setMagicLinkRequestMode(message, type = 'info') {
+      currentCrmMember = null;
+      currentAccessToken = null;
+      hasStartedCrm = false;
+      showAuthGate(message, type);
+    }
+
+    function describeMagicLinkError(error) {
+      if (error?.code === 'over_email_send_rate_limit' || /email rate limit/i.test(error?.message || '')) {
+        return 'ส่งอีเมลถึงขีดจำกัดชั่วคราว กรุณารอประมาณ 1 ชั่วโมงก่อนขอลิงก์ใหม่';
       }
-      return 'ลิงก์ยืนยันไม่ถูกต้องหรือหมดอายุ กรุณาขอลิงก์ใหม่อีกครั้ง';
+      if (/redirect|url/i.test(error?.message || '')) {
+        return 'URL ของ GOOD CRM ยังไม่ได้รับอนุญาตใน Supabase กรุณาตรวจสอบ Authentication → URL Configuration';
+      }
+      return error?.message || 'ไม่สามารถส่งลิงก์เข้าสู่ระบบได้';
     }
 
     async function initializeAuth() {
@@ -1956,29 +1932,20 @@
           auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
         });
         setAuthSubmitLoading(false);
-        supabaseClient.auth.onAuthStateChange((event) => {
-          if (event === 'PASSWORD_RECOVERY') {
-            isPasswordRecovery = true;
-            currentCrmMember = null;
-            hasStartedCrm = false;
-            setAuthMode('recovery');
-            showAuthGate('กรุณาตั้งรหัสผ่านใหม่เพื่อใช้งาน GOOD CRM ต่อ', 'info');
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+          if (event === 'SIGNED_OUT') {
+            setMagicLinkRequestMode('ออกจากระบบแล้ว กรุณากรอกอีเมลเพื่อรับลิงก์เข้าสู่ระบบ', 'info');
             return;
           }
-          if (event === 'SIGNED_OUT') {
-            isPasswordRecovery = false;
-            currentCrmMember = null;
-            hasStartedCrm = false;
-            setAuthMode('sign-in');
-            showAuthGate('ออกจากระบบแล้ว กรุณาเข้าสู่ระบบเพื่อใช้งาน CRM', 'info');
-          }
+          if (session?.access_token) currentAccessToken = session.access_token;
         });
-        const redirectError = consumeAuthRedirectError();
-        if (redirectError) {
-          await clearInvalidSession(redirectError);
+        const magicLinkError = consumeMagicLinkRedirectError();
+        const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+        if (sessionError || !sessionData.session) {
+          setMagicLinkRequestMode(magicLinkError || 'กรอกอีเมลเพื่อรับลิงก์เข้าสู่ GOOD CRM');
           return;
         }
-        await refreshCrmAccess();
+        await refreshCrmAccess(sessionData.session.access_token);
       } catch (error) {
         console.error('Supabase initialization failed:', error);
         setAuthSubmitLoading(false);
@@ -1987,13 +1954,18 @@
       }
     }
 
-    async function refreshCrmAccess() {
+    async function refreshCrmAccess(accessTokenOverride = null) {
       if (!supabaseClient) return false;
 
-      const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
+      let accessToken = accessTokenOverride || currentAccessToken;
+      let sessionError = null;
+      if (!accessToken) {
+        const { data: sessionData, error } = await supabaseClient.auth.getSession();
+        accessToken = sessionData.session?.access_token;
+        sessionError = error;
+      }
       if (sessionError || !accessToken) {
-        await clearInvalidSession('เซสชันหมดอายุแล้ว กรุณาเข้าสู่ระบบอีกครั้ง');
+        setMagicLinkRequestMode('กรอกอีเมลเพื่อรับลิงก์เข้าสู่ GOOD CRM');
         return false;
       }
 
@@ -2019,6 +1991,7 @@
       }
 
       currentCrmMember = access.membership;
+      currentAccessToken = accessToken;
       hideAuthGate();
       if (!hasStartedCrm) {
         hasStartedCrm = true;
@@ -2028,85 +2001,41 @@
     }
 
     async function clearInvalidSession(message, type = 'error') {
-      isPasswordRecovery = false;
+      // Do not sign out automatically here. A concurrent tab can briefly fail
+      // its CRM access check while a new Magic Link session is being saved,
+      // and a sign-out would discard that valid newly-created session.
       currentCrmMember = null;
+      currentAccessToken = null;
       hasStartedCrm = false;
-      if (supabaseClient) {
-        await supabaseClient.auth.signOut({ scope: 'local' });
-      }
-      setAuthMode('sign-in');
-      showAuthGate(message, type);
+      showAuthGate(message, type, true);
     }
 
-    async function signIn(event) {
+    async function sendMagicLink(event) {
       event.preventDefault();
       if (!supabaseClient) return;
 
       setAuthSubmitLoading(true);
-      setAuthGateMessage('กำลังตรวจสอบอีเมลและรหัสผ่าน…');
+      setAuthGateMessage('กำลังส่งลิงก์เข้าสู่ระบบ…');
       const email = document.getElementById('authEmail').value.trim();
-      const password = document.getElementById('authPassword').value;
-      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      const { error } = await supabaseClient.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: false,
+          emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+        },
+      });
       setAuthSubmitLoading(false);
 
       if (error) {
-        setAuthGateMessage(error.message, 'error');
+        setAuthGateMessage(describeMagicLinkError(error), 'error');
         return;
       }
-      await refreshCrmAccess();
-    }
-
-    async function requestPasswordReset() {
-      if (!supabaseClient) return;
-      const emailInput = document.getElementById('authEmail');
-      const email = emailInput.value.trim();
-      if (!email || !emailInput.checkValidity()) {
-        emailInput.focus();
-        setAuthGateMessage('กรุณากรอกอีเมลก่อนขอลิงก์ตั้งรหัสผ่านใหม่', 'error');
-        return;
-      }
-
-      const button = document.getElementById('requestPasswordResetButton');
-      button.disabled = true;
-      button.textContent = 'กำลังส่งลิงก์…';
-      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}${window.location.pathname}`,
-      });
-      button.disabled = false;
-      button.textContent = 'ลืมรหัสผ่าน?';
-
-      if (error) {
-        setAuthGateMessage(error.message, 'error');
-        return;
-      }
-      setAuthGateMessage('หากอีเมลนี้มีบัญชีอยู่ ระบบจะส่งลิงก์ตั้งรหัสผ่านใหม่ โปรดเปิดอีเมลฉบับล่าสุด', 'success');
-    }
-
-    async function updateRecoveredPassword(event) {
-      event.preventDefault();
-      if (!supabaseClient || !isPasswordRecovery) return;
-
-      const password = document.getElementById('recoveryPassword').value;
-      const confirmation = document.getElementById('recoveryPasswordConfirmation').value;
-      if (password !== confirmation) {
-        setAuthGateMessage('ยืนยันรหัสผ่านใหม่ไม่ตรงกัน', 'error');
-        return;
-      }
-
-      setPasswordRecoveryLoading(true);
-      const { error } = await supabaseClient.auth.updateUser({ password });
-      setPasswordRecoveryLoading(false);
-      if (error) {
-        setAuthGateMessage(error.message, 'error');
-        return;
-      }
-
-      document.getElementById('passwordRecoveryForm').reset();
-      await clearInvalidSession('ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่', 'success');
+      setAuthGateMessage('ส่งลิงก์แล้ว กรุณาเปิดอีเมลและกด “Sign in” เพื่อเข้าสู่ GOOD CRM', 'success');
     }
 
     async function signOut() {
       currentCrmMember = null;
+      currentAccessToken = null;
       hasStartedCrm = false;
       if (supabaseClient) await supabaseClient.auth.signOut();
       showAuthGate('ออกจากระบบแล้ว กรุณาเข้าสู่ระบบเพื่อใช้งาน CRM');
@@ -2116,12 +2045,18 @@
       if (!supabaseClient || !currentCrmMember) {
         throw new Error('กรุณาเข้าสู่ระบบด้วยบัญชีที่ได้รับสิทธิ์ CRM');
       }
-      const { data: sessionData, error } = await supabaseClient.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-      if (error || !accessToken) {
+      let accessToken = currentAccessToken;
+      let sessionError = null;
+      if (!accessToken) {
+        const { data: sessionData, error } = await supabaseClient.auth.getSession();
+        accessToken = sessionData.session?.access_token;
+        sessionError = error;
+      }
+      if (sessionError || !accessToken) {
         await clearInvalidSession('เซสชันหมดอายุแล้ว กรุณาเข้าสู่ระบบอีกครั้ง');
         throw new Error('เซสชันหมดอายุแล้ว');
       }
+      currentAccessToken = accessToken;
       const headers = new Headers(options.headers || {});
       headers.set('Authorization', `Bearer ${accessToken}`);
       const response = await fetch(resource, { ...options, headers });

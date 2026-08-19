@@ -1,6 +1,6 @@
 # GOOD CRM authentication setup
 
-GOOD CRM uses Supabase Auth (email/password) and Supabase Database with Row Level Security (RLS). There is no public sign-up path: a CRM administrator provisions each account.
+GOOD CRM uses Supabase Auth (email Magic Link) and Supabase Database with Row Level Security (RLS). There is no public sign-up path: a CRM administrator provisions each account.
 
 ## Configure the app
 
@@ -8,7 +8,9 @@ Copy `.env.example` to `.env` and set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_K
 
 ## Configure Supabase Auth
 
-In **Authentication → Providers**, enable Email. In **Authentication → URL Configuration**, add the deployed GOOD CRM origin and `http://localhost:3000` for local testing. An invited or newly created account must verify its email before password sign-in if email confirmation is enabled. Enable [leaked password protection](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection) before production.
+In **Authentication → Providers**, enable Email and disable **Allow new users to sign up**. In **Authentication → URL Configuration**, set the Site URL to the deployed GOOD CRM URL, and add that same origin plus `http://localhost:3000` for local testing to Redirect URLs.
+
+Use the default **Magic link or OTP** email template, which contains `{{ .ConfirmationURL }}` and sends a one-time **Sign in** link. Custom SMTP is not required. The app sends a link only to existing Supabase users (`shouldCreateUser: false`), then confirms that the user has an active `crm_members` record before displaying the CRM.
 
 ## Apply the CRM schema
 
@@ -35,6 +37,6 @@ Use `manager` or `sales` for other approved users. Active members can access CRM
 
 ## Verification
 
-Run `npm start`, then open `http://localhost:3000`. `/api/protected/health` must return `401` without a Bearer token. After an approved user signs in, the server validates the Supabase user and their active membership before the CRM is displayed.
+Run `npm start`, then open `http://localhost:3000`. `/api/protected/health` must return `401` without a Bearer token. Enter an approved email, request a sign-in link, and open that link from the email in the same browser. The server validates the signed-in user and their active membership before the CRM is displayed.
 
 For production, complete [SECURITY_DEPLOYMENT.md](SECURITY_DEPLOYMENT.md) to configure the Thailand-only edge rule.

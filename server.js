@@ -160,15 +160,32 @@ async function requireCrmMember(req, res, next) {
     return res.status(503).json({ error: 'CRM access control is not configured.' });
   }
 
-  const { data: userData, error: userError } = await userClient.auth.getUser(accessToken);
-  if (userError || !userData.user) {
+  let authUser;
+  try {
+    const authResponse = await fetch(`${PROJECT_URL}/auth/v1/user`, {
+      headers: {
+        apikey: PUBLISHABLE_KEY,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (!authResponse.ok) {
+      return res.status(401).json({ error: 'Your session is invalid or has expired.' });
+    }
+    authUser = await authResponse.json();
+  } catch (error) {
+    console.error('Unable to verify Supabase session:', error.message);
+    return res.status(503).json({ error: 'CRM access control is temporarily unavailable.' });
+  }
+
+  const userId = authUser?.id;
+  if (!userId) {
     return res.status(401).json({ error: 'Your session is invalid or has expired.' });
   }
 
   const { data: membership, error: membershipError } = await userClient
     .from('crm_members')
     .select('user_id, display_name, role, is_active')
-    .eq('user_id', userData.user.id)
+    .eq('user_id', userId)
     .maybeSingle();
 
   if (membershipError) {
@@ -179,7 +196,7 @@ async function requireCrmMember(req, res, next) {
     return res.status(403).json({ error: 'This account does not have active CRM access.' });
   }
 
-  req.crmUser = { id: userData.user.id, membership, client: userClient };
+  req.crmUser = { id: userId, membership, client: userClient };
   return next();
 }
 
@@ -752,7 +769,15 @@ app.use(
   })
 );
 
-app.use(express.static(path.join(__dirname, 'public'), { index: 'index.html', maxAge: 0 }));
+app.use(express.static(path.join(__dirname, 'public'), {
+  index: 'index.html',
+  maxAge: 0,
+  setHeaders(res, filePath) {
+    if (path.basename(filePath) === 'index.html') {
+      res.set('Cache-Control', 'no-store, must-revalidate');
+    }
+  },
+}));
 
 if (require.main === module) {
   app.listen(PORT, () => {
