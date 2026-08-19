@@ -1,0 +1,101 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1500' height='900' viewBox='0 0 1500 900'>
+  <defs>
+    <linearGradient id='bgBlue' x1='0' x2='1' y1='0' y2='1'>
+      <stop offset='0%' stop-color='#dbeafe'/>
+      <stop offset='100%' stop-color='#ffffff'/>
+    </linearGradient>
+    <filter id='soft' x='-20%' y='-20%' width='140%' height='140%'>
+      <feDropShadow dx='0' dy='8' stdDeviation='12' flood-color='#bfdbfe' flood-opacity='0.45'/>
+    </filter>
+  </defs>
+  <rect x='0' y='0' width='1500' height='900' fill='url(#bgBlue)'/>
+  <g filter='url(#soft)'>
+    <rect x='24' y='24' width='960' height='852' rx='28' fill='white' stroke='#bfdbfe' stroke-width='2'/>
+    <rect x='44' y='54' width='214' height='812' rx='20' fill='#eef2ff'/>
+    <text x='72' y='88' font-family='Poppins,Segoe UI,Arial' font-size='16' font-weight='800' fill='#1e3a8a'>CRM Shell</text>
+    
+      <g>
+        <rect x='66' y='130' width='186' height='38' rx='10' fill='#3b82f6' />
+        <text x='80' y='154' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#ffffff' font-weight='700'> หน้าหลัก </text>
+      </g>
+      <g>
+        <rect x='66' y='182' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='206' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> ลีด </text>
+      </g>
+      <g>
+        <rect x='66' y='234' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='258' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> ลูกค้า </text>
+      </g>
+      <g>
+        <rect x='66' y='286' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='310' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> นัดหมาย </text>
+      </g>
+      <g>
+        <rect x='66' y='338' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='362' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> เสนอราคา </text>
+      </g>
+      <g>
+        <rect x='66' y='390' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='414' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> ติดตั้ง </text>
+      </g>
+      <g>
+        <rect x='66' y='442' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='466' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> รายงาน </text>
+      </g>
+      <g>
+        <rect x='66' y='494' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='518' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> งาน </text>
+      </g>
+      <g>
+        <rect x='66' y='546' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='570' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> ตั้งค่า </text>
+      </g>
+      <g>
+        <rect x='66' y='598' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='622' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> นำเข้า </text>
+      </g>
+    <rect x='283' y='54' width='681' height='812' rx='20' fill='#f8fbff'/>
+    <rect x='316' y='84' width='615' height='64' rx='14' fill='#ffffff' stroke='#bfdbfe'/>
+    <text x='350' y='124' font-family='Poppins,Segoe UI,Arial' font-size='24' font-weight='800' fill='#1e3a8a'>แดชบอร์ดหลัก</text>
+    <text x='350' y='142' font-family='Poppins,Segoe UI,Arial' font-size='11' fill='#475569'>ภาพรวมยอดขาย ทีม และตัวชี้วัดสำคัญ</text>
+          <g>
+        <rect x='316' y='132' width='620' height='76' rx='16' fill='#ffffff' stroke='#bfdbfe'/>
+        <text x='346' y='168' font-family='Poppins,Segoe UI,Arial' font-size='26' font-weight='800' fill='#1e40af'>สรุปผลปัจจุบัน</text>
+        <text x='346' y='188' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#475569'>แสดง KPI และตัวชี้วัดที่สำคัญแบบสด</text>
+        <rect x='316' y='220' width='145' height='112' rx='14' fill='#dbeafe'/><text x='344' y='252' font-size='12' fill='#1e3a8a'>ยอดปิดดีล</text><text x='344' y='282' font-size='28' fill='#1d4ed8' font-weight='700'>156</text>
+        <rect x='480' y='220' width='145' height='112' rx='14' fill='#bfdbfe'/><text x='508' y='252' font-size='12' fill='#1e3a8a'>มูลค่ารวม</text><text x='508' y='282' font-size='28' fill='#1d4ed8' font-weight='700'>2.8M</text>
+        <rect x='644' y='220' width='145' height='112' rx='14' fill='#bfdbfe'/><text x='672' y='252' font-size='12' fill='#1e3a8a'>นัดหมายวันนี้</text><text x='672' y='282' font-size='28' fill='#1d4ed8' font-weight='700'>28</text>
+        <rect x='808' y='220' width='145' height='112' rx='14' fill='#dbeafe'/><text x='836' y='252' font-size='12' fill='#1e3a8a'>แปปคิวที่รอดำเนินการ</text><text x='836' y='282' font-size='28' fill='#1d4ed8' font-weight='700'>63</text>
+        <rect x='316' y='356' width='374' height='210' rx='14' fill='#ffffff' stroke='#bfdbfe'/>
+        <text x='346' y='388' font-family='Poppins,Segoe UI,Arial' font-size='15' font-weight='700' fill='#1e3a8a'>Sales trend (90 วัน)</text>
+        <polyline points='350,518 390,488 430,496 470,466 510,474 550,452 590,438 630,422 670,396 710,392 750,368 790,358 810,350' fill='none' stroke='#2563eb' stroke-width='4'/>
+        <text x='350' y='548' font-size='11' fill='#64748b'>Mon Tue Wed Thu Fri Sat Sun</text>
+        <rect x='706' y='356' width='246' height='210' rx='14' fill='#ffffff' stroke='#bfdbfe'/>
+        <text x='736' y='388' font-family='Poppins,Segoe UI,Arial' font-size='15' font-weight='700' fill='#1e3a8a'>Top Source</text>
+        <rect x='736' y='410' width='170' height='16' rx='8' fill='#e5edff'/><rect x='736' y='410' width='130' height='16' rx='8' fill='#3b82f6'/><text x='912' y='423' font-size='10' fill='#334155'>โฆษณา</text>
+        <rect x='736' y='436' width='170' height='16' rx='8' fill='#e5edff'/><rect x='736' y='436' width='108' height='16' rx='8' fill='#1d4ed8'/><text x='912' y='449' font-size='10' fill='#334155'>ออร์แกนิก</text>
+        <rect x='736' y='462' width='170' height='16' rx='8' fill='#e5edff'/><rect x='736' y='462' width='93' height='16' rx='8' fill='#60a5fa'/><text x='912' y='475' font-size='10' fill='#334155'>แนะนำ</text>
+        <rect x='316' y='590' width='636' height='178' rx='14' fill='#ffffff' stroke='#bfdbfe'/>
+        <text x='346' y='618' font-family='Poppins,Segoe UI,Arial' font-size='15' font-weight='700' fill='#1e3a8a'>กิจกรรมเด่นวันนี้</text>
+        <rect x='340' y='635' width='560' height='20' rx='10' fill='#eff6ff'/><text x='352' y='650' font-size='11' fill='#475569'>Apex Solar - นัด Demo 14:00</text>
+        <rect x='340' y='663' width='560' height='20' rx='10' fill='#eff6ff'/><text x='352' y='678' font-size='11' fill='#475569'>Green Life - ยืนยันใบเสนอราคา</text>
+        <rect x='340' y='691' width='560' height='20' rx='10' fill='#eff6ff'/><text x='352' y='706' font-size='11' fill='#475569'>Install Team - ตรวจระบบหลังส่งงาน 3 ราย</text>
+      </g>
+  </g>
+  <g>
+          <g>
+        <rect x='1046' y='110' width='330' height='720' rx='28' fill='white' stroke='#bfdbfe'/>
+        <rect x='1072' y='148' width='278' height='46' rx='12' fill='#e8f0ff'/>
+        <text x='1108' y='176' font-size='13' fill='#1e3a8a' font-weight='700'>Top Actions</text>
+        <rect x='1072' y='208' width='278' height='68' rx='12' fill='#dbeafe'/><text x='1090' y='238' font-size='11' fill='#1e3a8a'>สรุปหลัก</text><text x='1090' y='252' font-size='18' font-weight='700' fill='#1d4ed8'>ข้อมูลเร็ว</text>
+        <rect x='1072' y='286' width='278' height='420' rx='14' fill='#f8fbff'/>
+        <text x='1090' y='316' font-size='11' fill='#334155'>รายการแสดงแบบมือถือ</text>
+        <rect x='1090' y='334' width='242' height='56' rx='10' fill='#e0edff'/><text x='1102' y='366' font-size='10' fill='#1e3a8a'>1) ต้องติดตามลูกค้า</text>
+        <rect x='1090' y='400' width='242' height='56' rx='10' fill='#e0edff'/><text x='1102' y='432' font-size='10' fill='#1e3a8a'>2) นัดหมายวันนี้</text>
+        <rect x='1090' y='466' width='242' height='56' rx='10' fill='#e0edff'/><text x='1102' y='498' font-size='10' fill='#1e3a8a'>3) รายงานสรุปสั้น</text>
+        <rect x='1090' y='532' width='242' height='56' rx='10' fill='#e0edff'/><text x='1102' y='564' font-size='10' fill='#1e3a8a'>4) ตัวเลือกด่วน</text>
+        <rect x='1090' y='598' width='242' height='56' rx='10' fill='#e0edff'/><text x='1102' y='630' font-size='10' fill='#1e3a8a'>5) เริ่มงานใหม่</text>
+        <rect x='1072' y='670' width='278' height='54' rx='12' fill='#1d4ed8'/><text x='1211' y='705' text-anchor='middle' font-size='12' fill='white' font-weight='700'>ดำเนินงานด่วน</text>
+      </g>
+  </g>
+</svg>

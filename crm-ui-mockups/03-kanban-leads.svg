@@ -1,0 +1,94 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1500' height='900' viewBox='0 0 1500 900'>
+  <defs>
+    <linearGradient id='bgBlue' x1='0' x2='1' y1='0' y2='1'>
+      <stop offset='0%' stop-color='#dbeafe'/>
+      <stop offset='100%' stop-color='#ffffff'/>
+    </linearGradient>
+    <filter id='soft' x='-20%' y='-20%' width='140%' height='140%'>
+      <feDropShadow dx='0' dy='8' stdDeviation='12' flood-color='#bfdbfe' flood-opacity='0.45'/>
+    </filter>
+  </defs>
+  <rect x='0' y='0' width='1500' height='900' fill='url(#bgBlue)'/>
+  <g filter='url(#soft)'>
+    <rect x='24' y='24' width='960' height='852' rx='28' fill='white' stroke='#bfdbfe' stroke-width='2'/>
+    <rect x='44' y='54' width='214' height='812' rx='20' fill='#eef2ff'/>
+    <text x='72' y='88' font-family='Poppins,Segoe UI,Arial' font-size='16' font-weight='800' fill='#1e3a8a'>CRM Shell</text>
+    
+      <g>
+        <rect x='66' y='130' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='154' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> หน้าหลัก </text>
+      </g>
+      <g>
+        <rect x='66' y='182' width='186' height='38' rx='10' fill='#3b82f6' />
+        <text x='80' y='206' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#ffffff' font-weight='700'> ลีด </text>
+      </g>
+      <g>
+        <rect x='66' y='234' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='258' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> ลูกค้า </text>
+      </g>
+      <g>
+        <rect x='66' y='286' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='310' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> นัดหมาย </text>
+      </g>
+      <g>
+        <rect x='66' y='338' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='362' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> เสนอราคา </text>
+      </g>
+      <g>
+        <rect x='66' y='390' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='414' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> ติดตั้ง </text>
+      </g>
+      <g>
+        <rect x='66' y='442' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='466' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> รายงาน </text>
+      </g>
+      <g>
+        <rect x='66' y='494' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='518' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> งาน </text>
+      </g>
+      <g>
+        <rect x='66' y='546' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='570' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> ตั้งค่า </text>
+      </g>
+      <g>
+        <rect x='66' y='598' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='622' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> นำเข้า </text>
+      </g>
+    <rect x='283' y='54' width='681' height='812' rx='20' fill='#f8fbff'/>
+    <rect x='316' y='84' width='615' height='64' rx='14' fill='#ffffff' stroke='#bfdbfe'/>
+    <text x='350' y='124' font-family='Poppins,Segoe UI,Arial' font-size='24' font-weight='800' fill='#1e3a8a'>ลีด (Lead Pipeline)</text>
+    <text x='350' y='142' font-family='Poppins,Segoe UI,Arial' font-size='11' fill='#475569'>ติดตามสถานะลูกค้า Prospect ตั้งแต่เข้าไปจองถึงปิดดีล</text>
+          <g>
+        <rect x='316' y='132' width='640' height='78' rx='14' fill='#ffffff' stroke='#bfdbfe'/>
+        <text x='346' y='172' font-family='Poppins,Segoe UI,Arial' font-size='22' font-weight='800' fill='#1e3a8a'>Pipeline</text>
+        <text x='346' y='192' font-size='12' fill='#64748b'>ติดตามขั้นตอนลูกค้าแบบ realtime</text>
+        <rect x='316' y='230' width='150' height='520' rx='14' fill='#dbeafe'/><text x='344' y='256' font-size='12' fill='#1d4ed8' font-weight='700'>1. พบข้อมูลใหม่</text>
+        <rect x='344' y='270' width='94' height='36' rx='10' fill='#eff6ff'/><text x='359' y='292' font-size='10' fill='#1e3a8a'>Lead-1001</text>
+        <rect x='344' y='316' width='94' height='36' rx='10' fill='#eff6ff'/><text x='359' y='338' font-size='10' fill='#1e3a8a'>Lead-1008</text>
+        <rect x='344' y='362' width='94' height='36' rx='10' fill='#eff6ff'/><text x='359' y='384' font-size='10' fill='#1e3a8a'>Lead-1011</text>
+        <rect x='492' y='230' width='150' height='520' rx='14' fill='#dbeafe'/><text x='519' y='256' font-size='12' fill='#1d4ed8' font-weight='700'>2. นัดนำเสนอ</text>
+        <rect x='520' y='270' width='94' height='36' rx='10' fill='#e0edff'/><text x='535' y='292' font-size='10' fill='#1e3a8a'>Lead-1004</text>
+        <rect x='520' y='316' width='94' height='36' rx='10' fill='#e0edff'/><text x='535' y='338' font-size='10' fill='#1e3a8a'>Lead-1015</text>
+        <rect x='668' y='230' width='150' height='520' rx='14' fill='#bfdbfe'/><text x='689' y='256' font-size='12' fill='#1d4ed8' font-weight='700'>3. ตกลง</text>
+        <rect x='696' y='270' width='94' height='36' rx='10' fill='#dbeafe'/><text x='711' y='292' font-size='10' fill='#1e3a8a'>Lead-1009</text>
+        <rect x='844' y='230' width='150' height='520' rx='14' fill='#dbeafe'/><text x='867' y='256' font-size='12' fill='#1d4ed8' font-weight='700'>4. ติดตามติดตั้ง</text>
+        <rect x='872' y='270' width='94' height='36' rx='10' fill='#dbeafe'/><text x='887' y='292' font-size='10' fill='#1e3a8a'>Lead-1019</text>
+      </g>
+  </g>
+  <g>
+          <g>
+        <rect x='1046' y='110' width='330' height='720' rx='28' fill='white' stroke='#bfdbfe'/>
+        <rect x='1072' y='148' width='278' height='46' rx='12' fill='#e8f0ff'/>
+        <text x='1108' y='176' font-size='13' fill='#1e3a8a' font-weight='700'>Top Actions</text>
+        <rect x='1072' y='208' width='278' height='68' rx='12' fill='#dbeafe'/><text x='1090' y='238' font-size='11' fill='#1e3a8a'>สรุปหลัก</text><text x='1090' y='252' font-size='18' font-weight='700' fill='#1d4ed8'>ข้อมูลเร็ว</text>
+        <rect x='1072' y='286' width='278' height='420' rx='14' fill='#f8fbff'/>
+        <text x='1090' y='316' font-size='11' fill='#334155'>รายการแสดงแบบมือถือ</text>
+        <rect x='1090' y='334' width='242' height='56' rx='10' fill='#e0edff'/><text x='1102' y='366' font-size='10' fill='#1e3a8a'>1) ต้องติดตามลูกค้า</text>
+        <rect x='1090' y='400' width='242' height='56' rx='10' fill='#e0edff'/><text x='1102' y='432' font-size='10' fill='#1e3a8a'>2) นัดหมายวันนี้</text>
+        <rect x='1090' y='466' width='242' height='56' rx='10' fill='#e0edff'/><text x='1102' y='498' font-size='10' fill='#1e3a8a'>3) รายงานสรุปสั้น</text>
+        <rect x='1090' y='532' width='242' height='56' rx='10' fill='#e0edff'/><text x='1102' y='564' font-size='10' fill='#1e3a8a'>4) ตัวเลือกด่วน</text>
+        <rect x='1090' y='598' width='242' height='56' rx='10' fill='#e0edff'/><text x='1102' y='630' font-size='10' fill='#1e3a8a'>5) เริ่มงานใหม่</text>
+        <rect x='1072' y='670' width='278' height='54' rx='12' fill='#1d4ed8'/><text x='1211' y='705' text-anchor='middle' font-size='12' fill='white' font-weight='700'>ดำเนินงานด่วน</text>
+      </g>
+  </g>
+</svg>

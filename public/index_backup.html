@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOOD CRM - ระบบจัดการฐานข้อมูลลูกค้า</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts (Kanit & Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Kanit', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Smooth transition for sidebar width and opacity */
+    .sidebar-transition {
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .fade-transition {
+      transition: opacity 0.2s ease-in-out, visibility 0.2s;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Pulse glow effect for primary buttons */
+    .glow-primary {
+      box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.3);
+    }
+  </style>
+</head>
+<body class="h-full font-sans antialiased text-slate-800 flex overflow-hidden bg-slate-50">
+
+  <!-- Sidebar Backdrop for Mobile Overlay -->
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 z-30 md:hidden hidden transition-opacity duration-300"></div>
+
+  <!-- Left Sidebar (Collapsible & Mobile Responsive Drawer) -->
+  <aside id="sidebar" class="sidebar-transition w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 fixed inset-y-0 left-0 z-40 transform -translate-x-full md:relative md:translate-x-0">
+    
+    <!-- Sidebar Toggle Button (Floating - Hidden on mobile) -->
+    <button onclick="toggleSidebar()" class="absolute -right-3.5 top-8 bg-white border border-slate-200 text-slate-500 hover:text-blue-600 hover:bg-slate-50 w-7 h-7 rounded-full flex items-center justify-center shadow-md focus:outline-none z-30 transition-colors hidden md:flex">
+      <i id="toggleBtnIcon" class="fa-solid fa-chevron-left text-xs"></i>
+    </button>
+
+    <!-- Brand / Logo -->
+    <div class="h-16 flex items-center px-5 border-b border-slate-100 gap-3 overflow-hidden shrink-0">
+      <!-- Blue Dot/Circle representing Logo -->
+      <div class="w-7 h-7 rounded-full bg-blue-600 shrink-0 flex items-center justify-center shadow-sm">
+        <i class="fa-solid fa-building-office text-white text-[10px]"></i>
+      </div>
+      <!-- Brand Text: Hidden when sidebar collapsed -->
+      <div id="brandText" class="fade-transition whitespace-nowrap flex-1">
+        <h1 class="text-blue-900 font-bold text-md leading-tight">GOOD CRM</h1>
+        <p class="text-slate-400 text-[10px] font-medium leading-none">ระบบจัดการฐานข้อมูลลูกค้า</p>
+      </div>
+      <!-- Mobile Close Button inside sidebar -->
+      <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-slate-600 p-1">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto no-scrollbar">
+      <!-- Menu Item: ภาพรวม -->
+      <button onclick="switchPage('overview')" id="menu-overview" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-solid fa-chart-line text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">ภาพรวม</span>
+        <!-- Tooltip (Shown when collapsed) -->
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">ภาพรวม</span>
+      </button>
+
+      <!-- Menu Item: ลีดทั้งหมด -->
+      <button onclick="switchPage('leads-list')" id="menu-leads-list" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-solid fa-list-check text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">ลีดทั้งหมด</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">ลีดทั้งหมด</span>
+      </button>
+
+      <!-- Menu Item: เพิ่มลีดใหม่ -->
+      <button onclick="switchPage('create-lead')" id="menu-create-lead" class="w-full group flex items-center px-3.5 py-3 bg-blue-600 text-white rounded-xl shadow-md shadow-blue-200 transition-all duration-200 gap-3 font-semibold relative">
+        <i class="fa-solid fa-circle-plus text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">เพิ่มลีดใหม่</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">เพิ่มลีดใหม่</span>
+      </button>
+
+      <!-- Menu Item: Pipeline การขาย -->
+      <button onclick="switchPage('pipeline')" id="menu-pipeline" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-solid fa-arrows-spin text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">Pipeline การขาย</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">Pipeline การขาย</span>
+      </button>
+
+      <!-- Menu Item: ลูกค้า -->
+      <button onclick="switchPage('customers')" id="menu-customers" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-solid fa-users text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">ลูกค้า</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">ลูกค้า</span>
+      </button>
+
+      <!-- Menu Item: รายงาน -->
+      <button onclick="switchPage('reports')" id="menu-reports" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-solid fa-file-invoice-dollar text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">รายงาน</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">รายงาน</span>
+      </button>
+
+      <!-- Menu Item: กิจกรรมติดตาม -->
+      <button onclick="switchPage('tasks')" id="menu-tasks" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-regular fa-calendar-check text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">กิจกรรมติดตาม</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">กิจกรรมติดตาม</span>
+      </button>
+
+      <!-- Menu Item: ตั้งค่าระบบ -->
+      <button onclick="switchPage('settings')" id="menu-settings" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-solid fa-sliders text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">ตั้งค่าระบบ</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">ตั้งค่าระบบ</span>
+      </button>
+    </nav>
+
+    <!-- Footer of Sidebar -->
+    <div class="p-4 border-t border-slate-100 overflow-hidden text-center shrink-0">
+      <span id="sidebarFooterText" class="text-[10px] text-slate-400 font-light block transition-all">GOOD CRM Database v1.0.0</span>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <div class="flex-1 flex flex-col overflow-hidden relative w-full">
+    
+    <!-- Mobile Header Navbar (Visible only on mobile) -->
+    <div class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:hidden shrink-0 z-30">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleMobileSidebar()" class="text-slate-600 p-2 rounded-lg hover:bg-slate-100 focus:outline-none">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+        <span class="font-bold text-blue-900 text-md">GOOD CRM</span>
+      </div>
+      <!-- Quick user initials badge -->
+      <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold border border-blue-200 text-xs">
+        <span class="mobile-avatar-initials">ก</span>
+      </div>
+    </div>
+
+    <!-- Main Workspace (Dynamic Pages - Expanded to 100% width) -->
+    <main class="flex-1 overflow-y-auto bg-slate-100/40 p-4 sm:p-6 w-full">
+      
+      <!-- PAGE 1: OVERVIEW -->
+      <div id="page-overview" class="page-container hidden w-full space-y-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-2">
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-800">ภาพรวมระบบ (Overview Dashboard)</h2>
+          <span class="text-slate-400 text-xs font-light hidden sm:inline">ข้อมูลอัปเดตแบบเรียลไทม์</span>
+        </div>
+        
+        <!-- Stats Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-4">
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl shadow-inner shrink-0"><i class="fa-solid fa-address-card"></i></div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">ลีดลูกค้าทั้งหมด</span>
+              <h3 id="statTotalLeads" class="text-xl sm:text-2xl font-bold text-slate-800">0</h3>
+            </div>
+          </div>
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-4">
+            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl shadow-inner shrink-0"><i class="fa-solid fa-arrows-spin"></i></div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">กำลังเสนอราคา</span>
+              <h3 id="statActiveLeads" class="text-xl sm:text-2xl font-bold text-slate-800">0</h3>
+            </div>
+          </div>
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-4">
+            <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-xl shadow-inner shrink-0"><i class="fa-solid fa-circle-check"></i></div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">ปิดการขายสำเร็จ</span>
+              <h3 id="statSuccessLeads" class="text-xl sm:text-2xl font-bold text-slate-800">0</h3>
+            </div>
+          </div>
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-4">
+            <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl shadow-inner shrink-0"><i class="fa-solid fa-bullseye"></i></div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">เป้าการขายประจำเดือน</span>
+              <h3 class="text-xl sm:text-2xl font-bold text-slate-800">82%</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Recent Leads Card -->
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 lg:col-span-2 overflow-hidden">
+            <h3 class="font-bold text-slate-700 text-md sm:text-lg mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-list text-blue-600"></i>
+              <span>ลีดลูกค้าเข้าใหม่ล่าสุด</span>
+            </h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="text-slate-400 border-b border-slate-100">
+                    <th class="pb-3 font-semibold">ชื่อลูกค้า/บริษัท</th>
+                    <th class="pb-3 font-semibold">เบอร์โทรศัพท์</th>
+                    <th class="pb-3 font-semibold">ความสนใจ</th>
+                    <th class="pb-3 font-semibold text-right">รหัสลูกค้า</th>
+                  </tr>
+                </thead>
+                <tbody id="recentLeadsTableBody" class="divide-y divide-slate-100 text-slate-700">
+                  <tr>
+                    <td colspan="4" class="py-6 text-center text-slate-400">กำลังเชื่อมต่อข้อมูลกับ Google Sheets...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Channel Stats & Goal progress -->
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 space-y-6">
+            <h3 class="font-bold text-slate-700 text-md sm:text-lg flex items-center gap-2">
+              <i class="fa-solid fa-chart-pie text-blue-600"></i>
+              <span>สัดส่วนแหล่งที่มาลูกค้า</span>
+            </h3>
+            
+            <div class="space-y-4 text-xs sm:text-sm" id="referralSourceBreakdown">
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span>Website</span>
+                  <span>45%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-blue-600 h-full rounded-full" style="width: 45%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span>Facebook Ads</span>
+                  <span>30%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-indigo-500 h-full rounded-full" style="width: 30%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span>LINE Official</span>
+                  <span>15%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-green-500 h-full rounded-full" style="width: 15%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 2: LEADS LIST -->
+      <div id="page-leads-list" class="page-container hidden w-full space-y-6">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 gap-4">
+          <div class="flex items-center gap-3">
+            <div class="bg-blue-900 text-white font-bold w-9 h-9 rounded-lg flex items-center justify-center text-lg">
+              <i class="fa-solid fa-list-check"></i>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800">ลีดลูกค้าทั้งหมด (All Leads)</h2>
+          </div>
+          <!-- Action Buttons -->
+          <div class="flex items-center gap-2">
+            <button onclick="fetchLeadsData()" class="px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all text-xs">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span class="hidden sm:inline">รีเฟรชข้อมูล</span>
+            </button>
+            <button onclick="switchPage('create-lead')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center gap-2 shadow-md shadow-blue-200 transition-all glow-primary text-xs">
+              <i class="fa-solid fa-plus"></i>
+              <span>เพิ่มลีดใหม่</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/60 flex flex-col md:flex-row gap-3 items-center justify-between w-full">
+          <div class="relative w-full md:w-96">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="leadsSearchInput" oninput="filterLeads()" placeholder="ค้นหาชื่อลูกค้า, บริษัท, หรือเบอร์โทรศัพท์..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xs">
+          </div>
+          <div class="flex gap-3 w-full md:w-auto overflow-x-auto shrink-0">
+            <select id="filterProvince" onchange="filterLeads()" class="w-full md:w-40 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+              <option value="">ทุกจังหวัด</option>
+              <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
+              <option value="นนทบุรี">นนทบุรี</option>
+              <option value="ปทุมธานี">ปทุมธานี</option>
+              <option value="สมุทรปราการ">สมุทรปราการ</option>
+            </select>
+            <select id="filterChannel" onchange="filterLeads()" class="w-full md:w-40 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+              <option value="">ทุกช่องทางติดต่อ</option>
+              <option value="โทรศัพท์">โทรศัพท์</option>
+              <option value="อีเมล">อีเมล</option>
+              <option value="LINE">LINE</option>
+              <option value="Facebook">Facebook</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Leads Table Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden w-full">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200/80 text-slate-500">
+                  <th class="p-4 font-bold">รหัสลูกค้า</th>
+                  <th class="p-4 font-bold">ชื่อลูกค้า / บริษัท</th>
+                  <th class="p-4 font-bold">ข้อมูลติดต่อ</th>
+                  <th class="p-4 font-bold hidden sm:table-cell">จังหวัด</th>
+                  <th class="p-4 font-bold hidden md:table-cell">สินค้าที่สนใจ</th>
+                  <th class="p-4 font-bold hidden sm:table-cell">วันที่ลงข้อมูล</th>
+                  <th class="p-4 font-bold text-center">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="leadsTableBody" class="divide-y divide-slate-100 text-slate-700">
+                <tr>
+                  <td colspan="7" class="p-8 text-center text-slate-400">
+                    <div class="flex flex-col items-center justify-center gap-3">
+                      <div class="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                      <span>กำลังดาวน์โหลดลีดจากสเปรดชีตของคุณ...</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 3: CREATE LEAD FORM -->
+      <div id="page-create-lead" class="page-container hidden w-full space-y-6">
+        
+        <!-- Form Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 bg-slate-50/50 p-4 rounded-2xl border border-slate-200/50 gap-4">
+          <div class="flex items-center gap-4">
+            <button onclick="switchPage('leads-list')" class="w-9 h-9 rounded-full bg-white hover:bg-slate-100 flex items-center justify-center border border-slate-200 shadow-sm transition-colors text-slate-600 shrink-0">
+              <i class="fa-solid fa-arrow-left text-sm"></i>
+            </button>
+            <div>
+              <h2 class="text-xl sm:text-2xl font-bold text-slate-800">สร้างข้อมูลลูกค้าใหม่</h2>
+              <p class="text-[11px] text-slate-500 font-light mt-0.5">บันทึกข้อมูลลูกค้าและรายละเอียดการติดต่อ</p>
+            </div>
+          </div>
+          <!-- Quick Draft Loader Indicator -->
+          <div id="draftRecoverAlert" class="hidden px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-xs font-semibold flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
+            <span>พบแบบร่างเดิมที่บันทึกไว้ค้างคาอยู่</span>
+            <button onclick="loadDraft()" class="px-2.5 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shrink-0">ดึงข้อมูลร่าง</button>
+          </div>
+        </div>
+
+        <!-- The Lead Form -->
+        <form id="leadForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
+          
+          <!-- SECTION 1: ข้อมูลลูกค้า -->
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/70 space-y-5">
+            <!-- Section Title & Save Actions -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                  <i class="fa-regular fa-address-book"></i>
+                </div>
+                <h3 class="font-bold text-slate-700 text-sm sm:text-md">1. ข้อมูลลูกค้า</h3>
+              </div>
+              <!-- Action Button Bar -->
+              <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+                <button type="button" onclick="resetForm()" class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-[11px] transition-all shadow-sm">
+                  ยกเลิก
+                </button>
+                <button type="button" onclick="saveDraft()" class="px-4 py-2 bg-white border border-blue-200 hover:bg-blue-50 text-blue-700 font-semibold rounded-xl text-[11px] transition-all shadow-sm flex items-center gap-1.5">
+                  <i class="fa-regular fa-floppy-disk"></i>
+                  <span>บันทึกชั่วคราว</span>
+                </button>
+                <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-[11px] transition-all flex items-center gap-1.5 glow-primary">
+                  <i class="fa-solid fa-check"></i>
+                  <span>บันทึกข้อมูล</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Form Row Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 text-xs sm:text-sm">
+              <!-- Row 1 -->
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">ชื่อลูกค้า <span class="text-red-500">*</span></label>
+                <input type="text" id="customerName" required placeholder="กรอกชื่อลูกค้า" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+              </div>
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-2.5">เพศ</label>
+                <div class="flex items-center gap-5 mt-1.5">
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="gender" value="ชาย" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-350">
+                    <span class="font-semibold text-slate-700 text-xs">ชาย</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="gender" value="หญิง" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-350">
+                    <span class="font-semibold text-slate-700 text-xs">หญิง</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="gender" value="ไม่ระบุ" checked class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-350">
+                    <span class="font-semibold text-slate-700 text-xs">ไม่ระบุ</span>
+                  </label>
+                </div>
+              </div>
+              <div class="sm:col-span-2 md:col-span-1">
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">เบอร์โทรศัพท์ <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <i class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                  <input type="tel" id="phone" required placeholder="กรอกเบอร์โทรศัพท์" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                </div>
+              </div>
+
+              <!-- Row 2 -->
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">ช่องทางติดต่อ <span class="text-red-500">*</span></label>
+                <select id="contactChannel" required onchange="toggleChannelDetails(this.value)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                  <option value="">เลือกช่องทางติดต่อ</option>
+                  <option value="โทรศัพท์">โทรศัพท์</option>
+                  <option value="อีเมล">อีเมล</option>
+                  <option value="LINE">LINE</option>
+                  <option value="Facebook">Facebook</option>
+                  <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">ชื่อช่องทางติดต่อ</label>
+                <input type="text" id="contactHandle" placeholder="เช่น Line ID, Facebook, Email" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+              </div>
+              <div class="sm:col-span-2 md:col-span-1">
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">รู้จักครั้งแรก</label>
+                <div class="relative">
+                  <input type="date" id="referralDate" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-500">
+                </div>
+              </div>
+
+              <!-- Row 3 -->
+              <div class="sm:col-span-2">
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">หมายเหตุ</label>
+                <textarea id="customerRemarks" rows="2" placeholder="ข้อมูลเพิ่มเติม" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"></textarea>
+              </div>
+              <div class="sm:col-span-2 md:col-span-1">
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">หมายเหตุ (รู้จักครั้งแรก)</label>
+                <textarea id="referralRemarks" rows="2" placeholder="ข้อมูลเพิ่มเติมเกี่ยวกับการรู้จักครั้งแรก" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: รายละเอียดการติดต่อ (Log) -->
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/70 space-y-5">
+            <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+              <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                <i class="fa-regular fa-clipboard"></i>
+              </div>
+              <h3 class="font-bold text-slate-700 text-sm sm:text-md">2. รายละเอียดการติดต่อ (Log)</h3>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 text-xs sm:text-sm">
+              <!-- Row 1 -->
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">Log_ID</label>
+                <input type="text" value="AUTO" disabled class="w-full px-4 py-2.5 bg-slate-100 text-slate-400 border border-slate-200 rounded-xl cursor-not-allowed font-semibold">
+              </div>
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">Cut_ID</label>
+                <input type="text" value="AUTO" disabled class="w-full px-4 py-2.5 bg-slate-100 text-slate-400 border border-slate-200 rounded-xl cursor-not-allowed font-semibold">
+              </div>
+              <div class="sm:col-span-2 md:col-span-1">
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">แอดมิน <span class="text-red-500">*</span></label>
+                <select id="adminName" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                  <option value="คุณเก็ต">คุณเก็ต</option>
+                  <option value="คุณอนุชา">คุณอนุชา</option>
+                  <option value="คุณมานพ">คุณมานพ</option>
+                </select>
+              </div>
+
+              <!-- Row 2 -->
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">ประเภทลูกค้า <span class="text-red-500">*</span></label>
+                <select id="customerType" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                  <option value="">เลือกประเภทลูกค้า</option>
+                  <option value="โครงการใหม่">โครงการใหม่</option>
+                  <option value="งานปรับปรุง/เปลี่ยนฟิล์ม">งานปรับปรุง/เปลี่ยนฟิล์ม</option>
+                  <option value="งานบ้านเดี่ยวส่วนตัว">งานบ้านเดี่ยวส่วนตัว</option>
+                  <option value="งานราชการ">งานราชการ</option>
+                  <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">หัวข้อที่ติดต่อ <span class="text-red-500">*</span></label>
+                <input type="text" id="topic" required placeholder="กรอกหัวข้อที่ติดต่อ" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+              </div>
+              <div class="sm:col-span-2 md:col-span-1">
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">ความสำคัญ <span class="text-red-500">*</span></label>
+                <select id="priority" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                  <option value="">เลือกความสำคัญ</option>
+                  <option value="สูง">สูง</option>
+                  <option value="ปานกลาง" selected>ปานกลาง</option>
+                  <option value="ต่ำ">ต่ำ</option>
+                </select>
+              </div>
+
+              <!-- Row 3 -->
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">ประเภทหน้างาน <span class="text-red-500">*</span></label>
+                <select id="siteType" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                  <option value="">เลือกประเภทหน้างาน</option>
+                  <option value="อาคารสำนักงาน">อาคารสำนักงาน</option>
+                  <option value="บ้านเดี่ยว">บ้านเดี่ยว</option>
+                  <option value="ทาวน์โฮม">ทาวน์โฮม</option>
+                  <option value="คอนโดมิเนียม">คอนโดมิเนียม</option>
+                  <option value="โรงงาน/คลังสินค้า">โรงงาน/คลังสินค้า</option>
+                  <option value="ร้านค้า/โชว์รูม">ร้านค้า/โชว์รูม</option>
+                  <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">ที่อยู่หน้างาน <span class="text-red-500">*</span></label>
+                <input type="text" id="siteAddress" required placeholder="กรอกที่อยู่หน้างาน" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+              </div>
+              <div class="sm:col-span-2 md:col-span-1">
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">จังหวัด <span class="text-red-500">*</span></label>
+                <select id="province" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                  <option value="">เลือกจังหวัด</option>
+                  <option value="กรุงเทพมหานคร" selected>กรุงเทพมหานคร</option>
+                  <option value="นนทบุรี">นนทบุรี</option>
+                  <option value="ปทุมธานี">ปทุมธานี</option>
+                  <option value="สมุทรปราการ">สมุทรปราการ</option>
+                  <option value="นครปฐม">นครปฐม</option>
+                  <option value="สมุทรสาคร">สมุทรสาคร</option>
+                  <option value="ชลบุรี">ชลบุรี</option>
+                  <option value="ระยอง">ระยอง</option>
+                  <option value="เชียงใหม่">เชียงใหม่</option>
+                  <option value="นครราชสีมา">นครราชสีมา</option>
+                  <option value="ขอนแก่น">ขอนแก่น</option>
+                  <option value="ภูเก็ต">ภูเก็ต</option>
+                  <option value="สงขลา">สงขลา</option>
+                </select>
+              </div>
+
+              <!-- Row 4 -->
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">สินค้าที่สนใจ <span class="text-red-500">*</span></label>
+                <select id="goodsOfInterest" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                  <option value="">เลือกสินค้าที่สนใจ</option>
+                  <option value="ฟิล์มกรองแสง">ฟิล์มกรองแสง</option>
+                  <option value="ฟิล์มนิรภัย">ฟิล์มนิรภัย</option>
+                  <option value="ฟิล์มตกแต่ง">ฟิล์มตกแต่ง</option>
+                  <option value="ฟิล์มฝ้า">ฟิล์มฝ้า</option>
+                  <option value="ฟิล์มใสกันความร้อน">ฟิล์มใสกันความร้อน</option>
+                  <option value="ฟิล์มประหยัดพลังงาน">ฟิล์มประหยัดพลังงาน</option>
+                </select>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">รายละเอียดงาน</label>
+                <textarea id="jobDetails" rows="2" placeholder="กรอกรายละเอียดงาน" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: ข้อมูลสำหรับออกบิล -->
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/70 space-y-5">
+            <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+              <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                <i class="fa-solid fa-file-invoice"></i>
+              </div>
+              <h3 class="font-bold text-slate-700 text-sm sm:text-md">ข้อมูลสำหรับออกบิล</h3>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 text-xs sm:text-sm">
+              <!-- Row 1 -->
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">ชื่อ/บริษัทออกบิล <span class="text-red-500">*</span></label>
+                <input type="text" id="billingName" required placeholder="กรอกชื่อหรือบริษัท" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+              </div>
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">ที่อยู่สำหรับออกบิล <span class="text-red-500">*</span></label>
+                <textarea id="billingAddress" required rows="2" placeholder="กรอกที่อยู่สำหรับออกบิล" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"></textarea>
+              </div>
+              <div class="sm:col-span-2 md:col-span-1">
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">เลขประจำตัวผู้เสียภาษี</label>
+                <input type="text" id="taxId" placeholder="กรอกเลขประจำตัวผู้เสียภาษี" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+              </div>
+
+              <!-- Row 2 -->
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">ฝ่ายขาย</label>
+                <select id="salesperson" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                  <option value="">เลือกฝ่ายขาย</option>
+                  <option value="ฝ่ายขาย 1">ฝ่ายขาย 1</option>
+                  <option value="ฝ่ายขาย 2">ฝ่ายขาย 2</option>
+                  <option value="ฝ่ายขาย 3">ฝ่ายขาย 3</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">สถานะงาน <span class="text-red-500">*</span></label>
+                <select id="jobStatus" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                  <option value="">เลือกสถานะงาน</option>
+                  <option value="รอดำเนินการ" selected>รอดำเนินการ</option>
+                  <option value="นัดสำรวจหน้างาน">นัดสำรวจหน้างาน</option>
+                  <option value="เสนอราคาแล้ว">เสนอราคาแล้ว</option>
+                  <option value="รออนุมัติ">รออนุมัติ</option>
+                  <option value="ปิดการขายสำเร็จ">ปิดการขายสำเร็จ</option>
+                  <option value="ปิดการขายไม่ได้">ปิดการขายไม่ได้</option>
+                </select>
+              </div>
+              <div class="sm:col-span-2 md:col-span-1">
+                <label class="block text-slate-600 text-xs font-semibold mb-1.5">หมายเหตุ</label>
+                <textarea id="billingRemarks" rows="2" placeholder="ข้อมูลเพิ่มเติม" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"></textarea>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- PAGE 4: PIPELINE -->
+      <div id="page-pipeline" class="page-container hidden w-full space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Pipeline การขาย (Sales Pipeline)</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 overflow-x-auto min-h-[500px]">
+          <!-- Stage 1 -->
+          <div class="bg-slate-150 p-4 rounded-2xl flex flex-col gap-3 min-w-[200px] bg-slate-100">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+              <span class="font-bold text-slate-700 text-xs">ลีดใหม่ (New)</span>
+              <span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-bold">1</span>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/50 space-y-2 cursor-grab">
+              <span class="text-[10px] bg-amber-50 text-amber-700 border border-amber-100 px-2 py-0.5 rounded-full font-semibold">ฟิล์มตกแต่ง</span>
+              <h4 class="font-bold text-xs text-slate-800">คุณวิภาวี พงษ์สวัสดิ์</h4>
+              <p class="text-[10px] text-slate-400">บจก. ไบร์ท ดีเวลลอปเม้นท์</p>
+              <div class="text-[9px] text-slate-400 pt-2 flex items-center justify-between">
+                <span>งบ: 800k</span>
+                <span>กรุงเทพฯ</span>
+              </div>
+            </div>
+          </div>
+          <!-- Stages 2 - 5 -->
+          <div class="bg-slate-150 p-4 rounded-2xl flex flex-col gap-3 min-w-[200px] bg-slate-100"><div class="flex items-center justify-between border-b border-slate-200 pb-2"><span class="font-bold text-slate-700 text-xs">ติดต่อแล้ว</span><span class="bg-slate-200 text-slate-600 text-xs px-2 py-0.5 rounded-full">0</span></div></div>
+          <div class="bg-slate-150 p-4 rounded-2xl flex flex-col gap-3 min-w-[200px] bg-slate-100"><div class="flex items-center justify-between border-b border-slate-200 pb-2"><span class="font-bold text-slate-700 text-xs">วัดหน้างาน</span><span class="bg-slate-200 text-slate-600 text-xs px-2 py-0.5 rounded-full">0</span></div></div>
+          <div class="bg-slate-150 p-4 rounded-2xl flex flex-col gap-3 min-w-[200px] bg-slate-100"><div class="flex items-center justify-between border-b border-slate-200 pb-2"><span class="font-bold text-slate-700 text-xs">เสนอราคา</span><span class="bg-slate-200 text-slate-600 text-xs px-2 py-0.5 rounded-full">0</span></div></div>
+          <div class="bg-slate-150 p-4 rounded-2xl flex flex-col gap-3 min-w-[200px] bg-slate-100"><div class="flex items-center justify-between border-b border-slate-200 pb-2"><span class="font-bold text-slate-700 text-xs">สำเร็จ (Won)</span><span class="bg-slate-200 text-slate-600 text-xs px-2 py-0.5 rounded-full">0</span></div></div>
+        </div>
+      </div>
+
+      <!-- PAGE 5: CUSTOMERS -->
+      <div id="page-customers" class="page-container hidden w-full space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">รายชื่อลูกค้าทั้งหมด (Customer Profiles)</h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden w-full">
+          <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-bold text-slate-700 text-sm">ประวัติลูกค้าทั้งหมด</h3>
+          </div>
+          <div class="p-8 text-center text-slate-400">
+            <i class="fa-solid fa-users text-4xl mb-3 text-slate-300 block"></i>
+            <p class="text-sm">ประวัติและข้อมูลออกบิลทั้งหมดเชื่อมต่อไว้ในการดึงข้อมูลสดแล้ว</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 6: REPORTS -->
+      <div id="page-reports" class="page-container hidden w-full space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">รายงาน & วิเคราะห์ข้อมูล (Analytics Reports)</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+          <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/60 shadow-sm space-y-4">
+            <h3 class="font-bold text-slate-700 text-sm sm:text-md">สินค้าที่ได้รับความนิยมสุงสุด</h3>
+            <div class="space-y-3">
+              <div>
+                <div class="flex justify-between text-xs sm:text-sm font-semibold mb-1">
+                  <span>ฟิล์มกรองแสง</span>
+                  <span>75%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-blue-600 h-full rounded-full" style="width: 75%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs sm:text-sm font-semibold mb-1">
+                  <span>ฟิล์มนิรภัย</span>
+                  <span>45%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-indigo-500 h-full rounded-full" style="width: 45%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
+            <h3 class="font-bold text-slate-700 text-sm sm:text-md mb-4">ยอดเสนอราคาเปรียบเทียบตามเป้าหมาย</h3>
+            <div class="flex items-center gap-6">
+              <div class="relative w-24 h-24 flex items-center justify-center shrink-0">
+                <svg class="absolute inset-0 w-full h-full transform -rotate-90">
+                  <circle cx="48" cy="48" r="40" stroke="#f1f5f9" stroke-width="6" fill="transparent"/>
+                  <circle cx="48" cy="48" r="40" stroke="#2563eb" stroke-width="6" fill="transparent" stroke-dasharray="251" stroke-dashoffset="50"/>
+                </svg>
+                <span class="font-bold text-lg text-slate-800">80%</span>
+              </div>
+              <div class="space-y-1.5 text-xs sm:text-sm">
+                <p class="font-semibold text-slate-700">ยอดสะสม: 1,840,000 บาท</p>
+                <p class="text-xs text-slate-400">เป้าหมายเดือนนี้: 2,300,000 บาท</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 7: TASKS -->
+      <div id="page-tasks" class="page-container hidden w-full space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">กิจกรรมติดตาม (Follow-up Tasks)</h2>
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 max-w-xl w-full">
+          <h3 class="font-bold text-slate-700 text-sm sm:text-md mb-4">สิ่งที่ต้องทำวันนี้</h3>
+          <div class="space-y-3" id="todoListContainer">
+            <label class="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/50 rounded-xl cursor-pointer">
+              <input type="checkbox" checked class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
+              <span class="line-through text-slate-400 text-xs sm:text-sm">โทรยืนยันสถานที่ติดตั้ง คุณวิภาวี</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/50 rounded-xl cursor-pointer">
+              <input type="checkbox" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
+              <span class="text-slate-700 text-xs sm:text-sm">ส่งใบเสนอราคาระบบฟิล์มอาคารสำนักงาน</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 8: SETTINGS -->
+      <div id="page-settings" class="page-container hidden w-full space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">ตั้งค่าระบบ (CRM System Settings)</h2>
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 max-w-2xl w-full space-y-6">
+          <div>
+            <label class="block text-slate-600 text-xs font-semibold mb-1.5">ชื่อแอดมินผู้ดูแลระบบ (Admin Name)</label>
+            <input type="text" id="adminNameConfigSetting" placeholder="คุณเก็ต" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+          </div>
+          <div>
+            <label class="block text-slate-600 text-xs font-semibold mb-1.5">Google Apps Script Web App URL <span class="text-red-500">*</span></label>
+            <textarea id="appsScriptUrlSetting" rows="3" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xs font-mono"></textarea>
+            <p class="text-[10px] text-slate-400 mt-1.5 leading-relaxed">
+              ใส่ URL เว็บแอปพลิเคชันที่สร้างจาก Google Apps Script เพื่อใช้ดึงและส่งข้อมูลจากสเปรดชีต
+            </p>
+          </div>
+          
+          <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+            <button onclick="saveGlobalSettings()" class="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-md shadow-blue-200 transition-colors text-xs">
+              บันทึกการตั้งค่า
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Lead Detail Modal -->
+  <div id="leadDetailModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full mx-4 shadow-2xl transform scale-95 transition-transform duration-300 overflow-y-auto max-h-[90vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+        <h3 class="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-circle-info text-blue-600"></i>
+          <span>รายละเอียดลีดลูกค้า</span>
+        </h3>
+        <button onclick="closeLeadDetailModal()" class="text-slate-400 hover:text-slate-600 p-1.5 hover:bg-slate-50 rounded-full">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      
+      <div id="leadDetailContent" class="space-y-6 text-xs sm:text-sm">
+        <!-- Content will be dynamically inserted here -->
+      </div>
+      
+      <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+        <button onclick="closeLeadDetailModal()" class="px-5 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors text-xs">
+          ปิดหน้าต่าง
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/60 z-50 flex flex-col items-center justify-center hidden">
+    <div class="bg-white px-8 py-6 rounded-3xl flex flex-col items-center justify-center gap-4 shadow-2xl">
+      <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <span class="font-semibold text-slate-700 text-xs sm:text-sm">กำลังบันทึกข้อมูลลีดลง Google Sheets...</span>
+    </div>
+  </div>
+
+  <!-- Success Notification Modal -->
+  <div id="successModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-2xl text-center transform scale-95 transition-transform duration-300">
+      <div class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-200">
+        <i class="fa-solid fa-circle-check text-2xl"></i>
+      </div>
+      <h3 class="text-xl sm:text-2xl font-bold text-slate-800 mb-2">บันทึกข้อมูลสำเร็จ!</h3>
+      <p class="text-slate-500 text-xs sm:text-sm mb-6 leading-relaxed">
+        ข้อมูลลีดได้รับการจัดเก็บลงสเปรดชีตของคุณแล้วเป็นที่เรียบร้อย
+      </p>
+      <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-6 text-left space-y-2 text-xs sm:text-sm">
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-medium">รหัสลูกค้า (Cust_ID):</span>
+          <span id="resCustId" class="font-bold text-blue-700">C-0001</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-medium">รหัสการติดต่อ (Log_ID):</span>
+          <span id="resLogId" class="font-bold text-blue-700">L-0001</span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <a href="https://docs.google.com/spreadsheets/d/1oQNq-n-QaGquYeWIa5xEf3sbDWykT5g8GTbyA_zAfto/edit?usp=sharing" target="_blank" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-md shadow-blue-200 transition-colors flex items-center justify-center gap-2 text-xs">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>เปิดดูใน Google Sheets</span>
+        </a>
+        <button onclick="closeSuccessModal()" class="w-full py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors text-xs">
+          เพิ่มลีดใหม่ต่อ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Alert Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-red-600 text-white px-6 py-3.5 rounded-2xl shadow-xl z-50 flex items-center gap-3 max-w-sm hidden opacity-0 transition-opacity duration-300">
+    <i class="fa-solid fa-circle-exclamation text-xl"></i>
+    <span id="toastMessage" class="text-xs sm:text-sm font-semibold">เกิดข้อผิดพลาดในการส่งข้อมูล</span>
+  </div>
+
+  <script>
+    // State Variables
+    let selectedTags = ["ฟิล์มกรองแสง", "ฟิล์มนิรภัย", "ฟิล์มตกแต่ง"];
+    let config = {
+      adminName: "คุณเก็ต",
+      appsScriptUrl: ""
+    };
+    let allLeads = []; // Store fetched leads
+    let isSidebarCollapsed = false;
+    let isMobileSidebarOpen = false;
+
+    // Initialize App
+    window.onload = function() {
+      // Load configurations from LocalStorage
+      const savedAdmin = localStorage.getItem("gfs_admin_name");
+      const savedUrl = localStorage.getItem("gfs_apps_script_url");
+      
+      if (savedAdmin) config.adminName = savedAdmin;
+      if (savedUrl) config.appsScriptUrl = savedUrl;
+      
+      document.getElementById("adminNameConfigSetting").value = config.adminName;
+      document.getElementById("appsScriptUrlSetting").value = config.appsScriptUrl;
+      
+      updateAdminUI();
+      
+      // Default to "Overview" page
+      switchPage('overview');
+      
+      // Select Phone contact details label as initial state
+      toggleChannelDetails('โทรศัพท์');
+
+      // Check if draft exists
+      checkDraft();
+    };
+
+    // Toggle Sidebar collapsed state (Desktop)
+    function toggleSidebar() {
+      isSidebarCollapsed = !isSidebarCollapsed;
+      const sidebar = document.getElementById("sidebar");
+      const brandText = document.getElementById("brandText");
+      const toggleIcon = document.getElementById("toggleBtnIcon");
+      const footerText = document.getElementById("sidebarFooterText");
+      const labels = document.querySelectorAll(".sidebar-label");
+
+      if (isSidebarCollapsed) {
+        sidebar.className = "sidebar-transition w-20 bg-white border-r border-slate-200 flex flex-col shrink-0 relative z-20";
+        brandText.style.display = "none";
+        footerText.textContent = "v1.0";
+        toggleIcon.className = "fa-solid fa-chevron-right text-xs";
+        labels.forEach(lbl => lbl.style.display = "none");
+      } else {
+        sidebar.className = "sidebar-transition w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 relative z-20";
+        brandText.style.display = "block";
+        footerText.textContent = "GOOD CRM Database v1.0.0";
+        toggleIcon.className = "fa-solid fa-chevron-left text-xs";
+        labels.forEach(lbl => lbl.style.display = "inline");
+      }
+    }
+
+    // Toggle Mobile Sidebar Drawer
+    function toggleMobileSidebar() {
+      isMobileSidebarOpen = !isMobileSidebarOpen;
+      const sidebar = document.getElementById("sidebar");
+      const backdrop = document.getElementById("sidebarBackdrop");
+      
+      if (isMobileSidebarOpen) {
+        sidebar.classList.remove("-translate-x-full");
+        backdrop.classList.remove("hidden");
+      } else {
+        sidebar.classList.add("-translate-x-full");
+        backdrop.classList.add("hidden");
+      }
+    }
+
+    // Switch Page
+    function switchPage(pageId) {
+      // Hide all pages
+      document.querySelectorAll(".page-container").forEach(el => el.classList.add("hidden"));
+      
+      // Show target page
+      const targetPage = document.getElementById(`page-${pageId}`);
+      if (targetPage) targetPage.classList.remove("hidden");
+      
+      // Remove active states from all sidebar buttons
+      document.querySelectorAll("nav button").forEach(btn => {
+        btn.className = "w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600";
+      });
+      
+      // Set active state on target button
+      const activeBtn = document.getElementById(`menu-${pageId}`);
+      if (activeBtn) {
+        activeBtn.className = "w-full group flex items-center px-3.5 py-3 bg-blue-600 text-white rounded-xl shadow-md shadow-blue-200 transition-all duration-200 gap-3 font-semibold relative";
+      }
+
+      // Close mobile drawer if switching page
+      if (isMobileSidebarOpen) {
+        toggleMobileSidebar();
+      }
+
+      // Fetch data automatically when switching to Overview or Leads list
+      if (pageId === 'overview' || pageId === 'leads-list') {
+        fetchLeadsData();
+      }
+    }
+
+    // Fetch leads data from Google Sheet Web App
+    async function fetchLeadsData() {
+      if (!config.appsScriptUrl) {
+        renderMockDataWarning();
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${config.appsScriptUrl}?action=getLeads`);
+        const result = await response.json();
+        
+        if (result.success && result.leads) {
+          allLeads = result.leads;
+          updateDashboardStats();
+          renderLeadsTable();
+        } else {
+          showToast(`ไม่สามารถดึงข้อมูลได้: ${result.error || "เกิดข้อผิดพลาด"}`);
+          renderMockDataWarning();
+        }
+      } catch (err) {
+        console.error("Fetch leads error:", err);
+        renderMockDataWarning();
+      }
+    }
+
+    // Displays warning and shows mock data when API URL is not set
+    function renderMockDataWarning() {
+      allLeads = [
+        {
+          "Cust_ID": "C-0001",
+          "Log_ID": "L-0001",
+          "วันที่บันทึก": new Date().toISOString(),
+          "ชื่อลูกค้า": "คุณวิภาวี พงษ์สวัสดิ์",
+          "ชื่อ/บริษัทออกบิล": "บริษัท ไบร์ท ดีเวลลอปเม้นท์ จำกัด",
+          "เบอร์โทรศัพท์": "081-234-5678",
+          "อีเมล": "wipavee@brightdev.co.th",
+          "จังหวัด": "กรุงเทพมหานคร",
+          "หัวข้อที่ติดต่อ": "ฟิล์มตกแต่ง (สินค้าที่สนใจ: ฟิล์มตกแต่ง)",
+          "ประเภทหน้างาน": "อาคารสำนักงาน",
+          "รู้จักครั้งแรก": new Date().toLocaleDateString('en-CA'),
+          "ประเภทลูกค้า": "โครงการใหม่",
+          "แอดมิน": "คุณเก็ต",
+          "หมายเหตุ": "ความสำคัญ: สูง\
+ฝ่ายขาย: ฝ่ายขาย 1\
+สถานะงาน: รอดำเนินการ\
+รายละเอียดงาน: ต้องการฟิล์มลดความร้อนสูง เน้นความใสภาพภายนอก\
+\
+หมายเหตุทั่วไป: ลูกค้าต้องการเปรียบเทียบหลายยี่ห้อ"
+        }
+      ];
+      updateDashboardStats();
+      renderLeadsTable();
+    }
+
+    function updateDashboardStats() {
+      document.getElementById("statTotalLeads").textContent = allLeads.length;
+      document.getElementById("statActiveLeads").textContent = Math.ceil(allLeads.length * 0.4);
+      document.getElementById("statSuccessLeads").textContent = Math.floor(allLeads.length * 0.5);
+    }
+
+    function renderLeadsTable() {
+      const tableBody = document.getElementById("leadsTableBody");
+      tableBody.innerHTML = "";
+
+      const recentBody = document.getElementById("recentLeadsTableBody");
+      recentBody.innerHTML = "";
+      
+      if (allLeads.length === 0) {
+        const emptyRow = `<tr><td colspan="7" class="p-8 text-center text-slate-400">ไม่มีข้อมูลลีดลูกค้าบันทึกอยู่ในระบบ</td></tr>`;
+        tableBody.innerHTML = emptyRow;
+        recentBody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">ไม่มีข้อมูลลีด</td></tr>`;
+        return;
+      }
+      
+      allLeads.forEach(lead => {
+        const dateFormatted = lead["วันที่บันทึก"] ? new Date(lead["วันที่บันทึก"]).toLocaleDateString('th-TH', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }) : "-";
+        
+        const row = document.createElement("tr");
+        row.className = "hover:bg-slate-50/80 transition-colors";
+        row.innerHTML = `
+          <td class="p-4 font-bold text-blue-700">${lead["Cust_ID"] || lead["Cut_ID"] || "-"}</td>
+          <td class="p-4">
+            <span class="font-bold text-slate-800 block">${lead["ชื่อลูกค้า"] || "-"}</span>
+            <span class="text-xs text-slate-400 block text-ellipsis overflow-hidden max-w-[120px] sm:max-w-none">${lead["ชื่อ/บริษัทออกบิล"] || lead["บริษัท"] || "-"}</span>
+          </td>
+          <td class="p-4 text-xs space-y-0.5">
+            <div class="text-slate-600"><i class="fa-solid fa-phone text-slate-400 mr-1.5 w-3.5"></i>${lead["เบอร์โทรศัพท์"] || "-"}</div>
+            <div class="text-slate-400"><i class="fa-regular fa-envelope text-slate-400 mr-1.5 w-3.5"></i>${lead["อีเมล"] || "-"}</div>
+          </td>
+          <td class="p-4 font-semibold text-slate-600 hidden sm:table-cell">${lead["จังหวัด"] || "-"}</td>
+          <td class="p-4 hidden md:table-cell">
+            <div class="flex flex-wrap gap-1 max-w-[200px]">
+              ${(lead["หัวข้อที่ติดต่อ"] || "").split(",").map(t => `<span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-full font-semibold border border-blue-100">${t.trim()}</span>`).join('')}
+            </div>
+          </td>
+          <td class="p-4 text-slate-500 font-medium hidden sm:table-cell">${dateFormatted}</td>
+          <td class="p-4 text-center">
+            <button onclick="viewLeadDetail('${lead["Cust_ID"]}')" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold rounded-lg text-xs transition-colors">
+              <i class="fa-regular fa-eye mr-1"></i><span class="hidden sm:inline">ดูรายละเอียด</span><span class="inline sm:hidden">ดู</span>
+            </button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      allLeads.slice(0, 5).forEach(lead => {
+        const row = document.createElement("tr");
+        row.className = "hover:bg-slate-50 transition-colors";
+        row.innerHTML = `
+          <td class="py-3.5">
+            <span class="font-bold text-slate-800 block">${lead["ชื่อลูกค้า"] || "-"}</span>
+            <span class="text-xs text-slate-400 block">${lead["ชื่อ/บริษัทออกบิล"] || "-"}</span>
+          </td>
+          <td class="py-3.5 text-slate-600 text-xs">${lead["เบอร์โทรศัพท์"] || "-"}</td>
+          <td class="py-3.5">
+            <span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded-full font-semibold border border-blue-100">
+              ${(lead["หัวข้อที่ติดต่อ"] || "").split(",")[0] || "-"}
+            </span>
+          </td>
+          <td class="py-3.5 text-right font-bold text-blue-700 text-xs">${lead["Cust_ID"] || "-"}</td>
+        `;
+        recentBody.appendChild(row);
+      });
+    }
+
+    // Filter Leads
+    function filterLeads() {
+      const search = document.getElementById("leadsSearchInput").value.toLowerCase().trim();
+      const province = document.getElementById("filterProvince").value;
+      const channel = document.getElementById("filterChannel").value;
+      
+      const tableRows = document.querySelectorAll("#leadsTableBody tr");
+      
+      allLeads.forEach((lead, idx) => {
+        const matchesSearch = 
+          (lead["ชื่อลูกค้า"] || "").toLowerCase().includes(search) ||
+          (lead["ชื่อ/บริษัทออกบิล"] || "").toLowerCase().includes(search) ||
+          (lead["เบอร์โทรศัพท์"] || "").toLowerCase().includes(search);
+          
+        const matchesProvince = !province || lead["จังหวัด"] === province;
+        const matchesChannel = !channel || lead["ช่องทางติดต่อ"] === channel;
+        
+        const rowElement = tableRows[idx];
+        if (rowElement) {
+          if (matchesSearch && matchesProvince && matchesChannel) {
+            rowElement.classList.remove("hidden");
+          } else {
+            rowElement.classList.add("hidden");
+          }
+        }
+      });
+    }
+
+    // View Lead Detail
+    function viewLeadDetail(custId) {
+      const lead = allLeads.find(l => l["Cust_ID"] === custId);
+      if (!lead) return;
+      
+      const content = document.getElementById("leadDetailContent");
+      const refDateStr = lead["รู้จักครั้งแรก"] ? new Date(lead["รู้จักครั้งแรก"]).toLocaleDateString('th-TH') : "-";
+      
+      content.innerHTML = `
+        <div class="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-4">
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">รหัสลูกค้า / รหัสการติดต่อ</span>
+            <span class="font-bold text-blue-700 text-sm sm:text-md">${lead["Cust_ID"]} / ${lead["Log_ID"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">วันที่บันทึกเข้าระบบ</span>
+            <span class="font-semibold text-slate-800">${new Date(lead["วันที่บันทึก"]).toLocaleString('th-TH')}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">ชื่อลูกค้า / ผู้ติดต่อ</span>
+            <span class="font-bold text-slate-800 text-sm sm:text-md">${lead["ชื่อลูกค้า"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">ชื่อบริษัทออกบิล / บริษัท</span>
+            <span class="font-bold text-slate-800">${lead["ชื่อ/บริษัทออกบิล"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">เบอร์โทรศัพท์</span>
+            <span class="font-bold text-slate-800">${lead["เบอร์โทรศัพท์"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">เพศ</span>
+            <span class="font-semibold text-slate-800">${lead["เพศ"] || "ไม่ระบุ"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">ช่องทางติดต่อหลักที่เข้ามา</span>
+            <span class="font-semibold text-slate-800">${lead["ช่องทางติดต่อ"]} (${lead["ชื่อช่องทางติดต่อ"] || "-"})</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">รู้จักครั้งแรก (วันที่แรกพบ)</span>
+            <span class="font-semibold text-slate-800">${refDateStr}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">ประเภทหน้างาน / สถานที่</span>
+            <span class="font-semibold text-slate-800">${lead["ประเภทหน้างาน"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">จังหวัดหน้างาน</span>
+            <span class="font-semibold text-slate-800">${lead["จังหวัด"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">ประเภทสินค้า/ความสนใจ</span>
+            <span class="font-bold text-blue-700">${lead["หัวข้อที่ติดต่อ"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">ประเภทลูกค้า</span>
+            <span class="font-bold text-slate-800">${lead["ประเภทลูกค้า"] || "-"}</span>
+          </div>
+        </div>
+        
+        <div class="border-t border-slate-100 pt-4 text-xs sm:text-sm">
+          <span class="text-slate-400 text-[10px] sm:text-xs block mb-1">ที่อยู่หน้างาน / ที่อยู่ออกบิล</span>
+          <p class="text-slate-700 font-medium bg-slate-50 p-3 rounded-xl border border-slate-200/50">
+            <b>ที่อยู่ติดตั้ง:</b> ${lead["ที่อยู่หน้างาน"] || "-"}<br>
+            <b>เลขผู้เสียภาษี:</b> ${lead["เลขประจำตัวผู้เสียภาษี"] || "-"}<br>
+            <b>ที่อยู่ออกบิล:</b> ${lead["ที่อยู่สำหรับออกบิล"] || "-"}
+          </p>
+        </div>
+
+        <div class="border-t border-slate-100 pt-4 text-xs sm:text-sm">
+          <span class="text-slate-400 text-[10px] sm:text-xs block mb-1">หมายเหตุระบบและรายละเอียดความต้องการ</span>
+          <p class="text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200/50 whitespace-pre-line font-medium leading-relaxed">${lead["หมายเหตุ"] || "-"}</p>
+        </div>
+        
+        <div class="flex justify-between text-[10px] text-slate-400 pt-2">
+          <span>ผู้ลงประวัติ: ${lead["แอดมิน"] || "-"}</span>
+        </div>
+      `;
+      
+      const modal = document.getElementById("leadDetailModal");
+      modal.classList.remove("hidden");
+      setTimeout(() => {
+        modal.classList.remove("opacity-0");
+        modal.querySelector("div").classList.remove("scale-95");
+      }, 50);
+    }
+
+    function closeLeadDetailModal() {
+      const modal = document.getElementById("leadDetailModal");
+      modal.classList.add("opacity-0");
+      modal.querySelector("div").classList.add("scale-95");
+      setTimeout(() => {
+        modal.classList.add("hidden");
+      }, 300);
+    }
+
+    // Save Settings
+    function saveGlobalSettings() {
+      const adminVal = document.getElementById("adminNameConfigSetting").value.trim();
+      const urlVal = document.getElementById("appsScriptUrlSetting").value.trim();
+      
+      if (!urlVal) {
+        showToast("กรุณาระบุ Google Apps Script Web App URL");
+        return;
+      }
+      
+      config.adminName = adminVal || "คุณเก็ต";
+      config.appsScriptUrl = urlVal;
+      
+      localStorage.setItem("gfs_admin_name", config.adminName);
+      localStorage.setItem("gfs_apps_script_url", config.appsScriptUrl);
+      
+      updateAdminUI();
+      showSuccessToast("บันทึกการตั้งค่าเรียบร้อยแล้ว");
+      fetchLeadsData();
+    }
+
+    // Update Admin UI
+    function updateAdminUI() {
+      document.getElementById("headerAdminName").textContent = config.adminName;
+      const initials = config.adminName.replace("คุณ", "").substring(0, 2);
+      document.getElementById("userAvatarInitials").textContent = initials || "ก";
+      
+      // Update mobile avatar
+      document.querySelector(".mobile-avatar-initials").textContent = initials || "ก";
+      
+      // Update form fields
+      document.getElementById("adminName").value = config.adminName;
+      document.getElementById("adminNameConfigSetting").value = config.adminName;
+    }
+
+    // Draft Functions
+    function saveDraft() {
+      const payload = getFormValues();
+      localStorage.setItem('good_crm_draft', JSON.stringify(payload));
+      showSuccessToast("บันทึกข้อมูลร่างชั่วคราวแล้ว");
+      checkDraft();
+    }
+
+    function checkDraft() {
+      const draft = localStorage.getItem('good_crm_draft');
+      const banner = document.getElementById('draftRecoverAlert');
+      if (draft) {
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    function loadDraft() {
+      const draftStr = localStorage.getItem('good_crm_draft');
+      if (!draftStr) return;
+      
+      const data = JSON.parse(draftStr);
+      
+      document.getElementById("customerName").value = data.customerName || "";
+      
+      if (data.gender) {
+        const rad = document.querySelector(`input[name="gender"][value="${data.gender}"]`);
+        if (rad) rad.checked = true;
+      }
+      
+      document.getElementById("phone").value = data.phone || "";
+      document.getElementById("contactChannel").value = data.contactChannel || "";
+      toggleChannelDetails(data.contactChannel || "");
+      document.getElementById("contactHandle").value = data.contactHandle || "";
+      document.getElementById("referralDate").value = data.referralDate || "";
+      document.getElementById("customerRemarks").value = data.customerRemarks || "";
+      document.getElementById("referralRemarks").value = data.referralRemarks || "";
+      
+      document.getElementById("adminName").value = data.adminName || config.adminName;
+      document.getElementById("customerType").value = data.customerType || "";
+      document.getElementById("topic").value = data.topic || "";
+      document.getElementById("priority").value = data.priority || "ปานกลาง";
+      document.getElementById("siteType").value = data.siteType || "";
+      document.getElementById("siteAddress").value = data.siteAddress || "";
+      document.getElementById("province").value = data.province || "กรุงเทพมหานคร";
+      document.getElementById("goodsOfInterest").value = data.interests || "";
+      document.getElementById("jobDetails").value = data.jobDetails || "";
+      
+      document.getElementById("billingName").value = data.billingName || "";
+      document.getElementById("billingAddress").value = data.billingAddress || "";
+      document.getElementById("taxId").value = data.taxId || "";
+      document.getElementById("salesperson").value = data.salesperson || "";
+      document.getElementById("jobStatus").value = data.jobStatus || "รอดำเนินการ";
+      document.getElementById("billingRemarks").value = data.billingRemarks || "";
+      
+      showSuccessToast("โหลดข้อมูลร่างเรียบร้อยแล้ว");
+      document.getElementById('draftRecoverAlert').classList.add('hidden');
+    }
+
+    function clearDraft() {
+      localStorage.removeItem('good_crm_draft');
+      checkDraft();
+    }
+
+    // Get form field values
+    function getFormValues() {
+      const genderRad = document.querySelector('input[name="gender"]:checked');
+      return {
+        adminName: document.getElementById("adminName").value,
+        customerName: document.getElementById("customerName").value.trim(),
+        gender: genderRad ? genderRad.value : "ไม่ระบุ",
+        phone: document.getElementById("phone").value.trim(),
+        contactChannel: document.getElementById("contactChannel").value,
+        contactHandle: document.getElementById("contactHandle").value.trim(),
+        referralDate: document.getElementById("referralDate").value,
+        customerRemarks: document.getElementById("customerRemarks").value.trim(),
+        referralRemarks: document.getElementById("referralRemarks").value.trim(),
+        
+        customerType: document.getElementById("customerType").value,
+        topic: document.getElementById("topic").value.trim(),
+        priority: document.getElementById("priority").value,
+        siteType: document.getElementById("siteType").value,
+        siteAddress: document.getElementById("siteAddress").value.trim(),
+        province: document.getElementById("province").value,
+        interests: document.getElementById("goodsOfInterest").value,
+        jobDetails: document.getElementById("jobDetails").value.trim(),
+        
+        billingName: document.getElementById("billingName").value.trim(),
+        billingAddress: document.getElementById("billingAddress").value.trim(),
+        taxId: document.getElementById("taxId").value.trim(),
+        salesperson: document.getElementById("salesperson").value,
+        jobStatus: document.getElementById("jobStatus").value,
+        billingRemarks: document.getElementById("billingRemarks").value.trim()
+      };
+    }
+
+    // Toggle contact channel placeholder
+    function toggleChannelDetails(channel) {
+      const input = document.getElementById("contactHandle");
+      
+      switch(channel) {
+        case "โทรศัพท์":
+          input.placeholder = "ระบุเบอร์โทรศัพท์ที่ใช้ติดต่อหลัก";
+          break;
+        case "อีเมล":
+          input.placeholder = "เช่น customer@email.com";
+          break;
+        case "LINE":
+          input.placeholder = "เช่น LINE ID หรือ LINE Name";
+          break;
+        case "Facebook":
+          input.placeholder = "ชื่อโปรไฟล์หรือลิงก์เพจ Facebook";
+          break;
+        default:
+          input.placeholder = "เช่น Line ID, Facebook, Email";
+          break;
+      }
+    }
+
+    // Custom Toast warnings
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      const toastMessage = document.getElementById("toastMessage");
+      
+      toastMessage.textContent = message;
+      toast.classList.remove("hidden");
+      toast.classList.remove("bg-green-600");
+      toast.classList.add("bg-red-600");
+      
+      setTimeout(() => {
+        toast.classList.remove("opacity-0");
+      }, 50);
+      
+      setTimeout(() => {
+        toast.classList.add("opacity-0");
+        setTimeout(() => {
+          toast.classList.add("hidden");
+        }, 300);
+      }, 4000);
+    }
+
+    function showSuccessToast(message) {
+      const toast = document.getElementById("toast");
+      const toastMessage = document.getElementById("toastMessage");
+      
+      toastMessage.textContent = message;
+      toast.classList.remove("hidden");
+      toast.classList.remove("bg-red-600");
+      toast.classList.add("bg-green-600");
+      
+      setTimeout(() => {
+        toast.classList.remove("opacity-0");
+      }, 50);
+      
+      setTimeout(() => {
+        toast.classList.add("opacity-0");
+        setTimeout(() => {
+          toast.classList.add("hidden");
+        }, 300);
+      }, 3000);
+    }
+
+    // Modal control: Success
+    function openSuccessModal(custId, logId) {
+      document.getElementById("resCustId").textContent = custId;
+      document.getElementById("resLogId").textContent = logId;
+      
+      const modal = document.getElementById("successModal");
+      modal.classList.remove("hidden");
+      setTimeout(() => {
+        modal.classList.remove("opacity-0");
+        modal.querySelector("div").classList.remove("scale-95");
+      }, 50);
+    }
+
+    function closeSuccessModal() {
+      const modal = document.getElementById("successModal");
+      modal.classList.add("opacity-0");
+      modal.querySelector("div").classList.add("scale-95");
+      setTimeout(() => {
+        modal.classList.add("hidden");
+        resetForm();
+        switchPage('leads-list');
+      }, 300);
+    }
+
+    // Reset Form
+    function resetForm() {
+      document.getElementById("leadForm").reset();
+      clearDraft();
+      toggleChannelDetails('');
+    }
+
+    // Handle Form Submit and call Google Apps Script
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      if (!config.appsScriptUrl) {
+        showToast("กรุณาตั้งค่า Google Apps Script Web App URL ก่อนกดบันทึก (ไปที่เมนู 'ตั้งค่าระบบ')");
+        switchPage('settings');
+        return;
+      }
+
+      const values = getFormValues();
+      const loading = document.getElementById("loadingOverlay");
+      loading.classList.remove("hidden");
+
+      try {
+        const response = await fetch(config.appsScriptUrl, {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(values)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        loading.classList.add("hidden");
+
+        if (result.success) {
+          clearDraft();
+          openSuccessModal(result.custId, result.logId);
+        } else {
+          showToast(`เกิดข้อผิดพลาดในการบันทึก: ${result.error || "ไม่ทราบสาเหตุ"}`);
+        }
+        
+      } catch (error) {
+        loading.classList.add("hidden");
+        console.error("Submission error:", error);
+        showToast(`ไม่สามารถส่งข้อมูลได้: โปรดตรวจสอบสัญญาณเครือข่าย หรือลิงก์ Web App URL ว่าถูกต้องและเป็นสาธารณะหรือไม่`);
+      }
+    }
+  </script>
+</body>
+</html>

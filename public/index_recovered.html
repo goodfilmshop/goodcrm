@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOOD CRM - ระบบจัดการฐานข้อมูลลูก�?��า</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts (Kanit & Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Kanit', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Smooth transition for sidebar width and opacity */
+    .sidebar-transition {
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .fade-transition {
+      transition: opacity 0.2s ease-in-out, visibility 0.2s;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Pulse glow effect for primary buttons */
+    .glow-primary {
+      box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.3);
+    }
+  </style>
+</head>
+<body class="h-full font-sans antialiased text-slate-800 flex overflow-hidden bg-slate-50">
+
+  <!-- Sidebar Backdrop for Mobile Overlay -->
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 z-30 md:hidden hidden transition-opacity duration-300"></div>
+
+  <!-- Left Sidebar (Collapsible & Mobile Responsive Drawer) -->
+  <aside id="sidebar" class="sidebar-transition w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 fixed inset-y-0 left-0 z-40 transform -translate-x-full md:relative md:translate-x-0">
+    
+    <!-- Sidebar Toggle Button (Floating - Hidden on mobile) -->
+    <button onclick="toggleSidebar()" class="absolute -right-3.5 top-8 bg-white border border-slate-200 text-slate-500 hover:text-blue-600 hover:bg-slate-50 w-7 h-7 rounded-full flex items-center justify-center shadow-md focus:outline-none z-30 transition-colors hidden md:flex">
+      <i id="toggleBtnIcon" class="fa-solid fa-chevron-left text-xs"></i>
+    </button>
+
+    <!-- Brand / Logo -->
+    <div class="h-16 flex items-center px-5 border-b border-slate-100 gap-3 overflow-hidden shrink-0">
+      <!-- Blue Dot/Circle representing Logo -->
+      <div class="w-7 h-7 rounded-full bg-blue-600 shrink-0 flex items-center justify-center shadow-sm">
+        <i class="fa-solid fa-building-office text-white text-[10px]"></i>
+      </div>
+      <!-- Brand Text: Hidden when sidebar collapsed -->
+      <div id="brandText" class="fade-transition whitespace-nowrap flex-1">
+        <h1 class="text-blue-900 font-bold text-md leading-tight">GOOD CRM</h1>
+        <p class="text-slate-400 text-[10px] font-medium leading-none">ระบบจัดการฐานข้อมูลลูก�?��า</p>
+      </div>
+      <!-- Mobile Close Button inside sidebar -->
+      <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-slate-600 p-1">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto no-scrollbar">
+      <!-- Menu Item: �?าพรวม -->
+      <button onclick="switchPage('overview')" id="menu-overview" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-solid fa-chart-line text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">�?าพรวม</span>
+        <!-- Tooltip (Shown when collapsed) -->
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">�?าพรวม</span>
+      </button>
+
+      <!-- Menu Item: ลีดทั้�?��ม�? -->
+      <button onclick="switchPage('leads-list')" id="menu-leads-list" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-solid fa-list-check text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">ลีดทั้�?��ม�?</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">ลีดทั้�?��ม�?</span>
+      </button>
+
+      <!-- Menu Item: เพิ่มลีด�?��ม�? -->
+      <button onclick="switchPage('create-lead')" id="menu-create-lead" class="w-full group flex items-center px-3.5 py-3 bg-blue-600 text-white rounded-xl shadow-md shadow-blue-200 transition-all duration-200 gap-3 font-semibold relative">
+        <i class="fa-solid fa-circle-plus text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">เพิ่มลีด�?��ม�?</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">เพิ่มลีด�?��ม�?</span>
+      </button>
+
+      <!-- Menu Item: Pipeline การขาย -->
+      <button onclick="switchPage('pipeline')" id="menu-pipeline" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-solid fa-arrows-spin text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">Pipeline การขาย</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">Pipeline การขาย</span>
+      </button>
+
+      <!-- Menu Item: ลูก�?��า -->
+      <button onclick="switchPage('customers')" id="menu-customers" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-solid fa-users text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">ลูก�?��า</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">ลูก�?��า</span>
+      </button>
+
+      <!-- Menu Item: ราย�?���? -->
+      <button onclick="switchPage('reports')" id="menu-reports" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-solid fa-file-invoice-dollar text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">ราย�?���?</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">ราย�?���?</span>
+      </button>
+
+      <!-- Menu Item: กิจกรรมติดตาม -->
+      <button onclick="switchPage('tasks')" id="menu-tasks" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-regular fa-calendar-check text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">กิจกรรมติดตาม</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">กิจกรรมติดตาม</span>
+      </button>
+
+      <!-- Menu Item: ตั้�?�?��าระบ�? -->
+      <button onclick="switchPage('settings')" id="menu-settings" class="w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+        <i class="fa-solid fa-sliders text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">ตั้�?�?��าระบ�?</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">ตั้�?�?��าระบ�?</span>
+      </button>
+    </nav>
+
+    <!-- Footer of Sidebar -->
+    <div class="p-4 border-t border-slate-100 overflow-hidden text-center shrink-0">
+      <span id="sidebarFooterText" class="text-[10px] text-slate-400 font-light block transition-all">GOOD CRM Database v1.0.0</span>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <div class="flex-1 flex flex-col overflow-hidden relative w-full">
+    
+    <!-- Mobile Header Navbar (Visible only on mobile) -->
+    <div class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:hidden shrink-0 z-30">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleMobileSidebar()" class="text-slate-600 p-2 rounded-lg hover:bg-slate-100 focus:outline-none">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+        <span class="font-bold text-blue-900 text-md">GOOD CRM</span>
+      </div>
+      <!-- Quick user initials badge -->
+      <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold border border-blue-200 text-xs">
+        <span class="mobile-avatar-initials">�?</span>
+      </div>
+    </div>
+
+    <!-- Main Workspace (Dynamic Pages - Expanded to 100% width) -->
+    <main class="flex-1 overflow-y-auto bg-slate-100/40 p-4 sm:p-6 w-full">
+      
+      <!-- PAGE 1: OVERVIEW -->
+      <div id="page-overview" class="page-container hidden w-full space-y-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-2">
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-800">�?าพรวมระบ�? (Overview Dashboard)</h2>
+          <span class="text-slate-400 text-xs font-light hidden sm:inline">ข้อมูลอัปเดตแบบเรียล�?��ม�?</span>
+        </div>
+        
+        <!-- Stats Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-4">
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl shadow-inner shrink-0"><i class="fa-solid fa-address-card"></i></div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">ลีดลูก�?��าทั้�?��ม�?</span>
+              <h3 id="statTotalLeads" class="text-xl sm:text-2xl font-bold text-slate-800">0</h3>
+            </div>
+          </div>
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-4">
+            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl shadow-inner shrink-0"><i class="fa-solid fa-arrows-spin"></i></div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">กำลั�?��สนอรา�?��</span>
+              <h3 id="statActiveLeads" class="text-xl sm:text-2xl font-bold text-slate-800">0</h3>
+            </div>
+          </div>
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-4">
+            <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-xl shadow-inner shrink-0"><i class="fa-solid fa-circle-check"></i></div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">ปิดการขายสำเร�?�?</span>
+              <h3 id="statSuccessLeads" class="text-xl sm:text-2xl font-bold text-slate-800">0</h3>
+            </div>
+          </div>
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-4">
+            <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl shadow-inner shrink-0"><i class="fa-solid fa-bullseye"></i></div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">เป้าการขายประจำเดือ�?</span>
+              <h3 class="text-xl sm:text-2xl font-bold text-slate-800">82%</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Recent Leads Card -->
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 lg:col-span-2 overflow-hidden">
+            <h3 class="font-bold text-slate-700 text-md sm:text-lg mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-list text-blue-600"></i>
+              <span>ลีดลูก�?��าเข้า�?��ม่ล่าสุ�?</span>
+            </h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="text-slate-400 border-b border-slate-100">
+                    <th class="pb-3 font-semibold">ชื่อลูก�?��า/บริษั�?</th>
+                    <th class="pb-3 font-semibold">เบอร์โทรศัพท�?</th>
+                    <th class="pb-3 font-semibold">�?��ามสน�?�?</th>
+                    <th class="pb-3 font-semibold text-right">รหัสลูก�?��า</th>
+                  </tr>
+                </thead>
+                <tbody id="recentLeadsTableBody" class="divide-y divide-slate-100 text-slate-700">
+                  <tr>
+                    <td colspan="4" class="py-6 text-center text-slate-400">กำลั�?��ชื่อมต่อข้อมูลกั�? Google Sheets...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Channel Stats & Goal progress -->
+          <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 space-y-6">
+            <h3 class="font-bold text-slate-700 text-md sm:text-lg flex items-center gap-2">
+              <i class="fa-solid fa-chart-pie text-blue-600"></i>
+              <span>สัดส่วนแหล่�?��ี่มาลูก�?��า</span>
+            </h3>
+            
+            <div class="space-y-4 text-xs sm:text-sm" id="referralSourceBreakdown">
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span>Website</span>
+                  <span>45%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-blue-600 h-full rounded-full" style="width: 45%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span>Facebook Ads</span>
+                  <span>30%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-indigo-500 h-full rounded-full" style="width: 30%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span>LINE Official</span>
+                  <span>15%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-green-500 h-full rounded-full" style="width: 15%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 2: LEADS LIST -->
+      <div id="page-leads-list" class="page-container hidden w-full space-y-6">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 gap-4">
+          <div class="flex items-center gap-3">
+            <div class="bg-blue-900 text-white font-bold w-9 h-9 rounded-lg flex items-center justify-center text-lg">
+              <i class="fa-solid fa-list-check"></i>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800">ลีดลูก�?��าทั้�?��ม�? (All Leads)</h2>
+          </div>
+          <!-- Action Buttons -->
+          <div class="flex items-center gap-2">
+            <button onclick="fetchLeadsData()" class="px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all text-xs">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span class="hidden sm:inline">รีเฟรชข้อมูล</span>
+            </button>
+            <button onclick="switchPage('create-lead')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center gap-2 shadow-md shadow-blue-200 transition-all glow-primary text-xs">
+              <i class="fa-solid fa-plus"></i>
+              <span>เพิ่มลีด�?��ม�?</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/60 flex flex-col md:flex-row gap-3 items-center justify-between w-full">
+          <div class="relative w-full md:w-96">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="leadsSearchInput" oninput="filterLeads()" placeholder="�?��นหาชื่อลูก�?��า, บริษั�?, หรือเบอร์โทรศัพท�?..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xs">
+          </div>
+          <div class="flex gap-3 w-full md:w-auto overflow-x-auto shrink-0">
+            <select id="filterProvince" onchange="filterLeads()" class="w-full md:w-40 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+              <option value="">ทุกจั�?��วั�?</option>
+              <option value="กรุ�?��ทพมหาน�?��">กรุ�?��ทพมหาน�?��</option>
+              <option value="นนทบุรี">นนทบุรี</option>
+              <option value="ปทุมธานี">ปทุมธานี</option>
+              <option value="สมุทรปราการ">สมุทรปราการ</option>
+            </select>
+            <select id="filterChannel" onchange="filterLeads()" class="w-full md:w-40 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+              <option value="">ทุกช่อ�?��า�?��ิดต่อ</option>
+              <option value="โทรศัพท�?">โทรศัพท�?</option>
+              <option value="อีเมล">อีเมล</option>
+              <option value="LINE">LINE</option>
+              <option value="Facebook">Facebook</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Leads Table Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden w-full">
+          <div class="ov        </div>
+      </div>
+
+            <!-- PAGE 3: CREATE LEAD FORM -->
+      <div id="page-create-lead" class="page-container hidden w-full space-y-4">
+        
+        <!-- Form Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between py-2.5 px-4 bg-slate-50/50 rounded-xl border border-slate-200/50 gap-4">
+          <div class="flex items-center gap-4">
+            <button onclick="switchPage('leads-list')" class="w-8.5 h-8.5 rounded-full bg-white hover:bg-slate-100 flex items-center justify-center border border-slate-200 shadow-sm transition-colors text-slate-600 shrink-0">
+              <i class="fa-solid fa-arrow-left text-xs"></i>
+            </button>
+            <div>
+              <h2 class="text-xl sm:text-2xl font-bold text-slate-800">?????????????????????</h2>
+              <p class="text-xs text-slate-500 font-light mt-0.5">????????????????????????????????????????</p>
+            </div>
+          </div>
+          <!-- Quick Draft Loader Indicator -->
+          <div id="draftRecoverAlert" class="hidden px-4 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
+            <span>???????????????????????????????????</span>
+            <button onclick="loadDraft()" class="px-2.5 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shrink-0">?????????????</button>
+          </div>
+        </div>
+
+        <!-- The Lead Form -->
+        <form id="leadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+          
+          <!-- Responsive 2-Column Layout Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            
+            <!-- COLUMN 1: ???????????? -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200/70 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 gap-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                    <i class="fa-regular fa-address-book text-sm"></i>
+                  </div>
+                  <h3 class="font-bold text-slate-800 text-base">1. ????????????</h3>
+                </div>
+                <!-- Action Buttons inside header for accessibility -->
+                <button type="button" onclick="resetForm()" class="px-2.5 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 font-semibold rounded-lg text-[10px] transition-all shadow-sm">
+                  ?????????
+                </button>
+              </div>
+
+              <!-- Form Fields (Stacked) -->
+              <div class="space-y-3.5 text-sm">
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">?????????? <span class="text-red-500">*</span></label>
+                  <input type="text" id="customerName" required placeholder="????????-???????" class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-slate-700 text-sm font-semibold mb-1">??? <span class="text-red-500">*</span></label>
+                    <div class="flex items-center gap-2 mt-1">
+                      <label class="flex-1 text-center cursor-pointer">
+                        <input type="radio" name="gender" value="????" class="peer sr-only">
+                        <div class="px-2 py-1.5 border border-slate-200 rounded-lg text-slate-600 text-xs font-semibold peer-checked:bg-blue-50 peer-checked:text-blue-600 peer-checked:border-blue-300 transition-all">????</div>
+                      </label>
+                      <label class="flex-1 text-center cursor-pointer">
+                        <input type="radio" name="gender" value="???" class="peer sr-only">
+                        <div class="px-2 py-1.5 border border-slate-200 rounded-lg text-slate-600 text-xs font-semibold peer-checked:bg-blue-50 peer-checked:text-blue-600 peer-checked:border-blue-300 transition-all">???</div>
+                      </label>
+                      <label class="flex-1 text-center cursor-pointer">
+                        <input type="radio" name="gender" value="???????" checked class="peer sr-only">
+                        <div class="px-2 py-1.5 border border-slate-200 rounded-lg text-slate-600 text-xs font-semibold peer-checked:bg-blue-50 peer-checked:text-blue-600 peer-checked:border-blue-300 transition-all">???????</div>
+                      </label>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-slate-700 text-sm font-semibold mb-1">?????????????? <span class="text-red-500">*</span></label>
+                    <select id="referralDate" class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm mt-1">
+                      <option value="">-- ?????????? --</option>
+                      <option value="Google Search">Google Search</option>
+                      <option value="Facebook">Facebook</option>
+                      <option value="Tiktok">Tiktok</option>
+                      <option value="???????????">???????????</option>
+                      <option value="WalkIn">???????? (Walk In)</option>
+                      <option value="?????">?????</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">????????????? <span class="text-red-500">*</span></label>
+                  <div class="relative">
+                    <i class="fa-solid fa-phone absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="tel" id="phone" required placeholder="09X-XXX-XXXX" class="w-full pl-8.5 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">????????????? <span class="text-red-500">*</span></label>
+                  
+                  <!-- Hidden real input to store the selected channel -->
+                  <input type="hidden" id="contactChannel" required>
+                  
+                  <!-- Button Grid -->
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+                    <button type="button" class="channel-btn px-2 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 transition-all" data-value="Line" onclick="selectChannel('Line', this)">
+                      <i class="fa-brands fa-line text-green-500 text-base"></i> Line
+                    </button>
+                    <button type="button" class="channel-btn px-2 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 transition-all" data-value="FB" onclick="selectChannel('FB', this)">
+                      <i class="fa-brands fa-facebook text-blue-600 text-base"></i> FB
+                    </button>
+                    <button type="button" class="channel-btn px-2 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 transition-all" data-value="Tel" onclick="selectChannel('Tel', this)">
+                      <i class="fa-solid fa-phone text-slate-600 text-sm"></i> Tel
+                    </button>
+                    <button type="button" class="channel-btn px-2 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 transition-all" data-value="WalkIn" onclick="selectChannel('WalkIn', this)">
+                      WalkIn
+                    </button>
+                    <button type="button" class="channel-btn px-2 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 transition-all" data-value="Email" onclick="selectChannel('Email', this)">
+                      <i class="fa-solid fa-envelope text-slate-600 text-sm"></i> Email
+                    </button>
+                    <button type="button" class="channel-btn px-2 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 transition-all" data-value="Tiktok" onclick="selectChannel('Tiktok', this)">
+                      <i class="fa-brands fa-tiktok text-slate-900 text-sm"></i> Tiktok
+                    </button>
+                    <button type="button" class="channel-btn sm:col-span-2 px-2 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 transition-all" data-value="????? (Other)" onclick="selectChannel('????? (Other)', this)">
+                      ????? (Other)
+                    </button>
+                  </div>
+                  
+                  <input type="text" id="contactHandle" placeholder="????????/???????? (?????)" class="w-full px-3.5 py-2 bg-slate-50/50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm hidden">
+                </div>
+
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">????????</label>
+                  <textarea id="customerRemarks" rows="2" placeholder="???????????????" class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none text-sm"></textarea>
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">???????? (??????????????)</label>
+                  <textarea id="referralRemarks" rows="2" placeholder="?????????????????????????????????????????" class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none text-sm"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- COLUMN 2: ??????????????????? (Log) -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200/70 space-y-4">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                  <i class="fa-regular fa-clipboard text-sm"></i>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base">2. ??????????????????? (Log)</h3>
+              </div>
+
+              <!-- Form Fields (Stacked) -->
+              <div class="space-y-3.5 text-sm">
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">?????? <span class="text-red-500">*</span></label>
+                  <select id="adminName" required class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                    <option value="???????">???????</option>
+                    <option value="????????">????????</option>
+                    <option value="???????">???????</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">???????????? <span class="text-red-500">*</span></label>
+                  <select id="customerType" required class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                    <option value="">?????????????????</option>
+                    <option value="???????????">???????????</option>
+                    <option value="???????????/????????????">???????????/????????????</option>
+                    <option value="????????????????????">????????????????????</option>
+                    <option value="?????????">?????????</option>
+                    <option value="?????">?????</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">??????????????? <span class="text-red-500">*</span></label>
+                  <input type="text" id="topic" required placeholder="???????????????????" class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">????????? <span class="text-red-500">*</span></label>
+                  <select id="priority" required class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                    <option value="">??????????????</option>
+                    <option value="???">???</option>
+                    <option value="???????" selected>???????</option>
+                    <option value="???">???</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">????????????? <span class="text-red-500">*</span></label>
+                  <select id="siteType" required class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                    <option value="">??????????????????</option>
+                    <option value="?????????????">?????????????</option>
+                    <option value="??????????">??????????</option>
+                    <option value="????????">????????</option>
+                    <option value="????????????">????????????</option>
+                    <option value="??????/??????????">??????/??????????</option>
+                    <option value="???????/???????">???????/???????</option>
+                    <option value="?????">?????</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">??????? <span class="text-red-500">*</span></label>
+                  <select id="province" required class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                    <option value="">????????????</option>
+                    <option value="?????????????" selected>?????????????</option>
+                    <option value="???????">???????</option>
+                    <option value="????????">????????</option>
+                    <option value="???????????">???????????</option>
+                    <option value="??????">??????</option>
+                    <option value="?????????">?????????</option>
+                    <option value="??????">??????</option>
+                    <option value="?????">?????</option>
+                    <option value="?????????">?????????</option>
+                    <option value="??????????">??????????</option>
+                    <option value="???????">???????</option>
+                    <option value="??????">??????</option>
+                    <option value="?????">?????</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">?????????????? <span class="text-red-500">*</span></label>
+                  <input type="text" id="siteAddress" required placeholder="??????????????????" class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">????????????? <span class="text-red-500">*</span></label>
+                  <select id="goodsOfInterest" required class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                    <option value="">??????????????????</option>
+                    <option value="????????????">????????????</option>
+                    <option value="???????????">???????????</option>
+                    <option value="???????????">???????????</option>
+                    <option value="????????">????????</option>
+                    <option value="??????????????????">??????????????????</option>
+                    <option value="???????????????????">???????????????????</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">?????????????</label>
+                  <textarea id="jobDetails" rows="2" placeholder="?????????????????" class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none text-sm"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- COLUMN 3: ?????????????????? (Spans 2 columns on large screen) -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200/70 space-y-4 lg:col-span-2">
+              <!-- Section Title & Save actions -->
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 gap-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                    <i class="fa-solid fa-file-invoice text-sm"></i>
+                  </div>
+                  <h3 class="font-bold text-slate-800 text-base">3. ??????????????????</h3>
+                </div>
+                <!-- Action Buttons inside header -->
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="resetForm()" class="px-3.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold rounded-lg text-xs transition-all shadow-sm">
+                    ??????
+                  </button>
+                  <button type="button" onclick="saveDraft()" class="px-3.5 py-1.5 bg-white border border-blue-200 hover:bg-blue-50 text-blue-700 font-semibold rounded-lg text-xs transition-all shadow-sm flex items-center gap-1.5">
+                    <i class="fa-regular fa-floppy-disk"></i>
+                    <span>??????????????</span>
+                  </button>
+                  <button type="submit" class="px-4.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs transition-all flex items-center gap-1.5 glow-primary">
+                    <i class="fa-solid fa-check"></i>
+                    <span>??????????????????</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Form Fields (Grid layout inside Col 3 since it is full-width) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">????/???????????? <span class="text-red-500">*</span></label>
+                  <input type="text" id="billingName" required placeholder="??????????????????" class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">??????????????????????</label>
+                  <input type="text" id="taxId" placeholder="??????????????????????????" class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">??????????????????? <span class="text-red-500">*</span></label>
+                  <textarea id="billingAddress" required rows="2" placeholder="???????????????????????" class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none text-sm"></textarea>
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">???????</label>
+                  <select id="salesperson" class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                    <option value="">????????????</option>
+                    <option value="??????? 1">??????? 1</option>
+                    <option value="??????? 2">??????? 2</option>
+                    <option value="??????? 3">??????? 3</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">???????? <span class="text-red-500">*</span></label>
+                  <select id="jobStatus" required class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                    <option value="">?????????????</option>
+                    <option value="???????????" selected>???????????</option>
+                    <option value="???????????????">???????????????</option>
+                    <option value="????????????">????????????</option>
+                    <option value="?????????">?????????</option>
+                    <option value="???????????????">???????????????</option>
+                    <option value="???????????????">???????????????</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-700 text-sm font-semibold mb-1">????????</label>
+                  <textarea id="billingRemarks" rows="2" placeholder="???????????????" class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none text-sm"></textarea>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+      <!-- PAGE 4: PIPELINE -->
+      <div id="page-pipeline" class="page-container hidden w-full space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Pipeline การขาย (Sales Pipeline)</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 overflow-x-auto min-h-[500px]">
+          <!-- Stage 1 -->
+          <div class="bg-slate-150 p-4 rounded-2xl flex flex-col gap-3 min-w-[200px] bg-slate-100">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+              <span class="font-bold text-slate-700 text-xs">ลีด�?��ม�? (New)</span>
+              <span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-bold">1</span>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/50 space-y-2 cursor-grab">
+              <span class="text-[10px] bg-amber-50 text-amber-700 border border-amber-100 px-2 py-0.5 rounded-full font-semibold">ฟิล์มตกแต่�?</span>
+              <h4 class="font-bold text-xs text-slate-800">�?��ณวิ�?าวี พ�?��์สวัสดิ�?</h4>
+              <p class="text-[10px] text-slate-400">บจ�?. �?��ร์�? ดีเวลลอปเม้นท�?</p>
+              <div class="text-[9px] text-slate-400 pt-2 flex items-center justify-between">
+                <span>�?�?: 800k</span>
+                <span>กรุ�?��ทพฯ</span>
+              </div>
+            </div>
+          </div>
+          <!-- Stages 2 - 5 -->
+          <div class="bg-slate-150 p-4 rounded-2xl flex flex-col gap-3 min-w-[200px] bg-slate-100"><div class="flex items-center justify-between border-b border-slate-200 pb-2"><span class="font-bold text-slate-700 text-xs">ติดต่อแล้ว</span><span class="bg-slate-200 text-slate-600 text-xs px-2 py-0.5 rounded-full">0</span></div></div>
+          <div class="bg-slate-150 p-4 rounded-2xl flex flex-col gap-3 min-w-[200px] bg-slate-100"><div class="flex items-center justify-between border-b border-slate-200 pb-2"><span class="font-bold text-slate-700 text-xs">วัดหน้า�?���?</span><span class="bg-slate-200 text-slate-600 text-xs px-2 py-0.5 rounded-full">0</span></div></div>
+          <div class="bg-slate-150 p-4 rounded-2xl flex flex-col gap-3 min-w-[200px] bg-slate-100"><div class="flex items-center justify-between border-b border-slate-200 pb-2"><span class="font-bold text-slate-700 text-xs">เสนอรา�?��</span><span class="bg-slate-200 text-slate-600 text-xs px-2 py-0.5 rounded-full">0</span></div></div>
+          <div class="bg-slate-150 p-4 rounded-2xl flex flex-col gap-3 min-w-[200px] bg-slate-100"><div class="flex items-center justify-between border-b border-slate-200 pb-2"><span class="font-bold text-slate-700 text-xs">สำเร�?�? (Won)</span><span class="bg-slate-200 text-slate-600 text-xs px-2 py-0.5 rounded-full">0</span></div></div>
+        </div>
+      </div>
+
+      <!-- PAGE 5: CUSTOMERS -->
+      <div id="page-customers" class="page-container hidden w-full space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">รายชื่อลูก�?��าทั้�?��ม�? (Customer Profiles)</h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden w-full">
+          <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-bold text-slate-700 text-sm">ประวัติลูก�?��าทั้�?��ม�?</h3>
+          </div>
+          <div class="p-8 text-center text-slate-400">
+            <i class="fa-solid fa-users text-4xl mb-3 text-slate-300 block"></i>
+            <p class="text-sm">ประวัติและข้อมูลออกบิลทั้�?��มดเชื่อมต่อ�?��้�?��การดึ�?��้อมูลสดแล้ว</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 6: REPORTS -->
+      <div id="page-reports" class="page-container hidden w-full space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">ราย�?���? & วิเ�?��าะห์ข้อมูล (Analytics Reports)</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+          <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/60 shadow-sm space-y-4">
+            <h3 class="font-bold text-slate-700 text-sm sm:text-md">สิน�?��าที่�?��้รับ�?��ามนิยมสุ�?��ุ�?</h3>
+            <div class="space-y-3">
+              <div>
+                <div class="flex justify-between text-xs sm:text-sm font-semibold mb-1">
+                  <span>ฟิล์มกรอ�?��ส�?</span>
+                  <span>75%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-blue-600 h-full rounded-full" style="width: 75%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs sm:text-sm font-semibold mb-1">
+                  <span>ฟิล์มนิร�?ัย</span>
+                  <span>45%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-indigo-500 h-full rounded-full" style="width: 45%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
+            <h3 class="font-bold text-slate-700 text-sm sm:text-md mb-4">ยอดเสนอรา�?��เปรียบเทียบตามเป้าหมาย</h3>
+            <div class="flex items-center gap-6">
+              <div class="relative w-24 h-24 flex items-center justify-center shrink-0">
+                <svg class="absolute inset-0 w-full h-full transform -rotate-90">
+                  <circle cx="48" cy="48" r="40" stroke="#f1f5f9" stroke-width="6" fill="transparent"/>
+                  <circle cx="48" cy="48" r="40" stroke="#2563eb" stroke-width="6" fill="transparent" stroke-dasharray="251" stroke-dashoffset="50"/>
+                </svg>
+                <span class="font-bold text-lg text-slate-800">80%</span>
+              </div>
+              <div class="space-y-1.5 text-xs sm:text-sm">
+                <p class="font-semibold text-slate-700">ยอดสะสม: 1,840,000 บา�?</p>
+                <p class="text-xs text-slate-400">เป้าหมายเดือนนี�?: 2,300,000 บา�?</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 7: TASKS -->
+      <div id="page-tasks" class="page-container hidden w-full space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">กิจกรรมติดตาม (Follow-up Tasks)</h2>
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 max-w-xl w-full">
+          <h3 class="font-bold text-slate-700 text-sm sm:text-md mb-4">สิ่�?��ี่ต้อ�?��ำวันนี�?</h3>
+          <div class="space-y-3" id="todoListContainer">
+            <label class="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/50 rounded-xl cursor-pointer">
+              <input type="checkbox" checked class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
+              <span class="line-through text-slate-400 text-xs sm:text-sm">โทรยืนยันสถานที่ติดตั้�? �?��ณวิ�?าวี</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/50 rounded-xl cursor-pointer">
+              <input type="checkbox" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
+              <span class="text-slate-700 text-xs sm:text-sm">ส่�?�?��เสนอรา�?��ระบบฟิล์มอา�?��รสำนัก�?���?</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 8: SETTINGS -->
+      <div id="page-settings" class="page-container hidden w-full space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">ตั้�?�?��าระบ�? (CRM System Settings)</h2>
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 max-w-2xl w-full space-y-6">
+          <div>
+            <label class="block text-slate-600 text-xs font-semibold mb-1.5">ชื่อแอดมินผู้้ดูแลระบ�? (Admin Name)</label>
+            <input type="text" id="adminNameConfigSetting" placeholder="�?��ณเก�?�?" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+          </div>
+          <div>
+            <label class="block text-slate-600 text-xs font-semibold mb-1.5">Google Apps Script Web App URL <span class="text-red-500">*</span></label>
+            <textarea id="appsScriptUrlSetting" rows="3" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xs font-mono"></textarea>
+            <p class="text-[10px] text-slate-400 mt-1.5 leading-relaxed">
+              �?���? URL เว�?��แอปพลิเ�?��ันที่สร้า�?��า�? Google Apps Script เพื่อ�?��้ดึ�?��ละส่�?��้อมูลจากสเปรดชี�?
+            </p>
+          </div>
+          
+          <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+            <button onclick="saveGlobalSettings()" class="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-md shadow-blue-200 transition-colors text-xs">
+              บันทึกการตั้�?�?��า
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Lead Detail Modal -->
+  <div id="leadDetailModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full mx-4 shadow-2xl transform scale-95 transition-transform duration-300 overflow-y-auto max-h-[90vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+        <h3 class="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-circle-info text-blue-600"></i>
+          <span>รายละเอียดลีดลูก�?��า</span>
+        </h3>
+        <button onclick="closeLeadDetailModal()" class="text-slate-400 hover:text-slate-600 p-1.5 hover:bg-slate-50 rounded-full">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      
+      <div id="leadDetailContent" class="space-y-6 text-xs sm:text-sm">
+        <!-- Content will be dynamically inserted here -->
+      </div>
+      
+      <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+        <button onclick="closeLeadDetailModal()" class="px-5 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors text-xs">
+          ปิดหน้าต่า�?
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/60 z-50 flex flex-col items-center justify-center hidden">
+    <div class="bg-white px-8 py-6 rounded-3xl flex flex-col items-center justify-center gap-4 shadow-2xl">
+      <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <span class="font-semibold text-slate-700 text-xs sm:text-sm">กำลั�?��ันทึกข้อมูลลีดล�? Google Sheets...</span>
+    </div>
+  </div>
+
+  <!-- Success Notification Modal -->
+  <div id="successModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-2xl text-center transform scale-95 transition-transform duration-300">
+      <div class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-200">
+        <i class="fa-solid fa-circle-check text-2xl"></i>
+      </div>
+      <h3 class="text-xl sm:text-2xl font-bold text-slate-800 mb-2">บันทึกข้อมูลสำเร�?�?!</h3>
+      <p class="text-slate-500 text-xs sm:text-sm mb-6 leading-relaxed">
+        ข้อมูลลีด�?��้รับการจัดเก�?��ล�?��เปรดชีตขอ�?�?��ณแล้วเป�?��ที่เรียบร้อย
+      </p>
+      <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-6 text-left space-y-2 text-xs sm:text-sm">
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-medium">รหัสลูก�?��า (Cust_ID):</span>
+          <span id="resCustId" class="font-bold text-blue-700">C-0001</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-medium">รหัสการติดต่อ (Log_ID):</span>
+          <span id="resLogId" class="font-bold text-blue-700">L-0001</span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <a href="https://docs.google.com/spreadsheets/d/1oQNq-n-QaGquYeWIa5xEf3sbDWykT5g8GTbyA_zAfto/edit?usp=sharing" target="_blank" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-md shadow-blue-200 transition-colors flex items-center justify-center gap-2 text-xs">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>เปิดดู�?�? Google Sheets</span>
+        </a>
+        <button onclick="closeSuccessModal()" class="w-full py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors text-xs">
+          เพิ่มลีด�?��ม่ต่อ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Alert Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-red-600 text-white px-6 py-3.5 rounded-2xl shadow-xl z-50 flex items-center gap-3 max-w-sm hidden opacity-0 transition-opacity duration-300">
+    <i class="fa-solid fa-circle-exclamation text-xl"></i>
+    <span id="toastMessage" class="text-xs sm:text-sm font-semibold">เกิดข้อผิดพลาด�?��การส่�?��้อมูล</span>
+  </div>
+
+  <script>
+    // State Variables
+    let selectedTags = ["ฟิล์มกรอ�?��ส�?", "ฟิล์มนิร�?ัย", "ฟิล์มตกแต่�?"];
+    let config = {
+      adminName: "�?��ณเก�?�?",
+      appsScriptUrl: "https://script.google.com/macros/s/AKfycbzJUk_Gtt_HygGSVz_qD_iKnFe8CzxaaZtQ6cwE22Pfp4B6VrdjfsFWqJcw9CkAzXTweg/exec"
+    };
+    let allLeads = []; // Store fetched leads
+    let isSidebarCollapsed = false;
+    let isMobileSidebarOpen = false;
+
+    // Initialize App
+    window.onload = function() {
+      // Load configurations from LocalStorage
+      const savedAdmin = localStorage.getItem("gfs_admin_name");
+      const savedUrl = localStorage.getItem("gfs_apps_script_url");
+      
+      if (savedAdmin) config.adminName = savedAdmin;
+      if (savedUrl && savedUrl.trim() !== "") {
+        config.appsScriptUrl = savedUrl;
+      } else {
+        localStorage.setItem("gfs_apps_script_url", config.appsScriptUrl);
+      }
+      
+      document.getElementById("adminNameConfigSetting").value = config.adminName;
+      document.getElementById("appsScriptUrlSetting").value = config.appsScriptUrl;
+      
+      updateAdminUI();
+      
+      // Default to "Create Lead" page
+      switchPage('create-lead');
+      
+      // Select Phone contact details label as initial state
+      toggleChannelDetails('โทรศัพท�?');
+
+      // Check if draft exists
+      checkDraft();
+    };
+
+    // Toggle Sidebar collapsed state (Desktop)
+    function toggleSidebar() {
+      isSidebarCollapsed = !isSidebarCollapsed;
+      const sidebar = document.getElementById("sidebar");
+      const brandText = document.getElementById("brandText");
+      const toggleIcon = document.getElementById("toggleBtnIcon");
+      const footerText = document.getElementById("sidebarFooterText");
+      const labels = document.querySelectorAll(".sidebar-label");
+
+      if (isSidebarCollapsed) {
+        sidebar.className = "sidebar-transition w-20 bg-white border-r border-slate-200 flex flex-col shrink-0 relative z-20";
+        brandText.style.display = "none";
+        footerText.textContent = "v1.0";
+        toggleIcon.className = "fa-solid fa-chevron-right text-xs";
+        labels.forEach(lbl => lbl.style.display = "none");
+      } else {
+        sidebar.className = "sidebar-transition w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 relative z-20";
+        brandText.style.display = "block";
+        footerText.textContent = "GOOD CRM Database v1.0.0";
+        toggleIcon.className = "fa-solid fa-chevron-left text-xs";
+        labels.forEach(lbl => lbl.style.display = "inline");
+      }
+    }
+
+    // Toggle Mobile Sidebar Drawer
+    function toggleMobileSidebar() {
+      isMobileSidebarOpen = !isMobileSidebarOpen;
+      const sidebar = document.getElementById("sidebar");
+      const backdrop = document.getElementById("sidebarBackdrop");
+      
+      if (isMobileSidebarOpen) {
+        sidebar.classList.remove("-translate-x-full");
+        backdrop.classList.remove("hidden");
+      } else {
+        sidebar.classList.add("-translate-x-full");
+        backdrop.classList.add("hidden");
+      }
+    }
+
+    // Switch Page
+    function switchPage(pageId) {
+      // Hide all pages
+      document.querySelectorAll(".page-container").forEach(el => el.classList.add("hidden"));
+      
+      // Show target page
+      const targetPage = document.getElementById(`page-${pageId}`);
+      if (targetPage) targetPage.classList.remove("hidden");
+      
+      // Remove active states from all sidebar buttons
+      document.querySelectorAll("nav button").forEach(btn => {
+        btn.className = "w-full group flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-500 hover:bg-slate-50 hover:text-blue-600";
+      });
+      
+      // Set active state on target button
+      const activeBtn = document.getElementById(`menu-${pageId}`);
+      if (activeBtn) {
+        activeBtn.className = "w-full group flex items-center px-3.5 py-3 bg-blue-600 text-white rounded-xl shadow-md shadow-blue-200 transition-all duration-200 gap-3 font-semibold relative";
+      }
+
+      // Close mobile drawer if switching page
+      if (isMobileSidebarOpen) {
+        toggleMobileSidebar();
+      }
+
+      // Fetch data automatically when switching to Overview or Leads list
+      if (pageId === 'overview' || pageId === 'leads-list') {
+        fetchLeadsData();
+      }
+    }
+
+    // Fetch leads data from Google Sheet Web App
+    async function fetchLeadsData() {
+      if (!config.appsScriptUrl) {
+        renderMockDataWarning();
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${config.appsScriptUrl}?action=getLeads`);
+        const result = await response.json();
+        
+        if (result.success && result.leads) {
+          allLeads = result.leads;
+          updateDashboardStats();
+          renderLeadsTable();
+        } else {
+          showToast(`�?��่สามารถดึ�?��้อมูล�?���?: ${result.error || "เกิดข้อผิดพลา�?"}`);
+          renderMockDataWarning();
+        }
+      } catch (err) {
+        console.error("Fetch leads error:", err);
+        renderMockDataWarning();
+      }
+    }
+
+    // Displays warning and shows mock data when API URL is not set
+    function renderMockDataWarning() {
+      allLeads = [
+        {
+          "Cust_ID": "C-0001",
+          "Log_ID": "L-0001",
+          "วันที่บันทึ�?": new Date().toISOString(),
+          "ชื่อลูก�?��า": "�?��ณวิ�?าวี พ�?��์สวัสดิ�?",
+          "ชื่อ/บริษัทออกบิล": "บริษั�? �?��ร์�? ดีเวลลอปเม้นท�? จำกั�?",
+          "เบอร์โทรศัพท�?": "081-234-5678",
+          "อีเมล": "wipavee@brightdev.co.th",
+          "จั�?��วั�?": "กรุ�?��ทพมหาน�?��",
+          "หัวข้อที่ติดต่อ": "ฟิล์มตกแต่�? (สิน�?��าที่สน�?�?: ฟิล์มตกแต่�?)",
+          "ประเ�?ทหน้า�?���?": "อา�?��รสำนัก�?���?",
+          "รู้จัก�?��ั้�?��ร�?": new Date().toLocaleDateString('en-CA'),
+          "ประเ�?ทลูก�?��า": "โ�?���?��าร�?��ม�?",
+          "แอดมิ�?": "�?��ณเก�?�?",
+          "หมายเหตุ": "�?��ามสำ�?���?: สูง\nฝ่ายขาย: ฝ่ายขาย 1\nสถานะ�?���?: รอดำเนินการ\nรายละเอียด�?���?: ต้อ�?��ารฟิล์มลด�?��ามร้อนสู�? เน้น�?��าม�?���?าพ�?ายนอก\n\nหมายเหตุทั่ว�?�?: ลูก�?��าต้อ�?��ารเปรียบเทียบหลายยี่ห้อ"
+        }
+      ];
+      updateDashboardStats();
+      renderLeadsTable();
+    }
+
+    function updateDashboardStats() {
+      document.getElementById("statTotalLeads").textContent = allLeads.length;
+      document.getElementById("statActiveLeads").textContent = Math.ceil(allLeads.length * 0.4);
+      document.getElementById("statSuccessLeads").textContent = Math.floor(allLeads.length * 0.5);
+    }
+
+    function renderLeadsTable() {
+      const tableBody = document.getElementById("leadsTableBody");
+      tableBody.innerHTML = "";
+
+      const recentBody = document.getElementById("recentLeadsTableBody");
+      recentBody.innerHTML = "";
+      
+      if (allLeads.length === 0) {
+        const emptyRow = `<tr><td colspan="7" class="p-8 text-center text-slate-400">�?��่มีข้อมูลลีดลูก�?��าบันทึกอยู่�?��ระบ�?</td></tr>`;
+        tableBody.innerHTML = emptyRow;
+        recentBody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">�?��่มีข้อมูลลี�?</td></tr>`;
+        return;
+      }
+      
+      allLeads.forEach(lead => {
+        const dateFormatted = lead["วันที่บันทึ�?"] ? new Date(lead["วันที่บันทึ�?"]).toLocaleDateString('th-TH', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }) : "-";
+        
+        const row = document.createElement("tr");
+        row.className = "hover:bg-slate-50/80 transition-colors";
+        row.innerHTML = `
+          <td class="p-4 font-bold text-blue-700">${lead["Cust_ID"] || lead["Cut_ID"] || "-"}</td>
+          <td class="p-4">
+            <span class="font-bold text-slate-800 block">${lead["ชื่อลูก�?��า"] || "-"}</span>
+            <span class="text-xs text-slate-400 block text-ellipsis overflow-hidden max-w-[120px] sm:max-w-none">${lead["ชื่อ/บริษัทออกบิล"] || lead["บริษั�?"] || "-"}</span>
+          </td>
+          <td class="p-4 text-xs space-y-0.5">
+            <div class="text-slate-600"><i class="fa-solid fa-phone text-slate-400 mr-1.5 w-3.5"></i>${lead["เบอร์โทรศัพท�?"] || "-"}</div>
+            <div class="text-slate-400"><i class="fa-regular fa-envelope text-slate-400 mr-1.5 w-3.5"></i>${lead["อีเมล"] || "-"}</div>
+          </td>
+          <td class="p-4 font-semibold text-slate-600 hidden sm:table-cell">${lead["จั�?��วั�?"] || "-"}</td>
+          <td class="p-4 hidden md:table-cell">
+            <div class="flex flex-wrap gap-1 max-w-[200px]">
+              ${(lead["หัวข้อที่ติดต่อ"] || "").split(",").map(t => `<span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-full font-semibold border border-blue-100">${t.trim()}</span>`).join('')}
+            </div>
+          </td>
+          <td class="p-4 text-slate-500 font-medium hidden sm:table-cell">${dateFormatted}</td>
+          <td class="p-4 text-center">
+            <button onclick="viewLeadDetail('${lead["Cust_ID"]}')" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold rounded-lg text-xs transition-colors">
+              <i class="fa-regular fa-eye mr-1"></i><span class="hidden sm:inline">ดูรายละเอีย�?</span><span class="inline sm:hidden">ดู</span>
+            </button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      allLeads.slice(0, 5).forEach(lead => {
+        const row = document.createElement("tr");
+        row.className = "hover:bg-slate-50 transition-colors";
+        row.innerHTML = `
+          <td class="py-3.5">
+            <span class="font-bold text-slate-800 block">${lead["ชื่อลูก�?��า"] || "-"}</span>
+            <span class="text-xs text-slate-400 block">${lead["ชื่อ/บริษัทออกบิล"] || "-"}</span>
+          </td>
+          <td class="py-3.5 text-slate-600 text-xs">${lead["เบอร์โทรศัพท�?"] || "-"}</td>
+          <td class="py-3.5">
+            <span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded-full font-semibold border border-blue-100">
+              ${(lead["หัวข้อที่ติดต่อ"] || "").split(",")[0] || "-"}
+            </span>
+          </td>
+          <td class="py-3.5 text-right font-bold text-blue-700 text-xs">${lead["Cust_ID"] || "-"}</td>
+        `;
+        recentBody.appendChild(row);
+      });
+    }
+
+    // Filter Leads
+    function filterLeads() {
+      const search = document.getElementById("leadsSearchInput").value.toLowerCase().trim();
+      const province = document.getElementById("filterProvince").value;
+      const channel = document.getElementById("filterChannel").value;
+      
+      const tableRows = document.querySelectorAll("#leadsTableBody tr");
+      
+      allLeads.forEach((lead, idx) => {
+        const matchesSearch = 
+          (lead["ชื่อลูก�?��า"] || "").toLowerCase().includes(search) ||
+          (lead["ชื่อ/บริษัทออกบิล"] || "").toLowerCase().includes(search) ||
+          (lead["เบอร์โทรศัพท�?"] || "").toLowerCase().includes(search);
+          
+        const matchesProvince = !province || lead["จั�?��วั�?"] === province;
+        const matchesChannel = !channel || lead["ช่อ�?��า�?��ิดต่อ"] === channel;
+        
+        const rowElement = tableRows[idx];
+        if (rowElement) {
+          if (matchesSearch && matchesProvince && matchesChannel) {
+            rowElement.classList.remove("hidden");
+          } else {
+            rowElement.classList.add("hidden");
+          }
+        }
+      });
+    }
+
+    // View Lead Detail
+    function viewLeadDetail(custId) {
+      const lead = allLeads.find(l => l["Cust_ID"] === custId);
+      if (!lead) return;
+      
+      const content = document.getElementById("leadDetailContent");
+      const refDateStr = lead["รู้จัก�?��ั้�?��ร�?"] ? new Date(lead["รู้จัก�?��ั้�?��ร�?"]).toLocaleDateString('th-TH') : "-";
+      
+      content.innerHTML = `
+        <div class="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-4">
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">รหัสลูก�?��า / รหัสการติดต่อ</span>
+            <span class="font-bold text-blue-700 text-sm sm:text-md">${lead["Cust_ID"]} / ${lead["Log_ID"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">วันที่บันทึกเข้าระบ�?</span>
+            <span class="font-semibold text-slate-800">${new Date(lead["วันที่บันทึ�?"]).toLocaleString('th-TH')}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">ชื่อลูก�?��า / ผู้้ติดต่อ</span>
+            <span class="font-bold text-slate-800 text-sm sm:text-md">${lead["ชื่อลูก�?��า"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">ชื่อบริษัทออกบิล / บริษั�?</span>
+            <span class="font-bold text-slate-800">${lead["ชื่อ/บริษัทออกบิล"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">เบอร์โทรศัพท�?</span>
+            <span class="font-bold text-slate-800">${lead["เบอร์โทรศัพท�?"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">เพศ</span>
+            <span class="font-semibold text-slate-800">${lead["เพศ"] || "�?��่ระบุ"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">ช่อ�?��า�?��ิดต่อหลักที่เข้ามา</span>
+            <span class="font-semibold text-slate-800">${lead["ช่อ�?��า�?��ิดต่อ"]} (${lead["ชื่อช่อ�?��า�?��ิดต่อ"] || "-"})</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">รู้จัก�?��ั้�?��ร�? (วันที่แรกพ�?)</span>
+            <span class="font-semibold text-slate-800">${refDateStr}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">ประเ�?ทหน้า�?���? / สถานที�?</span>
+            <span class="font-semibold text-slate-800">${lead["ประเ�?ทหน้า�?���?"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">จั�?��วัดหน้า�?���?</span>
+            <span class="font-semibold text-slate-800">${lead["จั�?��วั�?"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">ประเ�?ทสิน�?��า/�?��ามสน�?�?</span>
+            <span class="font-bold text-blue-700">${lead["หัวข้อที่ติดต่อ"] || "-"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] sm:text-xs block mb-0.5">ประเ�?ทลูก�?��า</span>
+            <span class="font-bold text-slate-800">${lead["ประเ�?ทลูก�?��า"] || "-"}</span>
+          </div>
+        </div>
+        
+        <div class="border-t border-slate-100 pt-4 text-xs sm:text-sm">
+          <span class="text-slate-400 text-[10px] sm:text-xs block mb-1">ที่อยู่หน้า�?���? / ที่อยู่ออกบิล</span>
+          <p class="text-slate-700 font-medium bg-slate-50 p-3 rounded-xl border border-slate-200/50">
+            <b>ที่อยู่ติดตั้�?:</b> ${lead["ที่อยู่หน้า�?���?"] || "-"}<br>
+            <b>เลขผู้้เสีย�?าษี:</b> ${lead["เลขประจำตัวผู้้เสีย�?าษี"] || "-"}<br>
+            <b>ที่อยู่ออกบิล:</b> ${lead["ที่อยู่สำหรับออกบิล"] || "-"}
+          </p>
+        </div>
+
+        <div class="border-t border-slate-100 pt-4 text-xs sm:text-sm">
+          <span class="text-slate-400 text-[10px] sm:text-xs block mb-1">หมายเหตุระบบและรายละเอียด�?��ามต้อ�?��าร</span>
+          <p class="text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200/50 whitespace-pre-line font-medium leading-relaxed">${lead["หมายเหตุ"] || "-"}</p>
+        </div>
+        
+        <div class="flex justify-between text-[10px] text-slate-400 pt-2">
+          <span>ผู้้ล�?��ระวัติ: ${lead["แอดมิ�?"] || "-"}</span>
+        </div>
+      `;
+      
+      const modal = document.getElementById("leadDetailModal");
+      modal.classList.remove("hidden");
+      setTimeout(() => {
+        modal.classList.remove("opacity-0");
+        modal.querySelector("div").classList.remove("scale-95");
+      }, 50);
+    }
+
+    function closeLeadDetailModal() {
+      const modal = document.getElementById("leadDetailModal");
+      modal.classList.add("opacity-0");
+      modal.querySelector("div").classList.add("scale-95");
+      setTimeout(() => {
+        modal.classList.add("hidden");
+      }, 300);
+    }
+
+    // Save Settings
+    function saveGlobalSettings() {
+      const adminVal = document.getElementById("adminNameConfigSetting").value.trim();
+      const urlVal = document.getElementById("appsScriptUrlSetting").value.trim();
+      
+      if (!urlVal) {
+        showToast("กรุณาระบุ Google Apps Script Web App URL");
+        return;
+      }
+      
+      config.adminName = adminVal || "�?��ณเก�?�?";
+      config.appsScriptUrl = urlVal;
+      
+      localStorage.setItem("gfs_admin_name", config.adminName);
+      localStorage.setItem("gfs_apps_script_url", config.appsScriptUrl);
+      
+      updateAdminUI();
+      showSuccessToast("บันทึกการตั้�?�?��าเรียบร้อยแล้ว");
+      fetchLeadsData();
+    }
+
+    // Update Admin UI
+    function updateAdminUI() {
+      document.getElementById("headerAdminName").textContent = config.adminName;
+      const initials = config.adminName.replace("�?���?", "").substring(0, 2);
+      document.getElementById("userAvatarInitials").textContent = initials || "�?";
+      
+      // Update mobile avatar
+      document.querySelector(".mobile-avatar-initials").textContent = initials || "�?";
+      
+      // Update form fields
+      document.getElementById("adminName").value = config.adminName;
+      document.getElementById("adminNameConfigSetting").value = config.adminName;
+    }
+
+    // Draft Functions
+    function saveDraft() {
+      const payload = getFormValues();
+      localStorage.setItem('good_crm_draft', JSON.stringify(payload));
+      showSuccessToast("บันทึกข้อมูลร่า�?��ั่ว�?��าวแล้ว");
+      checkDraft();
+    }
+
+    function checkDraft() {
+      const draft = localStorage.getItem('good_crm_draft');
+      const banner = document.getElementById('draftRecoverAlert');
+      if (draft) {
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    function loadDraft() {
+      const draftStr = localStorage.getItem('good_crm_draft');
+      if (!draftStr) return;
+      
+      const data = JSON.parse(draftStr);
+      
+      document.getElementById("customerName").value = data.customerName || "";
+      
+      if (data.gender) {
+        const rad = document.querySelector(`input[name="gender"][value="${data.gender}"]`);
+        if (rad) rad.checked = true;
+      }
+      
+      document.getElementById("phone").value = data.phone || "";
+      document.getElementById("contactChannel").value = data.contactChannel || "";
+      toggleChannelDetails(data.contactChannel || "");
+      document.getElementById("contactHandle").value = data.contactHandle || "";
+      document.getElementById("referralDate").value = data.referralDate || "";
+      document.getElementById("customerRemarks").value = data.customerRemarks || "";
+      document.getElementById("referralRemarks").value = data.referralRemarks || "";
+      
+      document.getElementById("adminName").value = data.adminName || config.adminName;
+      document.getElementById("customerType").value = data.customerType || "";
+      document.getElementById("topic").value = data.topic || "";
+      document.getElementById("priority").value = data.priority || "ปานกลา�?";
+      document.getElementById("siteType").value = data.siteType || "";
+      document.getElementById("siteAddress").value = data.siteAddress || "";
+      document.getElementById("province").value = data.province || "กรุ�?��ทพมหาน�?��";
+      document.getElementById("goodsOfInterest").value = data.interests || "";
+      document.getElementById("jobDetails").value = data.jobDetails || "";
+      
+      document.getElementById("billingName").value = data.billingName || "";
+      document.getElementById("billingAddress").value = data.billingAddress || "";
+      document.getElementById("taxId").value = data.taxId || "";
+      document.getElementById("salesperson").value = data.salesperson || "";
+      document.getElementById("jobStatus").value = data.jobStatus || "รอดำเนินการ";
+      document.getElementById("billingRemarks").value = data.billingRemarks || "";
+      
+      showSuccessToast("โหลดข้อมูลร่า�?��รียบร้อยแล้ว");
+      document.getElementById('draftRecoverAlert').classList.add('hidden');
+    }
+
+    function clearDraft() {
+      localStorage.removeItem('good_crm_draft');
+      checkDraft();
+    }
+
+    // Get form field values
+    function getFormValues() {
+      const genderRad = document.querySelector('input[name="gender"]:checked');
+      return {
+        adminName: document.getElementById("adminName").value,
+        customerName: document.getElementById("customerName").value.trim(),
+        gender: genderRad ? genderRad.value : "�?��่ระบุ",
+        phone: document.getElementById("phone").value.trim(),
+        contactChannel: document.getElementById("contactChannel").value,
+        contactHandle: document.getElementById("contactHandle").value.trim(),
+        referralDate: document.getElementById("referralDate").value,
+        customerRemarks: document.getElementById("customerRemarks").value.trim(),
+        referralRemarks: document.getElementById("referralRemarks").value.trim(),
+        
+        customerType: document.getElementById("customerType").value,
+        topic: document.getElementById("topic").value.trim(),
+        priority: document.getElementById("priority").value,
+        siteType: document.getElementById("siteType").value,
+        siteAddress: document.getElementById("siteAddress").value.trim(),
+        province: document.getElementById("province").value,
+        interests: document.getElementById("goodsOfInterest").value,
+        jobDetails: document.getElementById("jobDetails").value.trim(),
+        
+        billingName: document.getElementById("billingName").value.trim(),
+        billingAddress: document.getElementById("billingAddress").value.trim(),
+        taxId: document.getElementById("taxId").value.trim(),
+        salesperson: document.getElementById("salesperson").value,
+        jobStatus: document.getElementById("jobStatus").value,
+        billingRemarks: document.getElementById("billingRemarks").value.trim()
+      };
+    }
+
+    // Toggle contact channel placeholder
+        function selectChannel(channel, btn) {
+      document.getElementById("contactChannel").value = channel;
+      toggleChannelDetails(channel);
+    }
+
+    function toggleChannelDetails(channel) {
+      const input = document.getElementById("contactHandle");
+      
+      document.querySelectorAll(".channel-btn").forEach(b => {
+        if(b.dataset.value === channel) {
+          b.classList.remove("bg-white", "text-slate-600", "border-slate-200");
+          b.classList.add("bg-blue-50", "text-blue-700", "border-blue-300", "ring-1", "ring-blue-300");
+        } else {
+          b.classList.add("bg-white", "text-slate-600", "border-slate-200");
+          b.classList.remove("bg-blue-50", "text-blue-700", "border-blue-300", "ring-1", "ring-blue-300");
+        }
+      });
+      
+      input.classList.remove("hidden");
+      
+      switch(channel) {
+        case "Tel":
+          input.placeholder = "????????/???????? (?????)";
+          break;
+        case "Email":
+          input.placeholder = "???? customer@email.com";
+          break;
+        case "Line":
+          input.placeholder = "???? LINE ID ???? LINE Name";
+          break;
+        case "FB":
+          input.placeholder = "???????????????????? Facebook";
+          break;
+        case "WalkIn":
+          input.placeholder = "????????????????? (?????)";
+          break;
+        case "Tiktok":
+          input.placeholder = "???? Tiktok Account";
+          break;
+        default:
+          input.placeholder = "????????/???????? (?????)";
+          if(!channel) input.classList.add("hidden");
+          break;
+      }
+    }
+    }
+
+    // Custom Toast warnings
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      const toastMessage = document.getElementById("toastMessage");
+      
+      toastMessage.textContent = message;
+      toast.classList.remove("hidden");
+      toast.classList.remove("bg-green-600");
+      toast.classList.add("bg-red-600");
+      
+      setTimeout(() => {
+        toast.classList.remove("opacity-0");
+      }, 50);
+      
+      setTimeout(() => {
+        toast.classList.add("opacity-0");
+        setTimeout(() => {
+          toast.classList.add("hidden");
+        }, 300);
+      }, 4000);
+    }
+
+    function showSuccessToast(message) {
+      const toast = document.getElementById("toast");
+      const toastMessage = document.getElementById("toastMessage");
+      
+      toastMessage.textContent = message;
+      toast.classList.remove("hidden");
+      toast.classList.remove("bg-red-600");
+      toast.classList.add("bg-green-600");
+      
+      setTimeout(() => {
+        toast.classList.remove("opacity-0");
+      }, 50);
+      
+      setTimeout(() => {
+        toast.classList.add("opacity-0");
+        setTimeout(() => {
+          toast.classList.add("hidden");
+        }, 300);
+      }, 3000);
+    }
+
+    // Modal control: Success
+    function openSuccessModal(custId, logId) {
+      document.getElementById("resCustId").textContent = custId;
+      document.getElementById("resLogId").textContent = logId;
+      
+      const modal = document.getElementById("successModal");
+      modal.classList.remove("hidden");
+      setTimeout(() => {
+        modal.classList.remove("opacity-0");
+        modal.querySelector("div").classList.remove("scale-95");
+      }, 50);
+    }
+
+    function closeSuccessModal() {
+      const modal = document.getElementById("successModal");
+      modal.classList.add("opacity-0");
+      modal.querySelector("div").classList.add("scale-95");
+      setTimeout(() => {
+        modal.classList.add("hidden");
+        resetForm();
+        switchPage('leads-list');
+      }, 300);
+    }
+
+    // Reset Form
+    function resetForm() {
+      document.getElementById("leadForm").reset();
+      clearDraft();
+      toggleChannelDetails('');
+    }
+
+    // Handle Form Submit and call Google Apps Script
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      if (!config.appsScriptUrl) {
+        showToast("กรุณาตั้�?�?��า Google Apps Script Web App URL ก่อนกดบันทึ�? (�?��ที่เมนู 'ตั้�?�?��าระบ�?')");
+        switchPage('settings');
+        return;
+      }
+
+      const values = getFormValues();
+      const loading = document.getElementById("loadingOverlay");
+      loading.classList.remove("hidden");
+
+      try {
+        const response = await fetch(config.appsScriptUrl, {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(values)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        loading.classList.add("hidden");
+
+        if (result.success) {
+          clearDraft();
+          openSuccessModal(result.custId, result.logId);
+        } else {
+          showToast(`เกิดข้อผิดพลาด�?��การบันทึ�?: ${result.error || "�?��่ทราบสาเหตุ"}`);
+        }
+        
+      } catch (error) {
+        loading.classList.add("hidden");
+        console.error("Submission error:", error);
+        showToast(`�?��่สามารถส่�?��้อมูล�?���?: โปรดตรวจสอบสัญญาณเ�?��ือข่าย หรือลิ�?���? Web App URL ว่าถูกต้อ�?��ละเป�?��สาธารณะหรือ�?���?);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1500' height='900' viewBox='0 0 1500 900'>
+  <defs>
+    <linearGradient id='bgBlue' x1='0' x2='1' y1='0' y2='1'>
+      <stop offset='0%' stop-color='#dbeafe'/>
+      <stop offset='100%' stop-color='#ffffff'/>
+    </linearGradient>
+    <filter id='soft' x='-20%' y='-20%' width='140%' height='140%'>
+      <feDropShadow dx='0' dy='8' stdDeviation='12' flood-color='#bfdbfe' flood-opacity='0.45'/>
+    </filter>
+  </defs>
+  <rect x='0' y='0' width='1500' height='900' fill='url(#bgBlue)'/>
+  <g filter='url(#soft)'>
+    <rect x='24' y='24' width='960' height='852' rx='28' fill='white' stroke='#bfdbfe' stroke-width='2'/>
+    <rect x='44' y='54' width='214' height='812' rx='20' fill='#eef2ff'/>
+    <text x='72' y='88' font-family='Poppins,Segoe UI,Arial' font-size='16' font-weight='800' fill='#1e3a8a'>CRM Shell</text>
+    
+      <g>
+        <rect x='66' y='130' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='154' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> หน้าหลัก </text>
+      </g>
+      <g>
+        <rect x='66' y='182' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='206' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> ลีด </text>
+      </g>
+      <g>
+        <rect x='66' y='234' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='258' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> ลูกค้า </text>
+      </g>
+      <g>
+        <rect x='66' y='286' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='310' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> นัดหมาย </text>
+      </g>
+      <g>
+        <rect x='66' y='338' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='362' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> เสนอราคา </text>
+      </g>
+      <g>
+        <rect x='66' y='390' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='414' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> ติดตั้ง </text>
+      </g>
+      <g>
+        <rect x='66' y='442' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='466' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> รายงาน </text>
+      </g>
+      <g>
+        <rect x='66' y='494' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='518' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> งาน </text>
+      </g>
+      <g>
+        <rect x='66' y='546' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='570' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> ตั้งค่า </text>
+      </g>
+      <g>
+        <rect x='66' y='598' width='186' height='38' rx='10' fill='#ffffff' />
+        <text x='80' y='622' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#1f2937' font-weight='700'> นำเข้า </text>
+      </g>
+    <rect x='283' y='54' width='681' height='812' rx='20' fill='#f8fbff'/>
+    <rect x='316' y='84' width='615' height='64' rx='14' fill='#ffffff' stroke='#bfdbfe'/>
+    <text x='350' y='124' font-family='Poppins,Segoe UI,Arial' font-size='24' font-weight='800' fill='#1e3a8a'>เข้าสู่ระบบ</text>
+    <text x='350' y='142' font-family='Poppins,Segoe UI,Arial' font-size='11' fill='#475569'>ปลดล็อกระบบ CRM อย่างรวดเร็วและปลอดภัย</text>
+          <g>
+        <rect x='350' y='180' width='520' height='440' rx='24' fill='#ffffff' stroke='#93c5fd' stroke-width='2'/>
+        <text x='610' y='238' text-anchor='middle' font-family='Poppins,Segoe UI,Arial' font-size='24' font-weight='800' fill='#1d4ed8'>GoodCRM Login</text>
+        <text x='610' y='266' text-anchor='middle' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#4b5563'>Single Sign-On + RBAC</text>
+        <rect x='420' y='290' width='380' height='44' rx='10' fill='#f8fbff' stroke='#93c5fd'/>
+        <text x='438' y='318' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#6b7280'>อีเมลบริษัท</text>
+        <rect x='420' y='352' width='380' height='44' rx='10' fill='#f8fbff' stroke='#93c5fd'/>
+        <text x='438' y='380' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#6b7280'>รหัสผ่าน</text>
+        <rect x='420' y='420' width='380' height='44' rx='10' fill='#1d4ed8'/>
+        <text x='610' y='448' text-anchor='middle' font-family='Poppins,Segoe UI,Arial' font-size='14' fill='white' font-weight='700'>เข้าสู่ระบบ</text>
+        <text x='420' y='494' font-family='Poppins,Segoe UI,Arial' font-size='12' fill='#4f46e5'>จำลองแผงควบคุมองค์กรใน 2 ขั้นตอน</text>
+      </g>
+  </g>
+  <g>
+          <g>
+        <rect x='1100' y='120' width='270' height='620' rx='22' fill='white' stroke='#bfdbfe'/>
+        <rect x='1125' y='155' width='220' height='40' rx='10' fill='#dbeafe'/><text x='1185' y='182' font-size='12' fill='#1d4ed8'>GoodCRM</text>
+        <text x='1185' y='224' text-anchor='middle' font-size='18' font-weight='700' fill='#1e40af'>Login</text>
+        <rect x='1134' y='248' width='186' height='34' fill='#eff6ff' rx='8'/><text x='1142' y='269' font-size='10' fill='#475569'>อีเมล</text>
+        <rect x='1134' y='296' width='186' height='34' fill='#eff6ff' rx='8'/><text x='1142' y='317' font-size='10' fill='#475569'>รหัสผ่าน</text>
+        <rect x='1134' y='344' width='186' height='34' rx='8' fill='#1d4ed8'/><text x='1227' y='366' text-anchor='middle' font-size='11' fill='white'>เข้าสู่ระบบ</text>
+      </g>
+  </g>
+</svg>
