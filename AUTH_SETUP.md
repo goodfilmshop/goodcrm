@@ -35,6 +35,12 @@ set display_name = excluded.display_name,
 
 Use `manager` or `sales` for other approved users. Active members can access CRM rows under the current RLS policies.
 
+## Manage employees in GOOD CRM
+
+Apply the employee migrations through `20260819150000_restrict_employee_assignment_directory_rpc.sql`. An administrator can then open **ตั้งค่าระบบ → พนักงาน** to add, edit, deactivate, or remove employee records. The new-case admin dropdown lists active employees whose position is `Admin Sale`.
+
+GOOD CRM uses email Magic Links, so it never stores employee passwords. Create or invite the employee in **Authentication → Users** first. When an employee record is saved with the same email address, GOOD CRM automatically synchronizes its display name, status, and `admin` / `manager` / `sales` / `member` role to `crm_members`. If the Auth account is created after the employee record, open that employee and save it again to synchronize access.
+
 ## Verification
 
 Run `npm start`, then open `http://localhost:3000`. `/api/protected/health` must return `401` without a Bearer token. Enter an approved email, request a sign-in link, and open that link from the email in the same browser. The server validates the signed-in user and their active membership before the CRM is displayed.

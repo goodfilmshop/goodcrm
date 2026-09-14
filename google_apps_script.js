@@ -28,20 +28,26 @@ var GOOD_CRM_CASE_STATUSES = [
   "ติดต่อสอบถาม",
   "ประเมินราคา",
   "นัดวัดพื้นที่",
-  "เสนอราคา",
+  "ส่งใบเสนอราคา",
   "ติดตามครั้งที่ 1",
   "ติดตามครั้งที่ 2",
   "ติดตามครั้งที่ 3",
   "ติดตามครั้งที่ 4",
   "ติดตามครั้งที่ 5",
   "ต่อรองราคา",
+  "ออกใบแจ้งหนี้",
   "เซ็นต์สัญญา",
   "มัดจำก่อนติด",
   "นัดคิวติดตั้ง",
   "ติดตั้งสิ้นเสร็จ",
+  "ประเมินหลังการขาย",
+  "แก้ไขงาน",
+  "ออกใบเสร็จรับเงิน",
   "ชำระเงินครบ",
   "เก็บซิลิโคลน",
-  "ยกเลิก"
+  "ยกเลิก",
+  "อื่นๆ",
+  "ปิดงาน"
 ];
 var CUSTOMER_REMARKS_COLUMN = 9; // Column I (1-based)
 // Zero-based positions in the "ข้อมูลการติดต่อ" sheet. Keep this mapping in
@@ -462,6 +468,7 @@ function doPost(e) {
       setRowValue(contactHeaders, contactRow, "ความสำคัญ", data.priority || "");
       setRowValue(contactHeaders, contactRow, "ประเภทหน้างาน", data.siteType || "");
       setRowValue(contactHeaders, contactRow, "ที่อยู่หน้างาน", data.siteAddress || "");
+      setContactCaseValue(contactRow, CONTACT_CASE_COLUMNS.LOCATION, data.location || "");
       setRowValue(contactHeaders, contactRow, "จังหวัด", data.province || "");
       setRowValue(contactHeaders, contactRow, "สินค้าที่สนใจ", data.interests || "");
       setRowValue(contactHeaders, contactRow, "รายละเอียดงาน", data.jobDetails || "");
@@ -470,6 +477,7 @@ function doPost(e) {
       setRowValue(contactHeaders, contactRow, "บริษัท", data.company || data.billingName || "");
       setRowValue(contactHeaders, contactRow, "สถานะงาน", data.jobStatus || "");
       setRowValue(contactHeaders, contactRow, "ลิงก์", data.link || "");
+      setContactCaseValue(contactRow, CONTACT_CASE_COLUMNS.CHAT_LINK, data.chatLink || "");
       setRowValue(contactHeaders, contactRow, "ชื่อ/บริษัทออกบิล", data.billingName || "");
       setRowValue(contactHeaders, contactRow, "ที่อยู่สำหรับออกบิล", data.billingAddress || "");
       setRowValue(contactHeaders, contactRow, "เลขประจำตัวผู้เสียภาษี", data.taxId || "");
@@ -1198,6 +1206,7 @@ function updateCaseDetails(ss, data) {
     setContactCaseValue(row, CONTACT_CASE_COLUMNS.PRIORITY, String(data.priority || "").trim());
     setContactCaseValue(row, CONTACT_CASE_COLUMNS.SITE_TYPE, String(data.siteType || "").trim());
     setContactCaseValue(row, CONTACT_CASE_COLUMNS.SITE_ADDRESS, String(data.siteAddress || "").trim());
+    setContactCaseValue(row, CONTACT_CASE_COLUMNS.LOCATION, String(data.location || "").trim());
     setContactCaseValue(row, CONTACT_CASE_COLUMNS.PROVINCE, String(data.province || "").trim());
     setContactCaseValue(row, CONTACT_CASE_COLUMNS.JOB_DETAILS, String(data.jobDetails || "").trim());
     setContactCaseValue(row, CONTACT_CASE_COLUMNS.ADMIN, String(data.admin || "").trim());
@@ -1205,11 +1214,13 @@ function updateCaseDetails(ss, data) {
     setContactCaseValue(row, CONTACT_CASE_COLUMNS.COMPANY, String(data.company || "").trim());
     setContactCaseValue(row, CONTACT_CASE_COLUMNS.STATUS, status);
     setContactCaseValue(row, CONTACT_CASE_COLUMNS.REMARKS, String(data.remarks || "").trim());
+    setContactCaseValue(row, CONTACT_CASE_COLUMNS.CHAT_LINK, String(data.chatLink || "").trim());
 
     // These legacy optional fields do not have a fixed column in the requested
     // A-R layout, so retain their header-based mapping when that column exists.
     setRowValue(headers, row, "สินค้าที่สนใจ", String(data.interests || "").trim());
     setRowValue(headers, row, "งบประมาณ", String(data.budget || "").trim());
+    setRowValue(headers, row, "ประเภทลูกค้า", String(data.customerType || "").trim());
     if (linkIndex !== -1) row[linkIndex] = String(data.link || "").trim();
 
     sheet.getRange(rowNumber, 1, 1, row.length).setValues([row]);

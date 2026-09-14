@@ -91,6 +91,7 @@ const customerRows = sourceCustomers
     customer_name: nullable(customer['ชื่อลูกค้า']) || 'ไม่ระบุชื่อลูกค้า',
     gender: nullable(customer['เพศ']) || 'ไม่ระบุ',
     phone: nullable(customer['เบอร์โทรศัพท์']),
+    email: nullable(customer['อีเมล']),
     contact_channel: nullable(customer['ช่องทางติดต่อ']),
     contact_handle: nullable(customer['ชื่อช่องทางติดต่อ']),
     referral_source: nullable(customer['รู้จักครั้งแรก']),

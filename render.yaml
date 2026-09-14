@@ -1,0 +1,30 @@
+# Deployment scaffold. Keep access closed until the trusted edge is configured.
+# See RENDER_DEPLOYMENT.md before exposing this service to users.
+services:
+  - type: web
+    name: goodcrm
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm ci && npm test
+    startCommand: npm start
+    autoDeployTrigger: off
+    envVars:
+      - key: NODE_VERSION
+        value: 24.15.0
+      - key: NODE_ENV
+        value: production
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: GEO_RESTRICTION_ENABLED
+        value: "true"
+      - key: GEO_ALLOWED_COUNTRIES
+        value: TH
+      - key: GEO_COUNTRY_HEADER
+        value: cf-ipcountry
+      - key: GEO_ALLOW_LOCAL_DEVELOPMENT
+        value: "false"
+      - key: LINE_GFS_INTAKE_ENABLED
+        value: "false"

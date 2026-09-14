@@ -1,0 +1,27 @@
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const vm=require('node:vm');
+const fs=require('node:fs');
+const crypto=require('node:crypto');
+test('Apps Script bridge gates both accounts, strips message content and retries failed deliveries',()=>{
+  const props={}; const rows=[]; const deliveries=[]; let fail=true;
+  for(const prefix of ['GOODCRM_GFS_','GOODCRM_MHL_']) Object.assign(props,{[prefix+'ENABLED']:'true',[prefix+'WEBHOOK_KEY']:prefix+'key',[prefix+'BRIDGE_SECRET']:prefix+'bridge',[prefix+'BOT_USER_ID']:'U'+'a'.repeat(32)});
+  const sheet={getLastRow:()=>rows.length,appendRow:r=>rows.push(r),hideSheet(){},getRange:(r,c,n=1,m=1)=>({getValues:()=>rows.slice(r-1,r-1+n).map(row=>row.slice(c-1,c-1+m)),setValues:values=>values.forEach((row,i)=>{rows[r-1+i]??=[];row.forEach((v,j)=>rows[r-1+i][c-1+j]=v);}),setValue:v=>{rows[r-1][c-1]=v;}})};
+  const ctx=vm.createContext({SPREADSHEET_ID:'test',Date,PropertiesService:{getScriptProperties:()=>({getProperty:k=>props[k]})},LockService:{getScriptLock:()=>({waitLock(){},releaseLock(){}}),getUserLock:()=>({tryLock:()=>true,releaseLock(){}})},SpreadsheetApp:{openById:()=>({getSheetByName:()=>rows.length?sheet:null,insertSheet:()=>sheet})},Utilities:{Charset:{UTF_8:'utf8'},computeHmacSha256Signature:(raw,key)=>crypto.createHmac('sha256',key).update(raw).digest(),base64Encode:bytes=>Buffer.from(bytes).toString('base64')},UrlFetchApp:{fetch:(url,options)=>{deliveries.push({url,options});return {getResponseCode:()=>fail?503:200,getContentText:()=>'{"received":true}'};}}});
+  vm.runInContext(fs.readFileSync('scripts/goodfilm-crm-bridge.gs','utf8'),ctx);
+  const body={destination:'U'+'a'.repeat(32),events:[{type:'message',timestamp:Date.now(),webhookEventId:'same-event',source:{type:'user',userId:'U'+'b'.repeat(32)},message:{text:'PRIVATE'},replyToken:'SECRET'}]};
+  assert.throws(()=>ctx.queueGoodfilmCrm_(body,{parameter:{account:'1654307361'}}));
+  assert.equal(rows.length,0);
+  for(const [account,prefix] of [['1654307361','GOODCRM_GFS_'],['1621123913','GOODCRM_MHL_']]) ctx.queueGoodfilmCrm_(body,{parameter:{account,crm_key:prefix+'key'}});
+  assert.equal(rows.length,3);
+  assert.ok(!JSON.stringify(rows).includes('PRIVATE'));
+  assert.ok(!JSON.stringify(rows).includes('SECRET'));
+  ctx.flushGoodfilmCrmQueue();
+  assert.equal(rows[1][2],'');
+  assert.equal(rows[1][3],1);
+  fail=false;ctx.flushGoodfilmCrmQueue();
+  assert.ok(rows[1][2]);assert.ok(rows[2][2]);
+  assert.match(deliveries[2].url,/line-goodfilm-intake$/);
+  assert.match(deliveries[3].url,/line-mhl-intake$/);
+  const count=deliveries.length;ctx.flushGoodfilmCrmQueue();assert.equal(deliveries.length,count);
+});
