@@ -4790,6 +4790,7 @@
     }
 
     function clearCrmScopedData() {
+      window.cleanupStorageJob?.();
       closeAnnouncementImageViewer();
       if (typeof resetStorageOverview === 'function') resetStorageOverview();
       if (typeof resetLineIntake === 'function') resetLineIntake();
@@ -13589,6 +13590,11 @@
       detail.followUpsError = "";
       renderCaseStatusProgress();
       renderCaseContactHistory();
+      const storagePanel = document.createElement('section');
+      storagePanel.id = 'storageJobPanel';
+      storagePanel.className = 'rounded-2xl border border-blue-100 bg-white p-4';
+      content.querySelector('[data-case-detail-main]')?.append(storagePanel);
+      window.mountStorageJob?.(String(item.logId || ''));
       try {
         const historyUrl = new URL(config.crmApiUrl);
         historyUrl.searchParams.set("action", "getLeadFollowUps");
@@ -17047,6 +17053,7 @@
     }
 
     function closeCaseDetailDrawer(immediate = false) {
+      window.cleanupStorageJob?.();
       followUpTaskDetailRequestId += 1;
       const drawer = document.getElementById("caseDetailDrawer");
       const panel = document.getElementById("caseDetailDrawerPanel");
@@ -18483,6 +18490,7 @@
     }
   </script>
 <script src="/storage.js"></script>
+<script src="/storage-job-view.js"></script>
 <script src="/line-intake.js"></script>
 <script src="/facebook-intake.js"></script>
 </body>

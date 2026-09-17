@@ -6,10 +6,13 @@ const { createClient } = require('@supabase/supabase-js');
 const { getStorageOverview, deleteStorageFile } = require('./storage-overview');
 const { createWebhook, getIntake, resolveIntake } = require('./line-intake');
 const facebookIntake = require('./facebook-intake');
+const storageBridge = require('./storage-bridge.cjs');
+const {createRelay} = require('./storage-relay.cjs');
 
 loadLocalEnvironment();
 
 const app = express();
+const storageRelay = createRelay();
 const PORT = Number(process.env.PORT || 3000);
 const PROJECT_URL = process.env.SUPABASE_URL;
 const PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
@@ -4151,6 +4154,13 @@ async function handleCrmRequest(req, res) {
     }
     if (isGet) {
       switch (action) {
+        case 'getStorageJob':
+          try {
+            payload = await storageBridge.readJob(req.crmUser.client, text(input.caseRef), process.env, fetch, storageRelay);
+          } catch (error) {
+            throw new CrmRequestError(error.status || 503, error.message, 'STORAGE_JOB_UNAVAILABLE');
+          }
+          break;
         case 'getStorageOverview':
           try {
             payload = await getStorageOverview(req.crmUser.client, req.crmUser.membership);
@@ -4398,6 +4408,16 @@ app.post('/webhooks/line/gfs-249izgyn', express.raw({ type: 'application/json', 
 app.use(requireAllowedCountry);
 
 app.get('/api/runtime-config', runtimeConfig);
+app.get('/api/storage-bridge/export', storageBridge.createExportHandler({
+  getClient() {
+    const key = PUBLISHABLE_KEY;
+    if (!PROJECT_URL || !key) return null;
+    return createClient(PROJECT_URL, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  },
+}));
+app.get('/api/storage-bridge/poll', storageRelay.poll);
+app.post('/api/storage-bridge/result', express.raw({ type: 'application/json', limit: '1500kb' }), storageRelay.reply);
+app.get('/api/storage-bridge/photo', requireCrmMember, storageBridge.createPhotoHandler({relay: storageRelay}));
 app.use('/api/crm', express.json({ type: ['application/json', 'text/plain'], limit: '100kb' }));
 app.all('/api/crm', requireCrmMember, handleCrmRequest);
 
