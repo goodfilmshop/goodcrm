@@ -16,6 +16,8 @@ const storageRelay = createRelay();
 const PORT = Number(process.env.PORT || 3000);
 const PROJECT_URL = process.env.SUPABASE_URL;
 const PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+const releaseCommitCandidate = process.env.RENDER_GIT_COMMIT || process.env.CRM_RELEASE_COMMIT || '';
+const RELEASE_COMMIT = /^[a-f0-9]{40}$/.test(releaseCommitCandidate) ? releaseCommitCandidate : null;
 const geoAccess = createGeoAccessConfig(process.env);
 const CRM_API_VERSION = '2026-09-14-server-three-day-follow-up-v43';
 const INSTALLATION_QUEUE_STATUS = 'นัดคิวติดตั้ง';
@@ -236,7 +238,7 @@ function runtimeConfig(req, res) {
   }
 
   res.set('Cache-Control', 'no-store, private');
-  return res.json({ url: PROJECT_URL, publishableKey: PUBLISHABLE_KEY });
+  return res.json({ url: PROJECT_URL, publishableKey: PUBLISHABLE_KEY, releaseCommit: RELEASE_COMMIT });
 }
 
 function isInvalidSessionError(error) {

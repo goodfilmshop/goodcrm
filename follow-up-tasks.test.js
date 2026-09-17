@@ -12,7 +12,7 @@ const {
   summarizeFollowUpTasks,
 } = require('./server');
 
-const crmIndexHtml = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
+const crmIndexHtml = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8').replace(/\r\n/g, '\n');
 
 test('editable case status fields have prominent styling and accessible native labels without affecting filters', () => {
   for (const id of ['caseJobStatus', 'leadFollowUpStatus']) {

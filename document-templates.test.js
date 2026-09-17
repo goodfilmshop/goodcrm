@@ -18,7 +18,7 @@ const {
   validateDocumentTemplateType,
 } = require('./server');
 
-const crmIndexHtml = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
+const crmIndexHtml = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8').replace(/\r\n/g, '\n');
 const migrationSql = fs.readFileSync(
   path.join(__dirname, 'supabase', 'migrations', '20260822114021_document_template_designer.sql'),
   'utf8'

@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node --test server.access.test.js installation-queue.test.js follow-up-tasks.test.js document-templates.test.js quotation-entry.test.js invoices.test.js sidebar-tooltips.test.js storage-overview.test.js referral-sources.test.js announcements.test.js customer-chat-link.test.js",
+    "test": "node --test server.access.test.js installation-queue.test.js follow-up-tasks.test.js document-templates.test.js quotation-entry.test.js invoices.test.js sidebar-tooltips.test.js storage-overview.test.js referral-sources.test.js announcements.test.js customer-chat-link.test.js line-intake.test.js line-edge.test.js line-bridge.test.js facebook-intake.test.mjs",
     "migrate:import": "node scripts/import-google-apps-script.mjs",
     "test:line-intake": "node --test line-intake.test.js line-edge.test.js line-bridge.test.js"
   },
