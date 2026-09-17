@@ -3,6 +3,7 @@ const crypto = require('node:crypto');
 const ACCOUNT = 'gfs-line-249izgyn';
 const BASIC_ID = '@249izgyn';
 const INTAKE_ACCOUNTS = Object.freeze({
+  'car-line-fkq6145q': {company:'CAR',basicId:'@fkq6145q', endpoint:'line-maholan-intake'},
   'mhl-line-320opqkc': {company:'MHL',basicId:'@320opqkc', endpoint:'line-mhl-intake'},
   'gfs-line-249izgyn': {company:'GFS',basicId:'@249izgyn', endpoint:'line-gfs-intake'},
   'gfs-line-095jvuls': {company:'GFS',basicId:'@095jvuls', endpoint:'line-goodfilm-intake'},

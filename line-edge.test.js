@@ -4,6 +4,23 @@ const crypto = require('node:crypto');
 const destination = 'U'+'a'.repeat(32);
 const user = 'U'+'b'.repeat(32);
 const env = {LINE_GFS_INTAKE_ENABLED:'true',LINE_GFS_CHANNEL_SECRET:'test-secret',LINE_GFS_BOT_USER_ID:destination};
+
+test('Maholan accepts signed metadata only for its own bot and account', async () => {
+  const {createHandler}=await import('./supabase/functions/line-maholan-intake/handler.mjs');
+  const config={LINE_MAHOLAN_INTAKE_ENABLED:'true',LINE_MAHOLAN_BRIDGE_SECRET:'car-test-key',LINE_MAHOLAN_BOT_USER_ID:destination};
+  const calls=[];
+  const handler=createHandler({getEnv:n=>config[n],persist:async(...args)=>calls.push(args)});
+  const payload={destination,events:[{type:'message',webhookEventId:'car-event',timestamp:Date.now(),source:{type:'user',userId:user},message:{text:'PRIVATE'}}]};
+  const send=(body,key=config.LINE_MAHOLAN_BRIDGE_SECRET)=>{const raw=JSON.stringify(body); return handler(new Request('https://example.com/line-maholan-intake',{method:'POST',body:raw,headers:{'x-goodcrm-signature':crypto.createHmac('sha256',key).update(raw).digest('base64')}}));};
+  assert.equal((await send(payload,'wrong-key')).status,401);
+  assert.equal((await send({...payload,destination:'U'+'c'.repeat(32)})).status,400);
+  assert.equal(calls.length,0);
+  assert.equal((await send(payload)).status,200);
+  assert.equal(calls[0][0],'car-line-fkq6145q');
+  assert.ok(!JSON.stringify(calls).includes('PRIVATE'));
+  config.LINE_MAHOLAN_INTAKE_ENABLED='false';
+  assert.equal((await send(payload)).status,503);
+});
 test('Goodfilm bridge isolates account and authenticates metadata forwarding', async () => {
   const {createHandler}=await import('./supabase/functions/line-goodfilm-intake/handler.mjs');
   const config={LINE_GOODFILM_INTAKE_ENABLED:'true',LINE_GOODFILM_BRIDGE_SECRET:'bridge-test-key',LINE_GOODFILM_BOT_USER_ID:destination};

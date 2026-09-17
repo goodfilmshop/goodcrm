@@ -4,6 +4,7 @@
 // Deploy with *_ENABLED=false; set keys/trigger and LINE URL keys before enabling.
 const GOODCRM_QUEUE_SHEET = '_GOODCRM_LINE_QUEUE';
 const GOODCRM_ACCOUNTS = {
+  '1657810104': {prefix:'GOODCRM_CAR_', endpoint:'line-maholan-intake'},
   '1654307361': {prefix:'GOODCRM_GFS_', endpoint:'line-goodfilm-intake'},
   '1621123913': {prefix:'GOODCRM_MHL_', endpoint:'line-mhl-intake'}
 };

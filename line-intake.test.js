@@ -10,10 +10,12 @@ const destination = 'U' + 'a'.repeat(32);
 const user = 'U' + 'b'.repeat(32);
 const body = { destination, events: [{ type:'message', webhookEventId:'event-1', timestamp:Date.now(), source:{type:'user', userId:user}, message:{type:'text',text:'do not persist me'} }] };
 const sign = raw => crypto.createHmac('sha256',secret).update(raw).digest('base64');
-test('intake account selection permits only the two configured GFS accounts',()=>{
+test('intake account selection permits only configured LINE accounts',()=>{
   const {intakeAccount}=require('./line-intake');
   assert.equal(intakeAccount().basicId,'@249izgyn');
   assert.equal(intakeAccount('gfs-line-095jvuls').endpoint,'line-goodfilm-intake');
+  assert.equal(intakeAccount('car-line-fkq6145q').endpoint,'line-maholan-intake');
+  assert.equal(intakeAccount('car-line-fkq6145q').basicId,'@fkq6145q');
   for(const key of ['unknown','__proto__','constructor']) assert.throws(()=>intakeAccount(key));
 });
 
