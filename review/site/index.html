@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer"><meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src https://mbxuebqqglaeechltkyl.supabase.co; img-src 'self'; base-uri 'none'; form-action 'none'">
+<title>GOOD CRM · Meta Review</title><link rel="stylesheet" href="style.css"><script type="module" src="app.js"></script></head>
+<body><header><div><strong>GOOD CRM</strong><span>Meta Review · ส่วนทดสอบ</span></div><button id="logout" hidden>ออกจากส่วนทดสอบ / Sign out</button></header>
+<main><h1>Facebook รอคัดเข้า</h1><p class="intro">พื้นที่สำหรับตรวจสอบการเชื่อมต่อ Facebook · แสดงเฉพาะผู้เข้าร่วมทดสอบที่อนุญาตไว้</p>
+<section id="login"><h2>เข้าสู่ส่วนทดสอบ / Review access</h2><p>ใช้รหัสเข้าทดสอบที่ระบุในคำแนะนำสำหรับผู้ตรวจสอบ Meta</p><form id="login-form"><label>รหัสเข้าทดสอบ / Access code<input id="code" type="password" autocomplete="off" required maxlength="43"></label><button>เข้าสู่ระบบ / Sign in</button></form></section>
+<p id="status" role="status" aria-live="polite"></p>
+<div id="workspace" hidden><aside>Test area: profile names are fetched from Meta. Only the approved test participant is visible. Creating a customer here saves a separate test record.</aside>
+<nav id="pages" aria-label="Facebook Page"><button data-page="125106670932394" aria-pressed="true">FB-GFS</button><button data-page="101634951180913" aria-pressed="false">FB-MHL</button><button data-page="109607531869658" aria-pressed="false">FB-CAR</button></nav>
+<section><div class="toolbar"><h2>ผู้เข้าร่วมทดสอบ / Test participant</h2><div><button id="profile">ดึงชื่อ FB Name</button><button id="refresh">รีเฟรช / Refresh</button></div></div><div id="contact"></div></section>
+<section id="editor" hidden><h2>คัดรายชื่อ · ข้อมูลทดสอบเท่านั้น</h2><form id="customer-form"><label>ชื่อลูกค้าทดสอบ / Test customer name<input id="customer-name" maxlength="200" required></label><button>บันทึกลูกค้าทดสอบ / Save test customer</button></form></section>
+<section><h2>ลูกค้าทดสอบ / Test customers</h2><div id="customers"></div></section>
+<details><summary>ขั้นตอนทดสอบ / Review steps</summary><ol><li>เลือกเพจที่ใช้ในวิดีโอ / Select the Page shown in the recording.</li><li>กด “ดึงชื่อ FB Name” เพื่อเรียก User Profile API จริง / Fetch the actual profile name from Meta.</li><li>กด “คัดรายชื่อ” เพื่อตรวจชื่อที่กรอกให้อัตโนมัติ / Inspect the pre-filled name.</li><li>บันทึกลูกค้าทดสอบได้โดยไม่เปลี่ยนข้อมูลลูกค้าจริง / Save only to the isolated review records.</li></ol><p>Only the consenting tester is enabled. A new reviewer participant must be approved by the operator before it appears here. Replies remain in Meta Business Suite.</p></details>
+</div></main><footer>GOOD CRM · Review access does not grant access to the production CRM.</footer></body></html>
