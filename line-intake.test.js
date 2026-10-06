@@ -47,7 +47,7 @@ test('only one-to-one inbound messages count; no message content persists', () =
 test('pilot intake permissions and human reply confirmation are required', async () => {
   for (const member of [null,{role:'sales',is_active:true},{role:'admin',is_active:false}]) assert.throws(() => requireIntakeAdmin(member));
   let calls=0;
-  const client = {rpc: async()=>{calls++;return {data:{status:'imported'}};}};
+  const client = {from:()=>({select(){return this;},eq(){return this;},maybeSingle:async()=>({data:{id:'test',account_key:'gfs-line-249izgyn'}})}),rpc: async()=>{calls++;return {data:{status:'imported'}};}};
   await assert.rejects(resolveIntake(client,{role:'admin',is_active:true},{decision:'create',customerName:'Name'}));
   assert.equal(calls,0);
   await resolveIntake(client,{role:'admin',is_active:true},{id:'test',decision:'create',customerName:'Name',replied:true});

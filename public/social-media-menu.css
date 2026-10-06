@@ -1,0 +1,11 @@
+#social-media-group[hidden], #social-media-submenu[hidden], #social-media-unread[hidden] { display: none !important; }
+#menu-social-media .sidebar-label { white-space: normal; text-align: left; font-size: 13px; line-height: 1.5; flex: 1; }
+#menu-social-media { gap: 9px; }
+#menu-social-media[data-active="true"] { background: #e0ecff; color: #1d4ed8; }
+#menu-social-media .social-media-chevron { font-size: 10px; transition: transform .18s; }
+#menu-social-media[aria-expanded="true"] .social-media-chevron { transform: rotate(180deg); }
+#social-media-submenu { margin: 6px 0 4px 16px; padding-left: 8px; border-left: 2px solid #c7dcfb; }
+#social-media-submenu > button { padding: 10px; font-size: 13px; gap: 8px; margin-top: 4px; }
+#social-media-unread { position: absolute; right: 5px; top: 5px; width: 9px; height: 9px; border: 2px solid white; border-radius: 50%; background: #f43f5e; }
+#sidebar.w-20 #social-media-submenu { margin-left: 0; padding-left: 0; border-left: 0; }
+#sidebar.w-20 .social-media-chevron { display: none; }

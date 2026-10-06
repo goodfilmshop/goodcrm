@@ -1,4 +1,5 @@
 const crypto = require('node:crypto');
+const { canAccessIntake, requireIntakeAccess } = require('./intake-permissions');
 
 const ACCOUNT = 'gfs-line-249izgyn';
 const BASIC_ID = '@249izgyn';
@@ -75,8 +76,9 @@ function intakeDate(value) {
   return date;
 }
 async function getIntake(client, membership, input) {
-  requireIntakeAdmin(membership);
-  const account = intakeAccount(input.account);
+  const key = input.account || ACCOUNT;
+  requireIntakeAccess(membership, 'line', 'view', key);
+  const account = intakeAccount(key);
   const date = intakeDate(input.date);
   const status = ['pending', 'imported', 'dismissed'].includes(input.status) ? input.status : 'pending';
   const page = Math.max(0, Math.min(100000, Number.parseInt(input.page, 10) || 0));
@@ -99,7 +101,7 @@ async function getIntake(client, membership, input) {
   ]);
   if (rows.error || totals.error) throw new Error('ยังอ่านรายการ LINE ไม่ได้ กรุณาตรวจการติดตั้งฐานข้อมูล');
   // Profile lookup is read-only on LINE and never delays the webhook receipt.
-  if (account.key === ACCOUNT && settings.token) await Promise.all(rows.data.filter(row => !row.display_name).map(async row => {
+  if (canAccessIntake(membership, 'line', 'manage', account.key) && account.key === ACCOUNT && settings.token) await Promise.all(rows.data.filter(row => !row.display_name).map(async row => {
     try {
       const response = await fetch(`https://api.line.me/v2/bot/profile/${encodeURIComponent(row.line_user_id)}`, {
         headers: { Authorization: `Bearer ${settings.token}` }, signal: AbortSignal.timeout(2500),
@@ -114,14 +116,29 @@ async function getIntake(client, membership, input) {
   return { success: true, account: account.basicId, accountKey: account.key, company: account.company, enabled, connectionStatus, date, page,
     contacts: rows.data, total: rows.count, summary: totals.data };
 }
+async function requireStoredIntakeAccess(client, membership, channel, input) {
+  requireIntakeAccess(membership, channel, 'manage');
+  if (input.account !== undefined) requireIntakeAccess(membership, channel, 'manage', input.account);
+  const id = typeof input.id === 'string' ? input.id.trim() : '';
+  if (!id) throw Object.assign(new Error('กรุณาระบุรายชื่อที่ต้องการคัดเข้า'), { status: 400 });
+  // The caller's RLS client reads the stored account; a body account cannot grant access to another contact.
+  const { data, error } = await client.from(`${channel}_intake_contacts`)
+    .select('id,account_key').eq('id', id).maybeSingle();
+  if (error || !data || (input.account !== undefined && input.account !== data.account_key)) {
+    throw Object.assign(new Error('ไม่พบรายชื่อที่ได้รับสิทธิ์คัดเข้าในบัญชีนี้'), { status: 403, code: 'INTAKE_ACCESS_FORBIDDEN' });
+  }
+  requireIntakeAccess(membership, channel, 'manage', data.account_key);
+  return data;
+}
 async function resolveIntake(client, membership, input) {
-  requireIntakeAdmin(membership);
+  requireIntakeAccess(membership, 'line', 'manage');
   if (!['create', 'link', 'dismiss'].includes(input.decision)) throw new Error('เลือกการดำเนินการไม่ถูกต้อง');
   if (input.decision !== 'dismiss' && input.replied !== true) throw new Error('กรุณายืนยันว่าตอบลูกค้าใน LINE OA แล้ว');
   const name = String(input.customerName || '').trim();
   const customer = String(input.customerId || '').trim();
   if (input.decision === 'create' && (!name || name.length > 200)) throw new Error('กรุณากรอกชื่อลูกค้าไม่เกิน 200 ตัวอักษร');
   if (input.decision === 'link' && !customer) throw new Error('กรุณาระบุรหัสลูกค้าเดิม');
+  await requireStoredIntakeAccess(client, membership, 'line', input);
   const { data, error } = await client.rpc('resolve_intake_with_details', {
     p_platform:'line', p_details:input.customerDetails || {},
     p_id: input.id, p_decision: input.decision, p_name: name, p_customer: customer,
@@ -129,4 +146,4 @@ async function resolveIntake(client, membership, input) {
   if (error) throw new Error('คัดรายชื่อไม่สำเร็จ กรุณาตรวจรหัสลูกค้าหรือรีเฟรชรายการ');
   return { success: true, result: data };
 }
-module.exports = { intakeAccount, INTAKE_ACCOUNTS, ACCOUNT, BASIC_ID, configuration, validSignature, inboundEvents, createWebhook, requireIntakeAdmin, intakeDate, getIntake, resolveIntake };
+module.exports = { intakeAccount, INTAKE_ACCOUNTS, ACCOUNT, BASIC_ID, configuration, validSignature, inboundEvents, createWebhook, requireIntakeAdmin, requireStoredIntakeAccess, intakeDate, getIntake, resolveIntake };

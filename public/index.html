@@ -2130,7 +2130,7 @@
     .line-account-tab[aria-selected="true"] { background: #2563eb; border-color: #2563eb; color: white; font-weight: 600; }
     .line-account-tab:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
     /* Compact daily intake metrics. */
-    #line-intake-summary > div, #facebook-intake-summary > div {
+    #line-intake-summary > div, #facebook-intake-summary > div ,  #instagram-intake-summary > div  {
       --metric-color: #2563eb;
       --metric-bg: #eff6ff;
       --metric-border: #dbeafe;
@@ -2140,34 +2140,62 @@
       background: linear-gradient(110deg, var(--metric-bg), #fff);
       box-shadow: 0 2px 5px rgba(15, 23, 42, .025);
     }
-    #line-intake-summary > div:nth-child(2), #facebook-intake-summary > div:nth-child(2) {
+    #line-intake-summary > div:nth-child(2), #facebook-intake-summary > div:nth-child(2) ,  #instagram-intake-summary > div:nth-child(2)  {
       --metric-color: #7c3aed; --metric-bg: #f5f3ff; --metric-border: #ede9fe;
     }
-    #line-intake-summary > div:nth-child(3), #facebook-intake-summary > div:nth-child(3) {
+    #line-intake-summary > div:nth-child(3), #facebook-intake-summary > div:nth-child(3) ,  #instagram-intake-summary > div:nth-child(3)  {
       --metric-color: #0369a1; --metric-bg: #f0f9ff; --metric-border: #e0f2fe;
     }
-    #line-intake-summary > div:nth-child(4), #facebook-intake-summary > div:nth-child(4) {
+    #line-intake-summary > div:nth-child(4), #facebook-intake-summary > div:nth-child(4) ,  #instagram-intake-summary > div:nth-child(4)  {
       --metric-color: #047857; --metric-bg: #ecfdf5; --metric-border: #d1fae5;
     }
-    #line-intake-summary p, #facebook-intake-summary p {
+    #line-intake-summary p, #facebook-intake-summary p ,  #instagram-intake-summary p  {
       color: #475569; font-weight: 600;
     }
-    #line-intake-summary strong, #facebook-intake-summary strong {
+    #line-intake-summary strong, #facebook-intake-summary strong ,  #instagram-intake-summary strong  {
       color: var(--metric-color); font-size: 1.75rem; line-height: 1.2;
       font-weight: 800; font-variant-numeric: tabular-nums;
     }
-    #line-intake-date, #facebook-intake-date {
+    #line-intake-date, #facebook-intake-date ,  #instagram-intake-date  {
       margin-left: 8px; border-color: #dbeafe; background: #f8faff;
       color: #1e40af; font-weight: 600; border-radius: 10px;
     }
+    .intake-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .intake-controls-actions {
+      display: flex; flex-wrap: nowrap; align-items: center; justify-content: flex-end;
+      gap: 8px; margin-left: auto; max-width: 100%;
+    }
+    .intake-refresh-button {
+      display: inline-flex; min-height: 46px; align-items: center; justify-content: center;
+      padding: 8px 18px; border: 1px solid #e2e8f0; border-radius: 12px;
+      background: #ffffff; color: #0f172a; font-size: 16px; font-weight: 600;
+      line-height: 1.25; white-space: nowrap;
+    }
+    .intake-refresh-button:hover { border-color: #bfdbfe; background: #f8fafc; }
+    .intake-refresh-button:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
+    .intake-status-filter {
+      display: inline-flex; align-items: center; gap: 8px;
+      min-height: 46px; padding: 4px 6px 4px 14px; border: 1px solid #bfdbfe; border-radius: 12px;
+      background: #eff6ff; color: #1e40af; font-size: 16px; font-weight: 700;
+      white-space: nowrap;
+    }
+    .intake-status-filter select {
+      min-height: 36px; padding: 6px 32px 6px 12px; border: 1px solid #1d4ed8;
+      border-radius: 9px; background-color: #2563eb; color: #fff; font-size: 16px; font-weight: 700;
+      appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 9px center;
+    }
+    .intake-status-filter select:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
+    .intake-status-filter option { background: #fff; color: #0f172a; }
     /* Highlight the active intake form without changing its layout or behavior. */
-    #line-intake-form, #facebook-intake-form {
+    #line-intake-form, #facebook-intake-form ,  #instagram-intake-form  {
       border: 2px solid #93c5fd;
       background: linear-gradient(145deg, #eff6ff 0%, #ffffff 60%);
       box-shadow: 0 12px 32px rgba(37, 99, 235, .14);
       scroll-margin-top: 24px;
     }
-    #line-intake-selected, #facebook-intake-selected {
+    #line-intake-selected, #facebook-intake-selected ,  #instagram-intake-selected  {
       margin: -20px -20px 18px;
       padding: 16px 20px;
       border-radius: 14px 14px 0 0;
@@ -2176,21 +2204,22 @@
       font-size: 1.125rem;
       font-weight: 800;
     }
-    #line-intake-form label, #facebook-intake-form label {
+    #line-intake-form label, #facebook-intake-form label ,  #instagram-intake-form label  {
       color: #1e3a5f;
       font-weight: 600;
     }
     #line-intake-form input:not([type="checkbox"]), #line-intake-form select, #line-intake-form textarea,
-    #facebook-intake-form input:not([type="checkbox"]), #facebook-intake-form select, #facebook-intake-form textarea {
+    #facebook-intake-form input:not([type="checkbox"]), #facebook-intake-form select, #facebook-intake-form textarea ,
+    #instagram-intake-form input:not([type="checkbox"]), #instagram-intake-form select, #instagram-intake-form textarea  {
       background-color: #ffffff;
       border-color: #cbd5e1;
     }
-    #line-intake-replied-label, #facebook-intake-replied-label {
+    #line-intake-replied-label, #facebook-intake-replied-label ,  #instagram-intake-replied-label  {
       padding: 12px;
       background: #dbeafe;
       border-radius: 10px;
     }
-    #line-intake-save, #facebook-intake-save {
+    #line-intake-save, #facebook-intake-save ,  #instagram-intake-save  {
       font-weight: 700;
       box-shadow: 0 4px 12px rgba(4, 120, 87, .2);
     }
@@ -2239,14 +2268,19 @@
       background: #fff;
       color: #1e293b;
     }
+    [data-intake-permission-menu][hidden] { display: none !important; }
   </style>
+  <link rel="stylesheet" href="/intake-reports.css">
+  <link rel="stylesheet" href="/intake-timeline.css">
+  <link rel="stylesheet" href="/intake-drawer.css">
+  <link rel="stylesheet" href="/social-media-menu.css">
 </head>
 <body class="h-full font-sans antialiased text-slate-800 flex overflow-hidden bg-slate-50">
 
   <section id="authGate" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 px-4 py-8 backdrop-blur-sm" aria-labelledby="authGateTitle">
     <div class="w-full max-w-md rounded-3xl border border-white/20 bg-white p-7 shadow-2xl shadow-slate-950/40 sm:p-9">
       <div class="mb-6 flex items-center gap-3">
-        <span class="app-mark flex h-11 w-11 items-center justify-center rounded-2xl overflow-hidden"><img src="/assets/good-crm-icon.svg" width="44" height="44" alt=""></span>
+        <span class="app-mark flex h-11 w-11 items-center justify-center rounded-2xl overflow-hidden"><img src="/assets/good-crm-icon-192.png" width="44" height="44" alt=""></span>
         <div>
           <h1 id="authGateTitle" class="text-xl font-bold text-slate-900">เข้าสู่ระบบ GOOD CRM</h1>
           <p class="text-xs font-medium text-slate-500">สำหรับผู้ใช้ที่ได้รับอนุมัติเท่านั้น</p>
@@ -2363,22 +2397,40 @@
       </button>
 
       <!-- Menu Item: รายงาน -->
-      <button onclick="switchPage('reports')" id="menu-reports" class="w-full group flex items-center px-3.5 py-2.5 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-600 hover:bg-white hover:text-blue-600">
+      <button onclick="switchPage('reports')" id="menu-reports" data-intake-permission-menu hidden class="w-full group flex items-center px-3.5 py-2.5 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-600 hover:bg-white hover:text-blue-600">
         <i class="fa-solid fa-file-invoice-dollar text-lg w-6 text-center"></i>
         <span class="sidebar-label whitespace-nowrap">รายงาน</span>
         <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">รายงาน</span>
       </button>
 
-      <button onclick="switchPage('line-intake')" id="menu-line-intake" class="w-full group flex items-center px-3.5 py-2.5 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-600 hover:bg-white hover:text-blue-600">
+      <div id="social-media-group" hidden>
+      <button type="button" id="menu-social-media" onclick="SocialMediaMenu.toggle()" aria-expanded="true" aria-controls="social-media-submenu" class="w-full group flex items-center px-3.5 py-2.5 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-600 hover:bg-white hover:text-blue-600">
+        <i class="fa-solid fa-share-nodes text-lg w-6 text-center" aria-hidden="true"></i>
+        <span class="sidebar-label">ช่องทางโซเชียลมีเดีย</span>
+        <i class="fa-solid fa-chevron-down social-media-chevron" aria-hidden="true"></i>
+        <span id="social-media-unread" hidden aria-label="มีลีดใหม่ที่ยังไม่ได้เปิดดู" role="status"></span>
+        <span class="sidebar-tooltip">ช่องทางโซเชียลมีเดีย</span>
+      </button>
+      <div id="social-media-submenu" role="group" aria-label="ช่องทางโซเชียลมีเดีย">
+      <button onclick="switchPage('line-intake')" id="menu-line-intake" data-intake-permission-menu hidden class="w-full group flex items-center px-3.5 py-2.5 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-600 hover:bg-white hover:text-blue-600">
         <i class="fa-brands fa-line text-lg w-6 text-center"></i>
         <span class="sidebar-label whitespace-nowrap">LINE รอคัดเข้า</span>
+        <span id="line-intake-badge" class="hidden absolute right-2.5 top-2 min-w-5 rounded-full border-2 border-white bg-rose-500 px-1.5 py-0.5 text-center text-[10px] font-extrabold leading-none text-white shadow-sm" aria-live="polite">0</span>
         <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">LINE รอคัดเข้า</span>
       </button>
-      <button onclick="switchPage('facebook-intake')" id="menu-facebook-intake" class="w-full group flex items-center px-3.5 py-2.5 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-600 hover:bg-white hover:text-blue-600">
+      <button onclick="switchPage('facebook-intake')" id="menu-facebook-intake" data-intake-permission-menu hidden class="w-full group flex items-center px-3.5 py-2.5 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-600 hover:bg-white hover:text-blue-600">
         <i class="fa-brands fa-facebook text-lg w-6 text-center"></i>
         <span class="sidebar-label whitespace-nowrap">Facebook รอคัดเข้า</span>
+        <span id="facebook-intake-badge" class="hidden absolute right-2.5 top-2 min-w-5 rounded-full border-2 border-white bg-rose-500 px-1.5 py-0.5 text-center text-[10px] font-extrabold leading-none text-white shadow-sm" aria-live="polite">0</span>
         <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">Facebook รอคัดเข้า</span>
       </button>
+      <button onclick="switchPage('instagram-intake')" id="menu-instagram-intake" data-intake-permission-menu hidden class="w-full group flex items-center px-3.5 py-2.5 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-600 hover:bg-white hover:text-blue-600">
+        <i class="fa-brands fa-instagram text-lg w-6 text-center"></i>
+        <span class="sidebar-label whitespace-nowrap">Instagram รอคัดเข้า</span>
+        <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">Instagram รอคัดเข้า</span>
+      </button>
+      </div>
+      </div>
       <!-- Menu Item: ตั้งค่าระบบ -->
       <button onclick="switchPage('settings')" id="menu-settings" class="w-full group flex items-center px-3.5 py-2.5 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-600 hover:bg-white hover:text-blue-600">
         <i class="fa-solid fa-sliders text-lg w-6 text-center"></i>
@@ -3391,6 +3443,32 @@
       <!-- PAGE 6: REPORTS -->
       <div id="page-reports" class="page-container hidden w-full space-y-6">
         <h2 class="text-xl sm:text-2xl font-bold text-slate-800">รายงาน & วิเคราะห์ข้อมูล (Analytics Reports)</h2>
+        <section class="overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-sm" aria-labelledby="intake-report-heading">
+          <div class="intake-report-header">
+            <div class="intake-report-toolbar">
+              <h3 id="intake-report-heading">สรุปการติดต่อ FB และ LINE รายเดือน</h3>
+              <div class="intake-report-filters">
+                <label>เดือน (เวลาไทย)<input id="intake-report-month" type="month" min="1000-01" max="9998-12" onchange="void loadIntakeReport()"></label>
+                <label>บริษัท<select id="intake-report-company" onchange="renderIntakeReport()"><option value="">ทุกบริษัท</option><option value="GFS">GFS</option><option value="MHL">MHL</option><option value="CAR">CAR</option></select></label>
+                <label>ช่องทาง<select id="intake-report-channel" onchange="renderIntakeReport()"><option value="">ทุกช่องทาง</option><option value="FB">FB</option><option value="LINE">LINE</option></select></label>
+                <button id="intake-report-refresh" type="button" onclick="void loadIntakeReport()" class="disabled:opacity-50"><i class="fa-solid fa-rotate mr-1" aria-hidden="true"></i>รีเฟรช</button>
+              </div>
+            </div>
+            <p id="intake-report-status" role="status" aria-live="polite"></p>
+          </div>
+          <div id="intake-report-scroll" class="intake-report-scroll" tabindex="0" role="region" aria-label="ตารางรายเดือน เฉพาะวันที่มีข้อมูล">
+            <table id="intake-report-table" aria-describedby="intake-report-note">
+              <caption class="sr-only">สรุปการติดต่อเฉพาะวันที่มีข้อมูลจาก FB และ LINE</caption>
+              <thead id="intake-report-head"></thead>
+              <tbody id="intake-report-body"></tbody>
+            </table>
+          </div>
+          <div id="intake-report-note" class="space-y-1 border-t border-slate-100 bg-slate-50/50 p-5 text-xs leading-relaxed text-slate-500">
+            <p>คนทักใหม่ = ทักครั้งแรกในวันที่เลือก · คนเดิมทัก = เคยทักก่อนวันที่เลือกและกลับมาทักในวันนั้น · คนทักทั้งหมด = คนทักใหม่ + คนเดิมทัก</p>
+            <p>คัดเข้า CRM = รายชื่อที่กดเพิ่มหรือเชื่อมลูกค้าในวันที่เลือก อาจเป็นคนที่ทักวันก่อนหน้า</p>
+            <p>นับคนไม่ซ้ำต่อบัญชีต่อวัน แล้วรวมแต่ละบัญชีเข้าด้วยกัน คนที่ทักหลายบัญชีหรือหลายช่องทางอาจถูกนับซ้ำ · ข้อมูลเริ่มตั้งแต่ระบบบันทึกการติดต่อได้ · แสดงเฉพาะวันที่มีการติดต่อหรือคัดเข้า CRM ตามตัวกรอง</p>
+          </div>
+        </section>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/60 shadow-sm space-y-4">
             <h3 class="font-bold text-slate-700 text-sm sm:text-md">สินค้าที่ได้รับความนิยมสุงสุด</h3>
@@ -3496,7 +3574,7 @@
       </div>
 
       <section id="page-line-intake" class="page-container hidden w-full space-y-3">
-        <div><h2 class="text-2xl font-bold text-slate-800">LINE รอคัดเข้า</h2><p class="mt-2 text-sm text-slate-500">GFS / MHL — ตอบผ่านแอป LINE OA แล้วค่อยคัดเป็นลูกค้า · รายชื่อและสถิติแยกตามบัญชี</p></div>
+        <div><h2 class="text-2xl font-bold text-slate-800">LINE รอคัดเข้า</h2></div>
         <div class="flex flex-wrap items-center gap-3">
           <span class="text-sm">บัญชี LINE OA</span>
           <input id="line-intake-account" type="hidden" value="gfs-line-249izgyn">
@@ -3510,13 +3588,19 @@
         </div>
         <div id="line-intake-panel" role="tabpanel" aria-labelledby="line-tab-3m" class="space-y-3">
         <div class="rounded-2xl border border-slate-200 bg-white p-3 space-y-2">
-          <label class="block text-sm">สถิติวันที่ (เวลาไทย) <input id="line-intake-date" type="date" onchange="loadLineIntake()" class="rounded-lg border p-2"></label>
+          <div class="intake-controls">
+            <label class="block text-sm">สถิติวันที่ (เวลาไทย) <input id="line-intake-date" type="date" onchange="loadLineIntake()" class="rounded-lg border p-2"></label>
+            <div class="intake-controls-actions">
+              <button type="button" onclick="loadLineIntake()" class="intake-refresh-button">รีเฟรช</button>
+              <label class="intake-status-filter">รายการ <select id="line-intake-filter" onchange="loadLineIntake(0)"><option value="pending">รอคัดเข้า</option><option value="imported">เพิ่ม / เชื่อมแล้ว</option><option value="dismissed">ไม่รับเข้า</option></select></label>
+            </div>
+          </div>
           <div id="line-intake-summary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
-          <p class="text-xs text-slate-500">คนใหม่ = ผู้ที่ระบบพบครั้งแรกตั้งแต่เริ่มเก็บข้อมูล รวมทุกคนที่ทัก แม้ยังไม่ได้เพิ่มเป็นลูกค้า ประวัติก่อนเชื่อมต่อไม่รวมอยู่ในสถิตินี้</p>
+
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-3 space-y-2">
-          <div class="flex flex-wrap justify-between gap-3"><label class="text-sm">รายการ <select id="line-intake-filter" onchange="loadLineIntake(0)" class="rounded-lg border p-2"><option value="pending">รอคัดเข้า</option><option value="imported">เพิ่ม / เชื่อมแล้ว</option><option value="dismissed">ไม่รับเข้า</option></select></label><button type="button" onclick="loadLineIntake()" class="rounded-lg border px-4 py-2">รีเฟรช</button></div>
-          <p class="text-xs text-slate-500">รายการด้านล่างรวมทุกวัน ใช้ชื่อและรหัส LINE ตรวจสอบคนให้ถูกต้องก่อนเพิ่ม</p>
+
+
           <div id="line-intake-list" class="space-y-2"></div>
           <div class="flex justify-between text-sm"><button type="button" id="line-intake-prev" onclick="loadLineIntake(lineIntakePage - 1)">ก่อนหน้า</button><span id="line-intake-count"></span><button type="button" id="line-intake-next" onclick="loadLineIntake(lineIntakePage + 1)">ถัดไป</button></div>
         </div>
@@ -3531,17 +3615,17 @@
 <label class="block text-sm">ชื่อช่องทางติดต่อ<input id="line-intake-handle" type="text" maxlength="200" class="w-full rounded-lg border p-2"></label>
 <label class="block text-sm">รู้จักครั้งแรก<select id="line-intake-referral" class="w-full rounded-lg border p-2"><option value="">ยังไม่ระบุ</option></select></label>
 <label class="block text-sm md:col-span-2">หมายเหตุ<textarea id="line-intake-remarks" maxlength="5000" rows="3" class="w-full rounded-lg border p-2"></textarea></label>
-<p class="text-xs text-slate-500 md:col-span-2">กรอกข้อมูลที่ทราบ ช่องที่ยังไม่ทราบเว้นไว้ได้</p></fieldset>
+</fieldset>
           <label id="line-intake-customer-label" class="hidden text-sm">รหัสลูกค้าเดิม (คัดลอกจากหน้าลูกค้า) <input id="line-intake-customer" class="w-full rounded-lg border p-2"></label>
           <label id="line-intake-replied-label" class="block text-sm"><input id="line-intake-replied" type="checkbox"> ยืนยันว่าตอบลูกค้าในแอป LINE OA แล้ว</label>
-          <p class="text-xs text-slate-500">ระบบไม่ได้ตรวจการตอบในแอป OA อัตโนมัติ เมื่อบันทึกแล้วรายการจะออกจากรอคัดเข้า</p>
+
           <button id="line-intake-save" type="submit" class="rounded-lg bg-emerald-700 px-4 py-2 text-white disabled:opacity-50">บันทึกการคัดเข้า</button>
           <button type="button" onclick="closeLineIntakeForm()" class="rounded-lg border px-4 py-2">ยกเลิก</button>
         </form>
         </div>
       </section>
       <section id="page-facebook-intake" class="page-container hidden w-full space-y-3">
-        <div><h2 class="text-2xl font-bold text-slate-800">Facebook รอคัดเข้า</h2><p class="mt-2 text-sm text-slate-500">GFS / MHL — ตอบผ่าน Meta Business Suite แล้วค่อยคัดเป็นลูกค้า · รายชื่อและสถิติแยกตามเพจ</p></div>
+        <div><h2 class="text-2xl font-bold text-slate-800">Facebook รอคัดเข้า</h2></div>
         <div class="flex flex-wrap items-center gap-3">
           <span class="text-sm">บัญชี Facebook</span>
           <input id="facebook-intake-account" type="hidden" value="gfs-fb-125106670932394">
@@ -3554,15 +3638,19 @@
         </div>
         <div id="facebook-intake-panel" role="tabpanel" aria-labelledby="facebook-tab-3m" class="space-y-3">
         <div class="rounded-2xl border border-slate-200 bg-white p-3 space-y-2">
-          <label class="block text-sm">สถิติวันที่ (เวลาไทย) <input id="facebook-intake-date" type="date" onchange="loadFacebookIntake()" class="rounded-lg border p-2"></label>
+          <div class="intake-controls">
+            <label class="block text-sm">สถิติวันที่ (เวลาไทย) <input id="facebook-intake-date" type="date" onchange="loadFacebookIntake()" class="rounded-lg border p-2"></label>
+            <div class="intake-controls-actions">
+              <button type="button" onclick="loadFacebookIntake()" class="intake-refresh-button">รีเฟรช</button>
+              <label class="intake-status-filter">รายการ <select id="facebook-intake-filter" onchange="loadFacebookIntake(0)"><option value="pending">รอคัดเข้า</option><option value="imported">เพิ่ม / เชื่อมแล้ว</option><option value="dismissed">ไม่รับเข้า</option></select></label>
+            </div>
+          </div>
           <div id="facebook-intake-summary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
-          <p class="text-xs text-slate-500">คนใหม่ = ผู้ที่ระบบพบครั้งแรกตั้งแต่เริ่มเก็บข้อมูล รวมทุกคนที่ทัก แม้ยังไม่ได้เพิ่มเป็นลูกค้า ประวัติก่อนเชื่อมต่อไม่รวมอยู่ในสถิตินี้</p>
+
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-3 space-y-2">
-          <div class="flex flex-wrap justify-between gap-3"><label class="text-sm">รายการ <select id="facebook-intake-filter" onchange="loadFacebookIntake(0)" class="rounded-lg border p-2"><option value="pending">รอคัดเข้า</option><option value="imported">เพิ่ม / เชื่อมแล้ว</option><option value="dismissed">ไม่รับเข้า</option></select></label><button type="button" onclick="loadFacebookIntake()" class="rounded-lg border px-4 py-2">รีเฟรช</button></div>
-          <p class="text-xs text-slate-500">รายการด้านล่างรวมทุกวัน ใช้ชื่อและรหัส Facebook ตรวจสอบคนให้ถูกต้องก่อนเพิ่ม</p>
           <div id="facebook-intake-list" class="space-y-2"></div>
-          <div class="flex justify-between text-sm"><button type="button" id="facebook-intake-prev" onclick="loadFacebookIntake(lineIntakePage - 1)">ก่อนหน้า</button><span id="facebook-intake-count"></span><button type="button" id="facebook-intake-next" onclick="loadFacebookIntake(lineIntakePage + 1)">ถัดไป</button></div>
+          <div class="flex justify-between text-sm"><button type="button" id="facebook-intake-prev" onclick="loadFacebookIntake(facebookIntakePage - 1)">ก่อนหน้า</button><span id="facebook-intake-count"></span><button type="button" id="facebook-intake-next" onclick="loadFacebookIntake(facebookIntakePage + 1)">ถัดไป</button></div>
         </div>
         <form id="facebook-intake-form" onsubmit="event.preventDefault(); saveFacebookIntake()" class="hidden rounded-2xl border border-emerald-200 bg-white p-5 space-y-3">
           <h3 id="facebook-intake-selected" class="font-bold"></h3>
@@ -3575,12 +3663,61 @@
 <label class="block text-sm">ชื่อช่องทางติดต่อ<input id="facebook-intake-handle" type="text" maxlength="200" class="w-full rounded-lg border p-2"></label>
 <label class="block text-sm">รู้จักครั้งแรก<select id="facebook-intake-referral" class="w-full rounded-lg border p-2"><option value="">ยังไม่ระบุ</option></select></label>
 <label class="block text-sm md:col-span-2">หมายเหตุ<textarea id="facebook-intake-remarks" maxlength="5000" rows="3" class="w-full rounded-lg border p-2"></textarea></label>
-<p class="text-xs text-slate-500 md:col-span-2">กรอกข้อมูลที่ทราบ ช่องที่ยังไม่ทราบเว้นไว้ได้</p></fieldset>
+</fieldset>
           <label id="facebook-intake-customer-label" class="hidden text-sm">รหัสลูกค้าเดิม (คัดลอกจากหน้าลูกค้า) <input id="facebook-intake-customer" class="w-full rounded-lg border p-2"></label>
           <label id="facebook-intake-replied-label" class="block text-sm"><input id="facebook-intake-replied" type="checkbox"> ยืนยันว่าตอบลูกค้าใน Meta Business Suite แล้ว</label>
-          <p class="text-xs text-slate-500">ระบบไม่ได้ตรวจการตอบในแอป OA อัตโนมัติ เมื่อบันทึกแล้วรายการจะออกจากรอคัดเข้า</p>
+
           <button id="facebook-intake-save" type="submit" class="rounded-lg bg-emerald-700 px-4 py-2 text-white disabled:opacity-50">บันทึกการคัดเข้า</button>
           <button type="button" onclick="closeFacebookIntakeForm()" class="rounded-lg border px-4 py-2">ยกเลิก</button>
+        </form>
+        </div>
+      </section>
+
+      <section id="page-instagram-intake" class="page-container hidden w-full space-y-3">
+        <div><h2 class="text-2xl font-bold text-slate-800">Instagram รอคัดเข้า</h2></div>
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="text-sm">บัญชี Instagram</span>
+          <input id="instagram-intake-account" type="hidden" value="gfs-ig-17841402497215021">
+          <div id="instagram-intake-tabs" role="tablist" aria-label="บัญชี Instagram" class="flex max-w-full gap-2 overflow-x-auto p-1" onkeydown="handleInstagramAccountKey(event)">
+            <button id="instagram-tab-3m" type="button" role="tab" aria-selected="true" aria-controls="instagram-intake-panel" tabindex="0" data-account="gfs-ig-17841402497215021" class="line-account-tab" onclick="selectInstagramAccount(this)">IG-GFS</button>
+            <button id="instagram-tab-goodfilm" type="button" role="tab" aria-selected="false" aria-controls="instagram-intake-panel" tabindex="-1" data-account="mhl-ig-17841421260722221" class="line-account-tab" onclick="selectInstagramAccount(this)">IG-MHL</button>
+            <button id="instagram-tab-mhl" type="button" role="tab" aria-selected="false" aria-controls="instagram-intake-panel" tabindex="-1" data-account="car-ig-17841458662245781" class="line-account-tab" onclick="selectInstagramAccount(this)">IG-CAR</button>
+          </div>
+          <p id="instagram-intake-status" role="status" class="rounded-xl bg-blue-50 px-3 py-2 text-sm text-blue-800"></p>
+        </div>
+        <div id="instagram-intake-panel" role="tabpanel" aria-labelledby="instagram-tab-3m" class="space-y-3">
+        <div class="rounded-2xl border border-slate-200 bg-white p-3 space-y-2">
+          <div class="intake-controls">
+            <label class="block text-sm">สถิติวันที่ (เวลาไทย) <input id="instagram-intake-date" type="date" onchange="loadInstagramIntake()" class="rounded-lg border p-2"></label>
+            <div class="intake-controls-actions">
+              <button type="button" onclick="loadInstagramIntake()" class="intake-refresh-button">รีเฟรช</button>
+              <label class="intake-status-filter">รายการ <select id="instagram-intake-filter" onchange="loadInstagramIntake(0)"><option value="pending">รอคัดเข้า</option><option value="imported">เพิ่ม / เชื่อมแล้ว</option><option value="dismissed">ไม่รับเข้า</option></select></label>
+            </div>
+          </div>
+          <div id="instagram-intake-summary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-3 space-y-2">
+          <div id="instagram-intake-list" class="space-y-2"></div>
+          <div class="flex justify-between text-sm"><button type="button" id="instagram-intake-prev" onclick="loadInstagramIntake(instagramIntakePage - 1)">ก่อนหน้า</button><span id="instagram-intake-count"></span><button type="button" id="instagram-intake-next" onclick="loadInstagramIntake(instagramIntakePage + 1)">ถัดไป</button></div>
+        </div>
+        <form id="instagram-intake-form" onsubmit="event.preventDefault(); saveInstagramIntake()" class="hidden rounded-2xl border border-emerald-200 bg-white p-5 space-y-3">
+          <h3 id="instagram-intake-selected" class="font-bold"></h3>
+          <label class="block text-sm">การดำเนินการ <select id="instagram-intake-decision" onchange="updateInstagramIntakeForm()" class="rounded-lg border p-2"><option value="create">เพิ่มเป็นลูกค้าใหม่</option><option value="link">เชื่อมลูกค้าเดิม</option><option value="dismiss">ไม่รับเข้า</option></select></label>
+          <label id="instagram-intake-name-label" class="block text-sm">ชื่อลูกค้า <input id="instagram-intake-name" maxlength="200" class="w-full rounded-lg border p-2"></label>
+<fieldset id="instagram-intake-details" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<label class="block text-sm">เพศ<select id="instagram-intake-gender" class="w-full rounded-lg border p-2"><option>ไม่ระบุ</option><option>หญิง</option><option>ชาย</option></select></label>
+<label class="block text-sm">เบอร์โทรศัพท์<input id="instagram-intake-phone" type="tel" maxlength="30" class="w-full rounded-lg border p-2"></label><label class="block text-sm">อีเมล<input id="instagram-intake-email" type="email" maxlength="254" class="w-full rounded-lg border p-2"></label><label class="block text-sm">Link Chat<input id="instagram-intake-chat-link" type="url" maxlength="2000" class="w-full rounded-lg border p-2"></label>
+<label class="block text-sm">ช่องทางติดต่อ<input value="Instagram" readonly class="w-full rounded-lg border bg-slate-50 p-2"></label>
+<label class="block text-sm">ชื่อช่องทางติดต่อ<input id="instagram-intake-handle" type="text" maxlength="200" class="w-full rounded-lg border p-2"></label>
+<label class="block text-sm">รู้จักครั้งแรก<select id="instagram-intake-referral" class="w-full rounded-lg border p-2"><option value="">ยังไม่ระบุ</option></select></label>
+<label class="block text-sm md:col-span-2">หมายเหตุ<textarea id="instagram-intake-remarks" maxlength="5000" rows="3" class="w-full rounded-lg border p-2"></textarea></label>
+</fieldset>
+          <label id="instagram-intake-customer-label" class="hidden text-sm">รหัสลูกค้าเดิม (คัดลอกจากหน้าลูกค้า) <input id="instagram-intake-customer" class="w-full rounded-lg border p-2"></label>
+          <label id="instagram-intake-replied-label" class="block text-sm"><input id="instagram-intake-replied" type="checkbox"> ยืนยันว่าตอบลูกค้าใน Meta Business Suite แล้ว</label>
+
+          <button id="instagram-intake-save" type="submit" class="rounded-lg bg-emerald-700 px-4 py-2 text-white disabled:opacity-50">บันทึกการคัดเข้า</button>
+          <button type="button" onclick="closeInstagramIntakeForm()" class="rounded-lg border px-4 py-2">ยกเลิก</button>
         </form>
         </div>
       </section>
@@ -4069,13 +4206,40 @@
           </div>
           <div>
             <label for="employeeAccessRole" class="mb-1.5 block text-xs font-semibold text-slate-600">สิทธิ์การเข้าถึง</label>
-            <select id="employeeAccessRole" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+            <select id="employeeAccessRole" onchange="IntakePermissions.changeEditorRole(document, this.value)" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
               <option value="member">สมาชิก</option>
               <option value="sales">ฝ่ายขาย</option>
               <option value="manager">ผู้จัดการ</option>
               <option value="admin">ผู้ดูแลระบบ</option>
             </select>
           </div>
+        </div>
+        <div>
+          <fieldset class="rounded-2xl border border-slate-200 p-4" aria-describedby="employeeIntakePermissionsNote">
+            <legend class="px-1 text-sm font-bold text-slate-700">สิทธิ์ช่องทางรอคัดเข้า</legend>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead><tr class="text-slate-500"><th scope="col" class="pb-2 pr-3 text-left font-semibold">ช่องทาง</th><th scope="col" class="pb-2 pr-3 text-left font-semibold">บัญชี / เพจ</th><th scope="col" class="px-2 pb-2 text-center font-semibold">ดู</th><th scope="col" class="px-2 pb-2 text-center font-semibold">จัดการ</th></tr></thead>
+                <tbody class="divide-y divide-slate-100 border-t border-slate-200">
+                  <tr><th scope="rowgroup" rowspan="4" class="py-3 pr-3 text-left align-top font-semibold text-slate-700">LINE</th><th scope="row" class="py-2 pr-3 text-left font-medium text-slate-700">3M Dealer Support · @3mfilm</th><td class="px-2 text-center"><input id="employeeIntake-line-gfs-line-249izgyn-view" type="checkbox" aria-label="ดู LINE 3M Dealer Support · @3mfilm" onchange="IntakePermissions.changeEditorPermission(document, 'line', 'gfs-line-249izgyn', 'view')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td><td class="px-2 text-center"><input id="employeeIntake-line-gfs-line-249izgyn-manage" type="checkbox" aria-label="จัดการ LINE 3M Dealer Support · @3mfilm" onchange="IntakePermissions.changeEditorPermission(document, 'line', 'gfs-line-249izgyn', 'manage')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td></tr>
+                  <tr><th scope="row" class="py-2 pr-3 text-left font-medium text-slate-700">บจก.กู๊ดฟิล์ม · @goodfilm</th><td class="px-2 text-center"><input id="employeeIntake-line-gfs-line-095jvuls-view" type="checkbox" aria-label="ดู LINE บจก.กู๊ดฟิล์ม · @goodfilm" onchange="IntakePermissions.changeEditorPermission(document, 'line', 'gfs-line-095jvuls', 'view')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td><td class="px-2 text-center"><input id="employeeIntake-line-gfs-line-095jvuls-manage" type="checkbox" aria-label="จัดการ LINE บจก.กู๊ดฟิล์ม · @goodfilm" onchange="IntakePermissions.changeEditorPermission(document, 'line', 'gfs-line-095jvuls', 'manage')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td></tr>
+                  <tr><th scope="row" class="py-2 pr-3 text-left font-medium text-slate-700">ร้านมโหฬารฟิล์ม · @mhl1</th><td class="px-2 text-center"><input id="employeeIntake-line-mhl-line-320opqkc-view" type="checkbox" aria-label="ดู LINE ร้านมโหฬารฟิล์ม · @mhl1" onchange="IntakePermissions.changeEditorPermission(document, 'line', 'mhl-line-320opqkc', 'view')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td><td class="px-2 text-center"><input id="employeeIntake-line-mhl-line-320opqkc-manage" type="checkbox" aria-label="จัดการ LINE ร้านมโหฬารฟิล์ม · @mhl1" onchange="IntakePermissions.changeEditorPermission(document, 'line', 'mhl-line-320opqkc', 'manage')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td></tr>
+                  <tr><th scope="row" class="py-2 pr-3 text-left font-medium text-slate-700">รถยนต์ · @maholan</th><td class="px-2 text-center"><input id="employeeIntake-line-car-line-fkq6145q-view" type="checkbox" aria-label="ดู LINE รถยนต์ · @maholan" onchange="IntakePermissions.changeEditorPermission(document, 'line', 'car-line-fkq6145q', 'view')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td><td class="px-2 text-center"><input id="employeeIntake-line-car-line-fkq6145q-manage" type="checkbox" aria-label="จัดการ LINE รถยนต์ · @maholan" onchange="IntakePermissions.changeEditorPermission(document, 'line', 'car-line-fkq6145q', 'manage')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td></tr>
+                </tbody>
+                <tbody class="divide-y divide-slate-100 border-t border-slate-200">
+                  <tr><th scope="rowgroup" rowspan="3" class="py-3 pr-3 text-left align-top font-semibold text-slate-700">Facebook</th><th scope="row" class="py-2 pr-3 text-left font-medium text-slate-700">FB-GFS</th><td class="px-2 text-center"><input id="employeeIntake-facebook-gfs-fb-125106670932394-view" type="checkbox" aria-label="ดู Facebook FB-GFS" onchange="IntakePermissions.changeEditorPermission(document, 'facebook', 'gfs-fb-125106670932394', 'view')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td><td class="px-2 text-center"><input id="employeeIntake-facebook-gfs-fb-125106670932394-manage" type="checkbox" aria-label="จัดการ Facebook FB-GFS" onchange="IntakePermissions.changeEditorPermission(document, 'facebook', 'gfs-fb-125106670932394', 'manage')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td></tr>
+                  <tr><th scope="row" class="py-2 pr-3 text-left font-medium text-slate-700">FB-MHL</th><td class="px-2 text-center"><input id="employeeIntake-facebook-gfs-fb-101634951180913-view" type="checkbox" aria-label="ดู Facebook FB-MHL" onchange="IntakePermissions.changeEditorPermission(document, 'facebook', 'gfs-fb-101634951180913', 'view')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td><td class="px-2 text-center"><input id="employeeIntake-facebook-gfs-fb-101634951180913-manage" type="checkbox" aria-label="จัดการ Facebook FB-MHL" onchange="IntakePermissions.changeEditorPermission(document, 'facebook', 'gfs-fb-101634951180913', 'manage')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td></tr>
+                  <tr><th scope="row" class="py-2 pr-3 text-left font-medium text-slate-700">FB-CAR</th><td class="px-2 text-center"><input id="employeeIntake-facebook-mhl-fb-109607531869658-view" type="checkbox" aria-label="ดู Facebook FB-CAR" onchange="IntakePermissions.changeEditorPermission(document, 'facebook', 'mhl-fb-109607531869658', 'view')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td><td class="px-2 text-center"><input id="employeeIntake-facebook-mhl-fb-109607531869658-manage" type="checkbox" aria-label="จัดการ Facebook FB-CAR" onchange="IntakePermissions.changeEditorPermission(document, 'facebook', 'mhl-fb-109607531869658', 'manage')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td></tr>
+                </tbody>
+                <tbody class="divide-y divide-slate-100 border-t border-slate-200">
+                  <tr><th scope="rowgroup" rowspan="3" class="py-3 pr-3 text-left align-top font-semibold text-slate-700">Instagram</th><th scope="row" class="py-2 pr-3 text-left font-medium text-slate-700">IG-GFS · @goodfilm.shop</th><td class="px-2 text-center"><input id="employeeIntake-instagram-gfs-ig-17841402497215021-view" type="checkbox" aria-label="ดู Instagram IG-GFS · @goodfilm.shop" onchange="IntakePermissions.changeEditorPermission(document, 'instagram', 'gfs-ig-17841402497215021', 'view')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td><td class="px-2 text-center"><input id="employeeIntake-instagram-gfs-ig-17841402497215021-manage" type="checkbox" aria-label="จัดการ Instagram IG-GFS · @goodfilm.shop" onchange="IntakePermissions.changeEditorPermission(document, 'instagram', 'gfs-ig-17841402497215021', 'manage')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td></tr>
+                  <tr><th scope="row" class="py-2 pr-3 text-left font-medium text-slate-700">IG-MHL · @maholan.film</th><td class="px-2 text-center"><input id="employeeIntake-instagram-mhl-ig-17841421260722221-view" type="checkbox" aria-label="ดู Instagram IG-MHL · @maholan.film" onchange="IntakePermissions.changeEditorPermission(document, 'instagram', 'mhl-ig-17841421260722221', 'view')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td><td class="px-2 text-center"><input id="employeeIntake-instagram-mhl-ig-17841421260722221-manage" type="checkbox" aria-label="จัดการ Instagram IG-MHL · @maholan.film" onchange="IntakePermissions.changeEditorPermission(document, 'instagram', 'mhl-ig-17841421260722221', 'manage')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td></tr>
+                  <tr><th scope="row" class="py-2 pr-3 text-left font-medium text-slate-700">IG-CAR · @mhlcarfilm</th><td class="px-2 text-center"><input id="employeeIntake-instagram-car-ig-17841458662245781-view" type="checkbox" aria-label="ดู Instagram IG-CAR · @mhlcarfilm" onchange="IntakePermissions.changeEditorPermission(document, 'instagram', 'car-ig-17841458662245781', 'view')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td><td class="px-2 text-center"><input id="employeeIntake-instagram-car-ig-17841458662245781-manage" type="checkbox" aria-label="จัดการ Instagram IG-CAR · @mhlcarfilm" onchange="IntakePermissions.changeEditorPermission(document, 'instagram', 'car-ig-17841458662245781', 'manage')" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p id="employeeIntakePermissionsNote" class="mt-3 text-xs leading-5 text-slate-500">เลือกสิทธิ์แยกแต่ละบัญชี · จัดการ: เพิ่มลูกค้าใหม่ เชื่อมลูกค้าเดิม และไม่รับเข้า โดยต้องมีสิทธิ์ดูบัญชีนั้นด้วย</p>
+          </fieldset>
         </div>
         <div>
           <label for="employeeNotes" class="mb-1.5 block text-xs font-semibold text-slate-600">หมายเหตุ</label>
@@ -4489,6 +4653,9 @@
   </div>
 
   <script src="/vendor/supabase/supabase.js"></script>
+  <script src="/intake-accounts.js"></script>
+  <script src="/intake-permissions.js"></script>
+  <script src="/social-media-menu.js"></script>
   <script>
     // State Variables
     let config = {
@@ -4635,6 +4802,10 @@
     let currentAuthUser = null;
     let currentAccessToken = null;
     let hasStartedCrm = false;
+    let crmPermissionRefreshTimer = null;
+    let crmPermissionRefreshPromise = null;
+    let crmPermissionLastCheckedAt = 0;
+    const CRM_PERMISSION_REFRESH_INTERVAL_MS = 60 * 1000;
     const DOCUMENT_TEMPLATE_TYPES = Object.freeze({
       quotation: { label: 'ใบเสนอราคา', title: 'Quotation', numberPrefix: 'Q' },
       invoice: { label: 'ใบแจ้งหนี้', title: 'Invoice', numberPrefix: 'INV' },
@@ -4796,6 +4967,8 @@
       if (typeof resetStorageOverview === 'function') resetStorageOverview();
       if (typeof resetLineIntake === 'function') resetLineIntake();
       if (typeof resetFacebookIntake === 'function') resetFacebookIntake();
+      if (typeof resetInstagramIntake === 'function') resetInstagramIntake();
+      if (typeof resetIntakeReport === 'function') resetIntakeReport();
       crmScopeVersion += 1;
       closeQuotationCasePicker(false);
       leadsRequestId += 1;
@@ -4816,6 +4989,7 @@
       followUpTaskDetailRequestId += 1;
       stopCaseNotificationUpdates();
       stopFollowUpTaskUpdates();
+      if (typeof stopIntakeNotificationUpdates === 'function') stopIntakeNotificationUpdates();
       cancelFollowUpTaskRequest();
       customerLookupRequests = {
         name: customerLookupRequests.name + 1,
@@ -4904,24 +5078,101 @@
 
     function clearCrmAccessState() {
       crmAccessRequestId += 1;
+      stopCrmPermissionUpdates();
+      clearCrmScopedData();
       currentCrmMember = null;
       currentCrmAssignment = null;
       currentAuthUser = null;
       currentAccessToken = null;
       hasStartedCrm = false;
-      clearCrmScopedData();
       syncAnnouncementManagementControls();
+      syncIntakePermissionControls();
     }
 
     function getCrmScopeKey(user = currentAuthUser, membership = currentCrmMember, assignment = currentCrmAssignment) {
       return [
         String(user?.id || '').trim(),
         String(membership?.role || '').trim().toLowerCase(),
+        IntakePermissions.scopeKey(membership),
         String(assignment?.employeeId || '').trim(),
         String(assignment?.salespersonName || '').trim().toLocaleLowerCase('th-TH'),
         assignment?.restricted === true ? 'restricted' : 'unrestricted'
       ].join('|');
     }
+
+    function canViewIntakeChannel(channel, account) {
+      return IntakePermissions.canView(currentCrmMember, channel, account);
+    }
+
+    function canManageIntakeChannel(channel, account) {
+      return IntakePermissions.canManage(currentCrmMember, channel, account);
+    }
+
+    window.canViewIntakeChannel = canViewIntakeChannel;
+    window.canManageIntakeChannel = canManageIntakeChannel;
+
+    function syncIntakePermissionControls() {
+      hideSidebarMenuTooltip();
+      const denied = IntakePermissions.syncNavigation(document, currentCrmMember);
+      if (typeof SocialMediaMenu !== 'undefined') SocialMediaMenu.sync();
+      return denied;
+    }
+
+    function stopCrmPermissionUpdates() {
+      if (crmPermissionRefreshTimer) window.clearInterval(crmPermissionRefreshTimer);
+      crmPermissionRefreshTimer = null;
+      crmPermissionRefreshPromise = null;
+      crmPermissionLastCheckedAt = 0;
+    }
+
+    function startCrmPermissionUpdates() {
+      if (crmPermissionRefreshTimer) return;
+      crmPermissionRefreshTimer = window.setInterval(() => {
+        if (document.visibilityState !== 'hidden') void refreshCrmPermissionScope();
+      }, CRM_PERMISSION_REFRESH_INTERVAL_MS);
+    }
+
+    async function refreshCrmPermissionScope({ force = false } = {}) {
+      if (!supabaseClient || !currentCrmMember || !currentAccessToken) return false;
+      if (crmPermissionRefreshPromise) return crmPermissionRefreshPromise;
+      if (!force && Date.now() - crmPermissionLastCheckedAt < 15 * 1000) return false;
+      const accessToken = currentAccessToken;
+      const accessRequestId = crmAccessRequestId;
+      crmPermissionLastCheckedAt = Date.now();
+      const pending = (async () => {
+        try {
+          const response = await fetch('/api/protected/health', {
+            cache: 'no-store',
+            headers: { Authorization: `Bearer ${accessToken}` },
+            signal: AbortSignal.timeout(15000),
+          });
+          if (accessRequestId !== crmAccessRequestId || accessToken !== currentAccessToken || !currentCrmMember) return false;
+          if (response.status === 401 || response.status === 403) return refreshCrmAccess(accessToken);
+          if (!response.ok) return false;
+          const access = await response.json();
+          if (accessRequestId !== crmAccessRequestId || accessToken !== currentAccessToken || !currentCrmMember) return false;
+          const nextUser = { id: access.userId };
+          if (getCrmScopeKey(nextUser, access.membership, access.assignment) !== getCrmScopeKey()) {
+            return refreshCrmAccess(accessToken);
+          }
+          return true;
+        } catch (error) {
+          // The next check retries temporary network failures; data APIs keep enforcing current permissions.
+          return false;
+        }
+      })();
+      crmPermissionRefreshPromise = pending;
+      try {
+        return await pending;
+      } finally {
+        if (crmPermissionRefreshPromise === pending) crmPermissionRefreshPromise = null;
+      }
+    }
+
+    window.addEventListener('focus', () => void refreshCrmPermissionScope());
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') void refreshCrmPermissionScope();
+    });
 
     function syncSalespersonScopeControls() {
       const restricted = isRestrictedSalesUser();
@@ -5054,6 +5305,9 @@
     }
 
     function describeMagicLinkError(error) {
+      if (error?.code === 'user_not_found' || /signups?\s+not\s+allowed\s+for\s+otp/i.test(error?.message || '')) {
+        return 'ยังไม่มีบัญชีใช้งานสำหรับอีเมลนี้ กรุณาตรวจสอบอีเมล หรือติดต่อผู้ดูแล GOOD CRM ให้เพิ่มบัญชีก่อนขอลิงก์เข้าสู่ระบบ';
+      }
       if (error?.code === 'over_email_send_rate_limit' || /email rate limit/i.test(error?.message || '')) {
         return 'ส่งอีเมลถึงขีดจำกัดชั่วคราว กรุณารอประมาณ 1 ชั่วโมงก่อนขอลิงก์ใหม่';
       }
@@ -5182,6 +5436,11 @@
         : null;
       const previousScopeKey = getCrmScopeKey();
       const nextScopeKey = getCrmScopeKey(nextAuthUser, nextMembership, nextAssignment);
+      const activeIntakePageId = ['line-intake', 'facebook-intake', 'instagram-intake', 'reports']
+        .find(pageId => {
+          const page = document.getElementById(`page-${pageId}`);
+          return page && !page.classList.contains('hidden');
+        });
       if (previousScopeKey !== nextScopeKey && (currentCrmMember || currentAuthUser || currentCrmAssignment)) {
         clearCrmScopedData();
       }
@@ -5189,10 +5448,14 @@
       currentCrmAssignment = nextAssignment;
       currentAuthUser = nextAuthUser;
       currentAccessToken = accessToken;
+      crmPermissionLastCheckedAt = Date.now();
       syncAnnouncementManagementControls();
+      syncIntakePermissionControls();
+      startCrmPermissionUpdates();
       void loadAnnouncementUnreadCount();
       void loadCaseNotificationUnreadCounts();
       startCaseNotificationUpdates();
+      if (typeof startIntakeNotificationUpdates === 'function') startIntakeNotificationUpdates();
       void loadFollowUpTasks({ silent: true });
       startFollowUpTaskUpdates();
       syncSalespersonScopeControls();
@@ -5204,6 +5467,8 @@
       if (!hasStartedCrm) {
         hasStartedCrm = true;
         switchPage('leads-list');
+      } else if (previousScopeKey !== nextScopeKey && activeIntakePageId) {
+        switchPage(IntakePermissions.canAccessPage(currentCrmMember, activeIntakePageId) ? activeIntakePageId : 'leads-list');
       }
       return true;
     }
@@ -5563,6 +5828,10 @@
     // Switch Page
     function switchPage(pageId) {
       if (!requireCrmAccess()) return;
+      if (!IntakePermissions.canAccessPage(currentCrmMember, pageId)) {
+        showToast('คุณไม่มีสิทธิ์เข้าถึงช่องทางนี้');
+        return;
+      }
       closeAnnouncementImageViewer();
       if (document.getElementById('page-create-lead')?.classList.contains('customer-popup-mode')) return;
       closeLeadDetailModal();
@@ -5589,6 +5858,9 @@
         activeBtn.className = "w-full group flex items-center px-3.5 py-2.5 bg-blue-600 text-white rounded-xl shadow-md shadow-blue-200 transition-all duration-200 gap-3 font-semibold relative";
       }
 
+      syncIntakePermissionControls();
+      if (typeof SocialMediaMenu !== 'undefined') SocialMediaMenu.sync(pageId);
+
       // Close mobile drawer if switching page
       if (isMobileSidebarOpen) {
         toggleMobileSidebar();
@@ -5601,8 +5873,16 @@
         fetchLeadsData();
       }
       if (pageId === 'announcements') void loadAnnouncements();
-      if (pageId === 'line-intake') void loadLineIntake(0);
-      if (pageId === 'facebook-intake') void loadFacebookIntake(0);
+      if (pageId === 'line-intake') {
+        if (typeof markIntakeNotificationsRead === 'function') markIntakeNotificationsRead('line');
+        void loadLineIntake(0);
+      }
+      if (pageId === 'facebook-intake') {
+        if (typeof markIntakeNotificationsRead === 'function') markIntakeNotificationsRead('facebook');
+        void loadFacebookIntake(0);
+      }
+      if (pageId === 'instagram-intake') void loadInstagramIntake(0);
+      if (pageId === 'reports') void loadIntakeReport();
       if (pageId === 'cases-list') {
         void fetchCasesData().then((readThroughAt) => {
           if (readThroughAt && isCrmPageVisible('cases-list')) {
@@ -9075,6 +9355,7 @@
       document.getElementById('employeeStatus').value = employee?.status || 'active';
       document.getElementById('employeeLoginName').value = employee?.loginName || '';
       document.getElementById('employeeAccessRole').value = employee?.accessRole || 'sales';
+      IntakePermissions.populateEditor(document, employee?.intakePermissions, employee?.accessRole || 'sales');
       document.getElementById('employeeNotes').value = employee?.notes || '';
       document.getElementById('employeeModalTitle').textContent = employee ? `แก้ไขพนักงาน: ${employee.nickname}` : 'เพิ่มพนักงาน';
       document.getElementById('employeeModalDescription').textContent = employee
@@ -9103,6 +9384,7 @@
         status: value('employeeStatus'),
         loginName: value('employeeLoginName'),
         accessRole: value('employeeAccessRole'),
+        intakePermissions: IntakePermissions.readEditor(document, value('employeeAccessRole')),
         notes: value('employeeNotes')
       };
       if (!payload.nickname) {
@@ -9126,6 +9408,7 @@
         if (!response.ok || !result.success) throw new Error(result.error || 'ไม่สามารถบันทึกข้อมูลพนักงานได้');
         closeEmployeeModal();
         await loadEmployeeDirectory();
+        await refreshCrmPermissionScope({ force: true });
         showSuccessToast(payload.employeeId ? 'แก้ไขข้อมูลพนักงานแล้ว' : 'เพิ่มพนักงานแล้ว');
       } catch (error) {
         showToast(error.message || 'ไม่สามารถบันทึกข้อมูลพนักงานได้');
@@ -18492,7 +18775,22 @@
   </script>
 <script src="/storage.js"></script>
 <script src="/storage-job-view.js"></script>
+<script src="/intake-drawer.js"></script>
+<script src="/intake-list.js"></script>
 <script src="/line-intake.js"></script>
 <script src="/facebook-intake.js"></script>
+<script src="/instagram-intake.js"></script>
+<script src="/intake-reports.js"></script>
+<aside id="intake-notification-panel" class="hidden fixed bottom-5 right-5 z-50 w-80 max-w-[calc(100vw-2.5rem)] rounded-2xl border border-blue-200 bg-white p-4 shadow-xl" aria-label="แจ้งเตือนลีดใหม่">
+  <div class="mb-3 flex items-center justify-between gap-3">
+    <strong class="text-blue-700"><i class="fa-solid fa-bell mr-2" aria-hidden="true"></i>มีลีดใหม่รอคัดเข้า</strong>
+    <button type="button" onclick="dismissIntakeNotifications()" class="rounded-lg px-2 py-1 text-slate-500 hover:bg-slate-100" aria-label="ปิดแจ้งเตือนลีดใหม่">✕</button>
+  </div>
+  <div role="status" aria-live="polite" aria-atomic="true" class="space-y-2">
+    <button id="line-intake-alert" type="button" onclick="openIntakeNotification('line')" class="hidden w-full rounded-xl bg-blue-50 px-3 py-3 text-left text-sm font-semibold text-blue-700 hover:bg-blue-100"></button>
+    <button id="facebook-intake-alert" type="button" onclick="openIntakeNotification('facebook')" class="hidden w-full rounded-xl bg-blue-50 px-3 py-3 text-left text-sm font-semibold text-blue-700 hover:bg-blue-100"></button>
+  </div>
+</aside>
+<script src="/intake-notifications.js"></script>
 </body>
 </html>

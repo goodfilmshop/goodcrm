@@ -1,6 +1,6 @@
-export const PAGES = Object.freeze({'125106670932394':'gfs-fb-125106670932394','101634951180913':'gfs-fb-101634951180913','109607531869658':'mhl-fb-109607531869658'});
+export const PAGES = Object.freeze({'17841402497215021':'gfs-ig-17841402497215021','17841421260722221':'mhl-ig-17841421260722221','17841458662245781':'car-ig-17841458662245781'});
 export function parseEvents(body, now=Date.now()) {
-  if (body?.object !== 'page' || !Array.isArray(body.entry) || body.entry.length > 100) throw new Error('Invalid envelope');
+  if (body?.object !== 'instagram' || !Array.isArray(body.entry) || body.entry.length > 100) throw new Error('Invalid envelope');
   const groups = new Map(); let count=0;
   for (const entry of body.entry) {
     if (!Object.hasOwn(PAGES,entry?.id)) continue;
@@ -22,9 +22,12 @@ export function createHandler({getEnv,persist,enrich=async()=>{},background=()=>
   return async request=>{
     const url=new URL(request.url);
     const secret=getEnv('FACEBOOK_APP_SECRET');
-    const verify=getEnv('FACEBOOK_VERIFY_TOKEN');
-    const enabled=getEnv('FACEBOOK_INTAKE_ENABLED')==='true';
-    if(request.method==='GET' && url.pathname.endsWith('/health')) return reply({configured:Boolean(secret&&verify&&enabled),pages:Object.keys(PAGES)});
+    const verify=getEnv('INSTAGRAM_VERIFY_TOKEN');
+    const enabled=getEnv('INSTAGRAM_INTAKE_ENABLED')==='true';
+    if(request.method==='GET' && url.pathname.endsWith('/health')) {
+      const accounts=Object.keys(PAGES).filter(id=>Boolean(getEnv('INSTAGRAM_PAGE_TOKEN_'+id)));
+      return reply({configured:Boolean(secret&&verify&&enabled&&accounts.length),accounts});
+    }
     if(request.method==='GET') {
       if(!verify || url.searchParams.get('hub.mode')!=='subscribe' || url.searchParams.get('hub.verify_token')!==verify) return reply({error:'Forbidden'},403);
       const challenge=url.searchParams.get('hub.challenge');

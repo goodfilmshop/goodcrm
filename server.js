@@ -6,6 +6,9 @@ const { createClient } = require('@supabase/supabase-js');
 const { getStorageOverview, deleteStorageFile } = require('./storage-overview');
 const { createWebhook, getIntake, resolveIntake } = require('./line-intake');
 const facebookIntake = require('./facebook-intake');
+const instagramIntake = require('./instagram-intake');
+const { getIntakeReport } = require('./intake-reports');
+const { normalizeIntakePermissions, validateIntakePermissions, readIntakePermissions } = require('./intake-permissions');
 const storageBridge = require('./storage-bridge.cjs');
 const {createRelay} = require('./storage-relay.cjs');
 
@@ -324,6 +327,11 @@ async function requireCrmMember(req, res, next) {
     });
   }
 
+  try {
+    membership.intakePermissions = await readIntakePermissions(userClient);
+  } catch (error) {
+    return res.status(error.status || 503).json({ error: error.message, code: error.code });
+  }
   req.crmUser = { id: userId, membership, assignment, client: userClient };
   return next();
 }
@@ -2168,6 +2176,7 @@ function employeeRecord(employee) {
     notes: employee.notes || '',
     loginName: employee.login_name || '',
     accessRole: employee.access_role || 'sales',
+    intakePermissions: normalizeIntakePermissions(employee.intake_permissions),
   };
 }
 
@@ -2201,6 +2210,8 @@ function employeeWritePayload(body, userId) {
     notes: nullableText(notes),
     login_name: nullableText(loginName),
     access_role: accessRole,
+    ...(Object.hasOwn(body, 'intakePermissions')
+      ? { intake_permissions: validateIntakePermissions(body.intakePermissions) } : {}),
     updated_by: userId,
   };
 }
@@ -2209,7 +2220,7 @@ async function getEmployeeDirectory(client, membership) {
   requireEmployeeAdministrator(membership);
   const { data, error } = await client
     .from('crm_employees')
-    .select('id, employee_code, created_at, nickname, full_name, position, phone, email, company, status, notes, login_name, access_role')
+    .select('id, employee_code, created_at, nickname, full_name, position, phone, email, company, status, notes, login_name, access_role, intake_permissions')
     .order('created_at', { ascending: false });
   throwDatabaseError(error);
   return { success: true, employees: (data || []).map(employeeRecord), apiVersion: CRM_API_VERSION };
@@ -2230,7 +2241,7 @@ async function saveEmployee(client, userId, membership, body) {
     const { data, error } = await client
       .from('crm_employees')
       .insert({ ...payload, created_by: userId })
-      .select('id, employee_code, created_at, nickname, full_name, position, phone, email, company, status, notes, login_name, access_role')
+      .select('id, employee_code, created_at, nickname, full_name, position, phone, email, company, status, notes, login_name, access_role, intake_permissions')
       .single();
     throwEmployeeSaveError(error, 'ไม่สามารถเพิ่มข้อมูลพนักงานได้');
     return { success: true, employee: employeeRecord(data), apiVersion: CRM_API_VERSION };
@@ -2240,7 +2251,7 @@ async function saveEmployee(client, userId, membership, body) {
     .from('crm_employees')
     .update(payload)
     .eq('id', employeeId)
-    .select('id, employee_code, created_at, nickname, full_name, position, phone, email, company, status, notes, login_name, access_role')
+    .select('id, employee_code, created_at, nickname, full_name, position, phone, email, company, status, notes, login_name, access_role, intake_permissions')
     .maybeSingle();
   throwEmployeeSaveError(error, 'ไม่สามารถแก้ไขข้อมูลพนักงานได้');
   if (!data) throw new CrmRequestError(404, 'ไม่พบข้อมูลพนักงานที่ต้องการแก้ไข', 'EMPLOYEE_NOT_FOUND');
@@ -4134,6 +4145,14 @@ async function handleCrmRequest(req, res) {
 
   try {
     let payload;
+    if (isGet && action === 'getIntakeReport') {
+      try {
+        payload = await getIntakeReport(req.crmUser.client, req.crmUser.membership, input);
+        return res.set('Cache-Control', 'no-store, private').json(payload);
+      } catch (error) {
+        return res.status(error.status || 400).json({ success: false, error: error.message });
+      }
+    }
     if ((isGet && action === 'getLineIntake') || (!isGet && action === 'resolveLineIntake')) {
       try {
         payload = isGet
@@ -4144,11 +4163,25 @@ async function handleCrmRequest(req, res) {
         return res.status(error.status || 400).json({ success: false, error: error.message });
       }
     }
-    if ((isGet && action === 'getFacebookIntake') || (!isGet && action === 'resolveFacebookIntake')) {
+    if ((isGet && action === 'getInstagramIntake') || (!isGet && ['resolveInstagramIntake', 'refreshInstagramNames'].includes(action))) {
+      try {
+        payload = isGet
+          ? await instagramIntake.getIntake(req.crmUser.client, req.crmUser.membership, input)
+          : action === 'refreshInstagramNames'
+            ? await instagramIntake.refreshNames(req.crmUser.membership, input, req.get('authorization'))
+            : await instagramIntake.resolveIntake(req.crmUser.client, req.crmUser.membership, input);
+        return res.set('Cache-Control', 'no-store, private').json(payload);
+      } catch (error) {
+        return res.status(error.status || 400).json({ success: false, error: error.message });
+      }
+    }
+    if ((isGet && action === 'getFacebookIntake') || (!isGet && ['resolveFacebookIntake', 'refreshFacebookNames'].includes(action))) {
       try {
         payload = isGet
           ? await facebookIntake.getIntake(req.crmUser.client, req.crmUser.membership, input)
-          : await facebookIntake.resolveIntake(req.crmUser.client, req.crmUser.membership, input);
+          : action === 'refreshFacebookNames'
+            ? await facebookIntake.refreshNames(req.crmUser.membership, input, req.get('authorization'))
+            : await facebookIntake.resolveIntake(req.crmUser.client, req.crmUser.membership, input);
         return res.set('Cache-Control', 'no-store, private').json(payload);
       } catch (error) {
         return res.status(error.status || 400).json({ success: false, error: error.message });
@@ -4458,6 +4491,8 @@ if (require.main === module) {
 }
 
 module.exports = {
+  employeeRecord, employeeWritePayload, getEmployeeDirectory, saveEmployee,
+  requireCrmMember,
   announcementRecord, announcementWritePayload, getAnnouncements, setAnnouncementPinned,
   referralSourceRecord, referralSourceWritePayload, getReferralSources, saveReferralSource,
   normalizeInvoiceSnapshot, invoiceRecord, getInvoiceForQuotation, saveInvoice, deleteInvoice,

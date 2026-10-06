@@ -1,3 +1,4 @@
+import { extractLineContactDetails, sanitizeLineContactDetails } from '../_shared/line-contact-details.mjs';
 const ACCOUNT = 'mhl-line-320opqkc';
 const MAX_BYTES = 256 * 1024;
 const reply = (status, data) => new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
@@ -49,7 +50,8 @@ export function createHandler({ getEnv, persist, resolveDestination, enrich = as
       if (body.destination !== destination || !Array.isArray(body.events) || body.events.length > 100) throw new Error();
       events = body.events.filter(e => e?.type === 'message' && e.source?.type === 'user').map(e => {
         if (!/^U[0-9a-f]{32}$/.test(e.source.userId || '') || typeof e.webhookEventId !== 'string' || !e.webhookEventId || e.webhookEventId.length > 128 || !Number.isSafeInteger(e.timestamp) || e.timestamp < 0 || e.timestamp > Date.now()+300000) throw new Error();
-        return {eventId:e.webhookEventId,userId:e.source.userId,at:new Date(e.timestamp).toISOString()};
+        const details = sanitizeLineContactDetails(e.contactDetails);
+        return {eventId:e.webhookEventId,userId:e.source.userId,at:new Date(e.timestamp).toISOString(), ...(Object.keys(details).length ? {details} : {})};
       });
     } catch { return reply(400,{error:'Invalid LINE event'}); }
     if (events.length === 0) return reply(200,{received:true});
