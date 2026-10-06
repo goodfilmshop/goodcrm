@@ -55,6 +55,7 @@
   }
 
   function canAccessPage(member, pageId) {
+    if (pageId === 'settings') return member?.is_active === true && isAdmin(member.role);
     if (pageId === 'reports') return canViewReports(member);
     const channel = channels.find(item => pageId === `${item}-intake`);
     return !channel || canView(member, channel);
@@ -70,7 +71,7 @@
 
   function syncNavigation(document, member) {
     let deniedVisiblePage = false;
-    for (const pageId of [...channels.map(channel => `${channel}-intake`), 'reports']) {
+    for (const pageId of [...channels.map(channel => `${channel}-intake`), 'reports', 'settings']) {
       const allowed = canAccessPage(member, pageId);
       const menu = document.getElementById(`menu-${pageId}`);
       if (menu) {

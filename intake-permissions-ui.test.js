@@ -40,6 +40,8 @@ function fixture() {
   nodes['page-reports'] = element('page-container hidden');
   nodes['menu-overview'] = element('nav-button');
   nodes['page-overview'] = element('page-container');
+  nodes['menu-settings'] = element('nav-button');
+  nodes['page-settings'] = element('page-container hidden');
   const document = {
     getElementById: id => nodes[id] || null,
     querySelectorAll: selector => Object.entries(nodes)
@@ -191,6 +193,89 @@ const scopeFunction = html.slice(html.indexOf('function getCrmScopeKey('), html.
 const permissionCheck = html.slice(html.indexOf('async function refreshCrmPermissionScope('), html.indexOf("window.addEventListener('focus', () => void refreshCrmPermissionScope"));
 const switchPageFunction = html.slice(html.indexOf('function switchPage(pageId)'), html.indexOf('function isEmployeeAdministrator()'));
 
+test('Settings is visible only to active administrators and stays hidden across navigation resets', () => {
+  const { document, nodes } = fixture();
+  const admin = { role: 'admin', is_active: true };
+  assert.equal(permissions.canAccessPage(admin, 'settings'), true);
+  permissions.syncNavigation(document, admin);
+  assert.equal(nodes['menu-settings'].hidden, false);
+  for (const member of [null, { role: 'admin' }, { role: 'admin', is_active: false },
+    { role: 'admin', is_active: 'true' }, ...['manager', 'sales', 'member', 'staff'].map(role => ({
+      role, is_active: true, intakePermissions: permissions.normalize(null, 'admin'),
+    }))]) {
+    assert.equal(permissions.canAccessPage(member, 'settings'), false);
+    nodes['page-settings'].classList.remove('hidden');
+    assert.equal(permissions.syncNavigation(document, member), true);
+    nodes['menu-settings'].className = 'w-full flex';
+    assert.equal(nodes['menu-settings'].hidden, true);
+    assert.equal(nodes['menu-settings'].attributes['aria-hidden'], 'true');
+    assert.equal(nodes['page-settings'].classList.contains('hidden'), true);
+  }
+  assert.match(html, /id="menu-settings" data-intake-permission-menu hidden/);
+});
+
+test('direct Settings navigation and sections reject other roles before loading any directory', () => {
+  const { document, nodes } = fixture();
+  let loads = 0;
+  const messages = [];
+  const context = vm.createContext({ document, IntakePermissions: permissions,
+    currentCrmMember: { role: 'sales', is_active: true }, requireCrmAccess: () => true,
+    closeAnnouncementImageViewer() {}, closeLeadDetailModal() {}, closeCustomerPopup() {},
+    showToast: message => messages.push(message), isMobileSidebarOpen: false,
+    loadEmployeeDirectory: () => { loads++; },
+  });
+  context.syncIntakePermissionControls = () => permissions.syncNavigation(document, context.currentCrmMember);
+  const sectionsFunction = html.slice(html.indexOf('function showSettingsSection(section)'), html.indexOf('function openContactTopicSettings()'));
+  vm.runInContext(switchPageFunction + sectionsFunction, context);
+  for (const role of ['sales', 'manager', 'member']) {
+    context.currentCrmMember = { role, is_active: true };
+    context.switchPage('settings');
+    context.showSettingsSection('employees');
+    assert.equal(loads, 0);
+    assert.equal(nodes['page-overview'].classList.contains('hidden'), false);
+    assert.equal(nodes['page-settings'].classList.contains('hidden'), true);
+  }
+  assert.equal(messages.length, 6);
+  assert.ok(messages.every(message => message.includes('เฉพาะผู้ดูแลระบบ')));
+  context.currentCrmMember = { role: 'admin', is_active: true };
+  context.switchPage('settings');
+  assert.equal(loads, 1);
+  assert.equal(nodes['page-settings'].classList.contains('hidden'), false);
+  assert.equal(nodes['menu-settings'].hidden, false);
+});
+
+test('demotion and sign-out hide Settings editors outside the Settings page', () => {
+  const { document, nodes } = fixture();
+  const modalIds = ['employeeModal', 'contactTopicModal', 'siteTypeModal', 'referralSourceModal', 'productModal'];
+  for (const id of modalIds) nodes[id] = element();
+  const context = vm.createContext({ document, IntakePermissions: permissions,
+    currentCrmMember: { role: 'admin', is_active: true }, hideSidebarMenuTooltip() {},
+  });
+  for (const id of modalIds) context[`close${id[0].toUpperCase()}${id.slice(1)}`] = () => nodes[id].classList.add('hidden');
+  const syncFunction = html.slice(html.indexOf('function syncIntakePermissionControls()'), html.indexOf('function stopCrmPermissionUpdates()'));
+  vm.runInContext(syncFunction, context);
+  context.syncIntakePermissionControls();
+  assert.ok(modalIds.every(id => !nodes[id].classList.contains('hidden')));
+  for (const member of [{ role: 'sales', is_active: true }, null]) {
+    modalIds.forEach(id => nodes[id].classList.remove('hidden'));
+    context.currentCrmMember = member;
+    context.syncIntakePermissionControls();
+    assert.equal(nodes['menu-settings'].hidden, true);
+    assert.ok(modalIds.every(id => nodes[id].classList.contains('hidden')));
+  }
+});
+
+test('non-administrators cannot save global Settings through the legacy helper', () => {
+  const context = vm.createContext({ IntakePermissions: permissions,
+    currentCrmMember: { role: 'sales', is_active: true }, showToast() {},
+    document: { getElementById() { assert.fail('Denied Settings save must not read form values'); } },
+    localStorage: { setItem() { assert.fail('Denied Settings save must not write storage'); } },
+  });
+  const saveFunction = html.slice(html.indexOf('function saveGlobalSettings()'), html.indexOf('// Update Admin UI'));
+  vm.runInContext(saveFunction, context);
+  context.saveGlobalSettings();
+});
+
 test('direct channel navigation rejects denied grants before loading and reapplies menu visibility after resets', () => {
   const { document, nodes } = fixture();
   let lineLoads = 0;
@@ -296,6 +381,16 @@ test('permission refresh uses existing cache resets and leaves a revoked intake 
   assert.equal(await context.refreshCrmAccess(), true);
   assert.equal(cleared, 2);
   assert.deepEqual(pages, ['line-intake']);
+  nodes['page-line-intake'].classList.add('hidden');
+  nodes['page-settings'].classList.remove('hidden');
+  context.currentCrmMember = { role: 'admin', is_active: true };
+  revokedMember = { role: 'sales', is_active: true, intakePermissions: {} };
+  pages.length = 0;
+  assert.equal(await context.refreshCrmAccess(), true);
+  assert.equal(cleared, 3);
+  assert.deepEqual(pages, ['leads-list']);
+  assert.equal(nodes['page-settings'].classList.contains('hidden'), true);
+  assert.equal(nodes['menu-settings'].hidden, true);
 });
 
 test('employee grants are wired into populate/save and all inline scripts parse', () => {

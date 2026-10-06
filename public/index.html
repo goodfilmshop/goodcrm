@@ -2432,7 +2432,7 @@
       </div>
       </div>
       <!-- Menu Item: ตั้งค่าระบบ -->
-      <button onclick="switchPage('settings')" id="menu-settings" class="w-full group flex items-center px-3.5 py-2.5 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-600 hover:bg-white hover:text-blue-600">
+      <button onclick="switchPage('settings')" id="menu-settings" data-intake-permission-menu hidden class="w-full group flex items-center px-3.5 py-2.5 rounded-xl transition-all duration-200 gap-3 font-semibold relative text-slate-600 hover:bg-white hover:text-blue-600">
         <i class="fa-solid fa-sliders text-lg w-6 text-center"></i>
         <span class="sidebar-label whitespace-nowrap">ตั้งค่าระบบ</span>
         <span class="sidebar-tooltip absolute left-16 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 font-normal whitespace-nowrap z-50 shadow-md">ตั้งค่าระบบ</span>
@@ -5114,6 +5114,13 @@
     function syncIntakePermissionControls() {
       hideSidebarMenuTooltip();
       const denied = IntakePermissions.syncNavigation(document, currentCrmMember);
+      if (!IntakePermissions.canAccessPage(currentCrmMember, 'settings')) {
+        closeEmployeeModal();
+        closeContactTopicModal();
+        closeSiteTypeModal();
+        closeReferralSourceModal();
+        closeProductModal();
+      }
       if (typeof SocialMediaMenu !== 'undefined') SocialMediaMenu.sync();
       return denied;
     }
@@ -5436,7 +5443,7 @@
         : null;
       const previousScopeKey = getCrmScopeKey();
       const nextScopeKey = getCrmScopeKey(nextAuthUser, nextMembership, nextAssignment);
-      const activeIntakePageId = ['line-intake', 'facebook-intake', 'instagram-intake', 'reports']
+      const activePermissionPageId = ['line-intake', 'facebook-intake', 'instagram-intake', 'reports', 'settings']
         .find(pageId => {
           const page = document.getElementById(`page-${pageId}`);
           return page && !page.classList.contains('hidden');
@@ -5467,8 +5474,8 @@
       if (!hasStartedCrm) {
         hasStartedCrm = true;
         switchPage('leads-list');
-      } else if (previousScopeKey !== nextScopeKey && activeIntakePageId) {
-        switchPage(IntakePermissions.canAccessPage(currentCrmMember, activeIntakePageId) ? activeIntakePageId : 'leads-list');
+      } else if (previousScopeKey !== nextScopeKey && activePermissionPageId) {
+        switchPage(IntakePermissions.canAccessPage(currentCrmMember, activePermissionPageId) ? activePermissionPageId : 'leads-list');
       }
       return true;
     }
@@ -5829,7 +5836,8 @@
     function switchPage(pageId) {
       if (!requireCrmAccess()) return;
       if (!IntakePermissions.canAccessPage(currentCrmMember, pageId)) {
-        showToast('คุณไม่มีสิทธิ์เข้าถึงช่องทางนี้');
+        syncIntakePermissionControls();
+        showToast(pageId === 'settings' ? 'เฉพาะผู้ดูแลระบบเท่านั้นที่เข้าถึงการตั้งค่าระบบได้' : 'คุณไม่มีสิทธิ์เข้าถึงช่องทางนี้');
         return;
       }
       closeAnnouncementImageViewer();
@@ -9161,6 +9169,11 @@
     }
 
     function showSettingsSection(section) {
+      if (!IntakePermissions.canAccessPage(currentCrmMember, 'settings')) {
+        syncIntakePermissionControls();
+        showToast('เฉพาะผู้ดูแลระบบเท่านั้นที่เข้าถึงการตั้งค่าระบบได้');
+        return;
+      }
       if (!['employees', 'contact-topics', 'site-types', 'referral-sources', 'products', 'storage'].includes(section)) return;
       const sections = ['employees', 'contact-topics', 'site-types', 'referral-sources', 'products', 'storage'];
       sections.forEach(sectionName => {
@@ -17645,6 +17658,10 @@
 
     // Save Settings
     function saveGlobalSettings() {
+      if (!IntakePermissions.canAccessPage(currentCrmMember, 'settings')) {
+        showToast('เฉพาะผู้ดูแลระบบเท่านั้นที่เข้าถึงการตั้งค่าระบบได้');
+        return;
+      }
       const adminVal = document.getElementById("adminNameConfigSetting")?.value.trim() || config.adminName;
       config.adminName = adminVal || "คุณเก็ต";
       
